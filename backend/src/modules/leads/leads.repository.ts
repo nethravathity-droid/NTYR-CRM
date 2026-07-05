@@ -762,7 +762,7 @@ export class LeadsRepository {
       company_id: input.companyId,
       lead_id: input.leadId,
       action: input.action,
-      changes: JSON.stringify(input.changes),
+      changes: input.changes,
       performed_by: input.performedBy,
     });
   }
