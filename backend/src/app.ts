@@ -14,10 +14,17 @@ const app = express();
 app.set("trust proxy", 1);
 
 app.use(helmet());
+const allowedOrigins =
+  env.CORS_ORIGIN === "*"
+    ? true
+    : env.CORS_ORIGIN.split(",").map((origin) => origin.trim());
+
 app.use(
   cors({
-    origin: env.CORS_ORIGIN === "*" ? true : env.CORS_ORIGIN.split(","),
+    origin: allowedOrigins,
     credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   }),
 );
 
