@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import { asyncHandler } from "../../utils/asyncHandler.js";
+import { asyncHandler } from "../../common/utils/asyncHandler.js";
 import type { AuthService } from "./auth.service.js";
 import type {
   changePasswordSchema,
@@ -10,7 +10,9 @@ import type {
 import type { z } from "zod";
 
 type LoginRequest = Request & { validated: z.infer<typeof loginSchema> };
-type RefreshRequest = Request & { validated: z.infer<typeof refreshTokenSchema> };
+type RefreshRequest = Request & {
+  validated: z.infer<typeof refreshTokenSchema>;
+};
 type LogoutRequest = Request & { validated: z.infer<typeof logoutSchema> };
 type ChangePasswordRequest = Request & {
   validated: z.infer<typeof changePasswordSchema>;
@@ -37,15 +39,12 @@ export class AuthController {
   refresh = asyncHandler(async (req: Request, res: Response): Promise<void> => {
     const { body } = (req as RefreshRequest).validated;
 
-    const tokens = await this.authService.refresh(body, {
-      ipAddress: req.ip,
-      userAgent: req.get("user-agent"),
-    });
+    const tokens = await this.authService.refresh(body);
 
     res.status(200).json({
       success: true,
-      message: "Token refreshed successfully",
-      data: { tokens },
+      message: "Access token refreshed successfully",
+      data: tokens,
     });
   });
 
@@ -64,7 +63,7 @@ export class AuthController {
     async (req: Request, res: Response): Promise<void> => {
       const { body } = (req as ChangePasswordRequest).validated;
 
-      if (!req.user) {
+      if (!req.user?.companyId) {
         res.status(401).json({
           success: false,
           message: "Authentication required",
@@ -86,7 +85,7 @@ export class AuthController {
   );
 
   getMe = asyncHandler(async (req: Request, res: Response): Promise<void> => {
-    if (!req.user) {
+    if (!req.user?.companyId) {
       res.status(401).json({
         success: false,
         message: "Authentication required",
@@ -94,7 +93,7 @@ export class AuthController {
       return;
     }
 
-    const user = await this.authService.getCurrentUser(
+    const currentUser = await this.authService.getCurrentUser(
       req.user.id,
       req.user.companyId,
     );
@@ -102,7 +101,7 @@ export class AuthController {
     res.status(200).json({
       success: true,
       message: "User profile retrieved successfully",
-      data: { user },
+      data: currentUser,
     });
   });
 }

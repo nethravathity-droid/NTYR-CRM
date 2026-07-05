@@ -1,6 +1,7 @@
 export type UserStatus = "ACTIVE" | "INACTIVE" | "LOCKED";
 export type CompanyStatus = "TRIAL" | "ACTIVE" | "SUSPENDED" | "EXPIRED";
 export type TokenType = "access" | "refresh";
+export type LoginIdentifierType = "username" | "employee_code";
 
 export interface AccessTokenPayload {
   sub: string;
@@ -43,6 +44,11 @@ export interface AuthTokens {
   expiresIn: number;
 }
 
+export interface AccessTokenResult {
+  accessToken: string;
+  expiresIn: number;
+}
+
 export interface CompanyRecord {
   id: number;
   uuid: string;
@@ -82,7 +88,9 @@ export interface UserAuthRecord {
   company_code: string;
   company_name: string;
   company_status: CompanyStatus;
+  branch_uuid: string;
   branch_name: string;
+  department_uuid: string;
   department_name: string;
   designation_name: string;
 }
@@ -99,21 +107,38 @@ export interface RefreshTokenRecord {
   replaced_by_token_jti: string | null;
 }
 
-export interface UserProfile {
-  id: number;
-  uuid: string;
-  employeeCode: string;
-  username: string;
-  firstName: string;
-  lastName: string | null;
-  displayName: string | null;
-  officialEmail: string | null;
-  mobile: string;
-  profilePhotoUrl: string | null;
-  status: UserStatus;
-  lastLoginAt: Date | null;
-  emailVerified: boolean;
-  mobileVerified: boolean;
+export interface CurrentUserResponse {
+  user: {
+    id: number;
+    uuid: string;
+    employeeCode: string;
+    username: string;
+    firstName: string;
+    lastName: string | null;
+    displayName: string | null;
+    officialEmail: string | null;
+    mobile: string;
+    profilePhotoUrl: string | null;
+    status: UserStatus;
+    lastLoginAt: Date | null;
+    emailVerified: boolean;
+    mobileVerified: boolean;
+  };
+  role: {
+    id: number;
+    code: string;
+    name: string;
+  };
+  branch: {
+    id: number;
+    uuid: string;
+    name: string;
+  };
+  department: {
+    id: number;
+    uuid: string;
+    name: string;
+  };
   company: {
     id: number;
     uuid: string;
@@ -121,28 +146,20 @@ export interface UserProfile {
     name: string;
     status: CompanyStatus;
   };
-  organization: {
-    branchId: number;
-    branchName: string;
-    departmentId: number;
-    departmentName: string;
-    designationId: number;
-    designationName: string;
-  };
-  role: {
-    id: number;
-    code: string;
-    name: string;
-  };
   permissions: string[];
 }
 
 export interface LoginResult {
-  user: UserProfile;
+  user: CurrentUserResponse;
   tokens: AuthTokens;
 }
 
 export interface RequestMetadata {
   ipAddress: string | undefined;
   userAgent: string | undefined;
+}
+
+export interface LoginLookup {
+  identifierType: LoginIdentifierType;
+  identifier: string;
 }

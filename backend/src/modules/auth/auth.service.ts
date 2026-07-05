@@ -5,16 +5,19 @@ import type { Logger } from "winston";
 import { db } from "../../database/knex.js";
 import { logger } from "../../config/logger.js";
 import { env } from "../../config/env.js";
-import { AppError } from "../../middleware/errorHandler.js";
+import { AppError } from "../../common/errors/AppError.js";
 import { AuthRepository } from "./auth.repository.js";
 import type {
   AccessTokenPayload,
+  AccessTokenResult,
   AuthTokens,
+  CompanyRecord,
+  CurrentUserResponse,
+  LoginLookup,
   LoginResult,
   RefreshTokenPayload,
   RequestMetadata,
   UserAuthRecord,
-  UserProfile,
 } from "./auth.types.js";
 import type {
   ChangePasswordInput,
@@ -41,22 +44,20 @@ export class AuthService {
       this.logger.warn("Login failed: company not found", {
         companyCode: input.companyCode,
       });
-      throw new AppError(401, "Invalid company code or credentials");
+      throw new AppError(401, "Invalid credentials");
     }
 
     this.assertCompanyIsActive(company.status);
 
-    const user = await this.authRepository.findUserForLogin(
-      company.id,
-      input.username,
-    );
+    const lookup = this.resolveLoginLookup(input);
+    const user = await this.authRepository.findUserForLogin(company.id, lookup);
 
     if (!user) {
       this.logger.warn("Login failed: user not found", {
         companyId: company.id,
-        username: input.username,
+        identifierType: lookup.identifierType,
       });
-      throw new AppError(401, "Invalid company code or credentials");
+      throw new AppError(401, "Invalid credentials");
     }
 
     await this.assertUserCanAuthenticate(user);
@@ -68,7 +69,7 @@ export class AuthService {
 
     if (!isPasswordValid) {
       await this.handleFailedLogin(user);
-      throw new AppError(401, "Invalid company code or credentials");
+      throw new AppError(401, "Invalid credentials");
     }
 
     const permissions = await this.authRepository.getPermissionsByRoleId(
@@ -79,25 +80,27 @@ export class AuthService {
 
     await this.authRepository.recordSuccessfulLogin(
       user.id,
+      user.company_id,
       metadata.ipAddress,
       metadata.userAgent,
     );
 
-    const profile = this.mapUserToProfile(user, permissions);
+    const profile = this.authRepository.mapToCurrentUserResponse(
+      user,
+      permissions,
+    );
 
     this.logger.info("User logged in successfully", {
       userId: user.id,
       companyId: user.company_id,
       roleCode: user.role_code,
+      loginType: lookup.identifierType,
     });
 
     return { user: profile, tokens };
   }
 
-  async refresh(
-    input: RefreshTokenInput,
-    metadata: RequestMetadata,
-  ): Promise<AuthTokens> {
+  async refresh(input: RefreshTokenInput): Promise<AccessTokenResult> {
     const payload = this.verifyRefreshToken(input.refreshToken);
     const storedToken = await this.authRepository.findRefreshTokenByJti(
       payload.jti,
@@ -134,28 +137,17 @@ export class AuthService {
       user.role_id,
     );
 
-    const newJti = randomUUID();
-    const tokens = this.generateTokens(user, permissions, newJti);
-    const newRefreshExpiry = this.getRefreshTokenExpiryDate();
-
-    await this.authRepository.createRefreshToken({
-      userId: user.id,
-      companyId: user.company_id,
-      tokenJti: newJti,
-      tokenHash: this.hashToken(tokens.refreshToken),
-      expiresAt: newRefreshExpiry,
-      ipAddress: metadata.ipAddress,
-      userAgent: metadata.userAgent,
-    });
-
-    await this.authRepository.revokeRefreshToken(payload.jti, newJti);
+    const accessToken = this.generateAccessToken(user, permissions);
 
     this.logger.info("Access token refreshed", {
       userId: user.id,
       companyId: user.company_id,
     });
 
-    return tokens;
+    return {
+      accessToken,
+      expiresIn: this.getAccessTokenExpirySeconds(),
+    };
   }
 
   async logout(input: LogoutInput): Promise<void> {
@@ -180,7 +172,10 @@ export class AuthService {
     companyId: number,
     input: ChangePasswordInput,
   ): Promise<void> {
-    const currentHash = await this.authRepository.findUserPasswordHash(userId);
+    const currentHash = await this.authRepository.findUserPasswordHash(
+      userId,
+      companyId,
+    );
 
     if (!currentHash) {
       throw new AppError(404, "User not found");
@@ -200,8 +195,12 @@ export class AuthService {
       env.BCRYPT_ROUNDS,
     );
 
-    await this.authRepository.updatePassword(userId, newPasswordHash);
-    await this.authRepository.revokeAllUserRefreshTokens(userId);
+    await this.authRepository.updatePassword(
+      userId,
+      companyId,
+      newPasswordHash,
+    );
+    await this.authRepository.revokeAllUserRefreshTokens(userId, companyId);
 
     this.logger.info("Password changed successfully", {
       userId,
@@ -212,8 +211,8 @@ export class AuthService {
   async getCurrentUser(
     userId: number,
     companyId: number,
-  ): Promise<UserProfile> {
-    const profile = await this.authRepository.findUserProfileById(
+  ): Promise<CurrentUserResponse> {
+    const profile = await this.authRepository.findCurrentUserById(
       userId,
       companyId,
     );
@@ -222,7 +221,7 @@ export class AuthService {
       throw new AppError(404, "User not found");
     }
 
-    if (profile.status !== "ACTIVE") {
+    if (profile.user.status !== "ACTIVE") {
       throw new AppError(403, "User account is not active");
     }
 
@@ -240,7 +239,7 @@ export class AuthService {
         env.JWT_ACCESS_SECRET,
       ) as AccessTokenPayload;
 
-      if (payload.type !== "access") {
+      if (payload.type !== "access" || !payload.companyId) {
         throw new AppError(401, "Invalid access token");
       }
 
@@ -266,32 +265,50 @@ export class AuthService {
     };
   }
 
+  private resolveLoginLookup(input: LoginInput): LoginLookup {
+    if (input.employeeCode) {
+      return {
+        identifierType: "employee_code",
+        identifier: input.employeeCode,
+      };
+    }
+
+    return {
+      identifierType: "username",
+      identifier: input.username!,
+    };
+  }
+
   private async issueTokenPair(
     user: UserAuthRecord,
     permissions: string[],
     metadata: RequestMetadata,
   ): Promise<AuthTokens> {
     const tokenJti = randomUUID();
-    const tokens = this.generateTokens(user, permissions, tokenJti);
+    const accessToken = this.generateAccessToken(user, permissions);
+    const refreshToken = this.generateRefreshToken(user, tokenJti);
 
     await this.authRepository.createRefreshToken({
       userId: user.id,
       companyId: user.company_id,
       tokenJti,
-      tokenHash: this.hashToken(tokens.refreshToken),
+      tokenHash: this.hashToken(refreshToken),
       expiresAt: this.getRefreshTokenExpiryDate(),
       ipAddress: metadata.ipAddress,
       userAgent: metadata.userAgent,
     });
 
-    return tokens;
+    return {
+      accessToken,
+      refreshToken,
+      expiresIn: this.getAccessTokenExpirySeconds(),
+    };
   }
 
-  private generateTokens(
+  private generateAccessToken(
     user: UserAuthRecord,
     permissions: string[],
-    refreshTokenJti: string,
-  ): AuthTokens {
+  ): string {
     const accessPayload: AccessTokenPayload = {
       sub: user.uuid,
       userId: user.id,
@@ -304,27 +321,26 @@ export class AuthService {
       type: "access",
     };
 
+    return jwt.sign(accessPayload, env.JWT_ACCESS_SECRET, {
+      expiresIn: env.JWT_ACCESS_EXPIRES_IN as jwt.SignOptions["expiresIn"],
+    });
+  }
+
+  private generateRefreshToken(
+    user: UserAuthRecord,
+    refreshTokenJti: string,
+  ): string {
     const refreshPayload: RefreshTokenPayload = {
-      sub: user.username,
+      sub: user.uuid,
       userId: user.id,
       companyId: user.company_id,
       jti: refreshTokenJti,
       type: "refresh",
     };
 
-    const accessToken = jwt.sign(accessPayload, env.JWT_ACCESS_SECRET, {
-      expiresIn: env.JWT_ACCESS_EXPIRES_IN as jwt.SignOptions["expiresIn"],
-    });
-
-    const refreshToken = jwt.sign(refreshPayload, env.JWT_REFRESH_SECRET, {
+    return jwt.sign(refreshPayload, env.JWT_REFRESH_SECRET, {
       expiresIn: env.JWT_REFRESH_EXPIRES_IN as jwt.SignOptions["expiresIn"],
     });
-
-    return {
-      accessToken,
-      refreshToken,
-      expiresIn: this.getAccessTokenExpirySeconds(),
-    };
   }
 
   private verifyRefreshToken(token: string): RefreshTokenPayload {
@@ -334,7 +350,7 @@ export class AuthService {
         env.JWT_REFRESH_SECRET,
       ) as RefreshTokenPayload;
 
-      if (payload.type !== "refresh" || !payload.jti) {
+      if (payload.type !== "refresh" || !payload.jti || !payload.companyId) {
         throw new AppError(401, "Invalid refresh token");
       }
 
@@ -377,7 +393,9 @@ export class AuthService {
     }
   }
 
-  private assertCompanyIsActive(status: UserAuthRecord["company_status"]): void {
+  private assertCompanyIsActive(
+    status: UserAuthRecord["company_status"] | CompanyRecord["status"],
+  ): void {
     if (status === "SUSPENDED") {
       throw new AppError(403, "Company account is suspended");
     }
@@ -390,6 +408,7 @@ export class AuthService {
   private async handleFailedLogin(user: UserAuthRecord): Promise<void> {
     const attempts = await this.authRepository.incrementFailedLoginAttempts(
       user.id,
+      user.company_id,
     );
 
     this.logger.warn("Invalid login attempt", {
@@ -402,10 +421,15 @@ export class AuthService {
       const lockedUntil = new Date(
         Date.now() + env.ACCOUNT_LOCK_DURATION_MINUTES * 60 * 1000,
       );
-      await this.authRepository.lockUserAccount(user.id, lockedUntil);
+      await this.authRepository.lockUserAccount(
+        user.id,
+        user.company_id,
+        lockedUntil,
+      );
 
       this.logger.warn("User account locked after failed attempts", {
         userId: user.id,
+        companyId: user.company_id,
         lockedUntil,
       });
     }
@@ -423,37 +447,18 @@ export class AuthService {
   }
 
   private getAccessTokenExpirySeconds(): number {
-    const match = /^(\d+)([smhd])$/.exec(env.JWT_ACCESS_EXPIRES_IN);
-    if (!match) {
-      return 900;
-    }
-
-    const value = Number(match[1]);
-    const unit = match[2];
-
-    switch (unit) {
-      case "s":
-        return value;
-      case "m":
-        return value * 60;
-      case "h":
-        return value * 3600;
-      case "d":
-        return value * 86400;
-      default:
-        return 900;
-    }
+    return this.parseDurationToSeconds(env.JWT_ACCESS_EXPIRES_IN, 900);
   }
 
   private getRefreshTokenExpiryDate(): Date {
-    const seconds = this.parseDurationToSeconds(env.JWT_REFRESH_EXPIRES_IN);
+    const seconds = this.parseDurationToSeconds(env.JWT_REFRESH_EXPIRES_IN, 604800);
     return new Date(Date.now() + seconds * 1000);
   }
 
-  private parseDurationToSeconds(duration: string): number {
+  private parseDurationToSeconds(duration: string, fallback: number): number {
     const match = /^(\d+)([smhd])$/.exec(duration);
     if (!match) {
-      return 7 * 24 * 60 * 60;
+      return fallback;
     }
 
     const value = Number(match[1]);
@@ -469,51 +474,8 @@ export class AuthService {
       case "d":
         return value * 86400;
       default:
-        return 7 * 24 * 60 * 60;
+        return fallback;
     }
-  }
-
-  private mapUserToProfile(
-    user: UserAuthRecord,
-    permissions: string[],
-  ): UserProfile {
-    return {
-      id: user.id,
-      uuid: user.uuid,
-      employeeCode: user.employee_code,
-      username: user.username,
-      firstName: user.first_name,
-      lastName: user.last_name,
-      displayName: user.display_name,
-      officialEmail: user.official_email,
-      mobile: user.mobile,
-      profilePhotoUrl: user.profile_photo_url,
-      status: user.status,
-      lastLoginAt: user.last_login_at,
-      emailVerified: user.email_verified,
-      mobileVerified: user.mobile_verified,
-      company: {
-        id: user.company_id,
-        uuid: user.company_uuid,
-        code: user.company_code,
-        name: user.company_name,
-        status: user.company_status,
-      },
-      organization: {
-        branchId: user.branch_id,
-        branchName: user.branch_name,
-        departmentId: user.department_id,
-        departmentName: user.department_name,
-        designationId: user.designation_id,
-        designationName: user.designation_name,
-      },
-      role: {
-        id: user.role_id,
-        code: user.role_code,
-        name: user.role_name,
-      },
-      permissions,
-    };
   }
 }
 

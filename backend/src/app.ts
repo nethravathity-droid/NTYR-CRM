@@ -5,8 +5,8 @@ import rateLimit from "express-rate-limit";
 import helmet from "helmet";
 import morgan from "morgan";
 import { env } from "./config/env.js";
-import { errorHandler } from "./middleware/errorHandler.js";
-import { notFoundHandler } from "./middleware/notFound.js";
+import { errorHandler } from "./common/middleware/errorHandler.js";
+import { notFoundHandler } from "./common/middleware/notFound.js";
 import routes from "./routes/index.js";
 
 const app = express();

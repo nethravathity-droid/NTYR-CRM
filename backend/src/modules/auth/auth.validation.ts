@@ -12,24 +12,52 @@ const passwordSchema = z
     "Password must contain at least one special character",
   );
 
-export const loginSchema = z.object({
-  body: z.object({
-    companyCode: z
-      .string()
-      .trim()
-      .min(1, "Company code is required")
-      .max(50, "Company code is too long"),
-    username: z
-      .string()
-      .trim()
-      .min(1, "Username is required")
-      .max(100, "Username is too long"),
-    password: z
-      .string()
-      .min(1, "Password is required")
-      .max(128, "Password is too long"),
-  }),
-});
+export const loginSchema = z
+  .object({
+    body: z.object({
+      companyCode: z
+        .string()
+        .trim()
+        .min(1, "Company code is required")
+        .max(50, "Company code is too long"),
+      password: z
+        .string()
+        .min(1, "Password is required")
+        .max(128, "Password is too long"),
+      username: z
+        .string()
+        .trim()
+        .min(1, "Username cannot be empty")
+        .max(100, "Username is too long")
+        .optional(),
+      employeeCode: z
+        .string()
+        .trim()
+        .min(1, "Employee code cannot be empty")
+        .max(20, "Employee code is too long")
+        .optional(),
+    }),
+  })
+  .superRefine((data, ctx) => {
+    const hasUsername = Boolean(data.body.username);
+    const hasEmployeeCode = Boolean(data.body.employeeCode);
+
+    if (!hasUsername && !hasEmployeeCode) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["body", "username"],
+        message: "Either username or employeeCode is required",
+      });
+    }
+
+    if (hasUsername && hasEmployeeCode) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["body", "employeeCode"],
+        message: "Provide either username or employeeCode, not both",
+      });
+    }
+  });
 
 export const refreshTokenSchema = z.object({
   body: z.object({
