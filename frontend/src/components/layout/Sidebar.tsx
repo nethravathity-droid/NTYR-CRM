@@ -20,12 +20,14 @@ const navigation = [
     href: paths.dashboard,
     icon: LayoutDashboard,
     permission: null,
+    disabled: false,
   },
   {
     label: "Companies",
     href: paths.companies.list,
     icon: Building2,
     permission: "companies.view",
+    disabled: false,
   },
   {
     label: "Users",

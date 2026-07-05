@@ -42,13 +42,13 @@ export const companyFormSchema = z.object({
   addressLine2: optionalString,
   city: z.string().trim().min(2, "City is required").max(100),
   state: z.string().trim().min(2, "State is required").max(100),
-  country: z.string().trim().min(2).max(100).default("India"),
+  country: z.string().trim().min(2).max(100),
   postalCode: z.string().trim().min(3, "Postal code is required").max(20),
   logoUrl: optionalString,
   faviconUrl: optionalString,
-  timezone: z.string().trim().default("Asia/Kolkata"),
-  currency: z.string().trim().default("INR"),
-  status: z.enum(["TRIAL", "ACTIVE", "SUSPENDED", "EXPIRED"]).default("TRIAL"),
+  timezone: z.string().trim().min(1).max(50),
+  currency: z.string().trim().min(1).max(10),
+  status: z.enum(["TRIAL", "ACTIVE", "SUSPENDED", "EXPIRED"]),
   trialStartDate: optionalString,
   trialEndDate: optionalString,
   notes: optionalString,
@@ -85,7 +85,7 @@ export const companyDefaultValues: CompanyFormSchema = {
 };
 
 export function mapCompanyToFormValues(
-  company: import("./company.types").CompanyDetail,
+  company: import("../types/company.types").CompanyDetail,
 ): CompanyFormSchema {
   return {
     companyCode: company.companyCode,
