@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
+import { Building2 } from "lucide-react";
 import { CompanyForm } from "@/features/companies/components/CompanyForm";
+import { CompanyPageHeader } from "@/features/companies/components/CompanyPageHeader";
 import { useCreateCompany } from "@/features/companies/hooks/useCompanies";
 import type { CompanyFormSchema } from "@/features/companies/schemas/company.schema";
 import { getApiErrorMessage } from "@/lib/api/client";
@@ -26,19 +26,12 @@ export function CompanyCreatePage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-3">
-        <Button variant="ghost" size="icon" asChild>
-          <Link to={paths.companies.list} aria-label="Back to companies">
-            <ArrowLeft className="h-4 w-4" />
-          </Link>
-        </Button>
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Add Company</h1>
-          <p className="text-muted-foreground">
-            Register a new tenant company on the platform.
-          </p>
-        </div>
-      </div>
+      <CompanyPageHeader
+        icon={Building2}
+        tone="emerald"
+        title="Add Company"
+        description="Register a new tenant company on the platform."
+      />
 
       {error ? (
         <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">

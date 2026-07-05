@@ -9,8 +9,10 @@ import {
   deleteUserSchema,
   getUserSchema,
   listUsersSchema,
+  resetUserPasswordSchema,
   updateUserSchema,
   updateUserStatusSchema,
+  userFormOptionsSchema,
 } from "./users.validation.js";
 
 const usersController = new UsersController(usersService);
@@ -24,6 +26,13 @@ router.get(
   authorize("users.view"),
   validate(listUsersSchema),
   usersController.list,
+);
+
+router.get(
+  "/form-options",
+  authorize("users.view"),
+  validate(userFormOptionsSchema),
+  usersController.getFormOptions,
 );
 
 router.post(
@@ -52,6 +61,13 @@ router.patch(
   authorize("users.update"),
   validate(updateUserStatusSchema),
   usersController.updateStatus,
+);
+
+router.post(
+  "/:uuid/reset-password",
+  authorize("users.update"),
+  validate(resetUserPasswordSchema),
+  usersController.resetPassword,
 );
 
 router.delete(

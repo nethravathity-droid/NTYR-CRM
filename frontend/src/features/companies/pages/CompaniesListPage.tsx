@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
+import { Building2, ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -10,12 +10,15 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Loading } from "@/components/shared/Loading";
+import { CompanyPageHeader } from "@/features/companies/components/CompanyPageHeader";
 import { CompanySearchBar } from "@/features/companies/components/CompanySearchBar";
+import { CompanyStatsRow } from "@/features/companies/components/CompanyStatsRow";
 import { CompanyTable } from "@/features/companies/components/CompanyTable";
 import { DeleteCompanyDialog } from "@/features/companies/components/DeleteCompanyDialog";
 import {
   useCompanies,
   useDeleteCompany,
+  useUpdateCompanyActive,
 } from "@/features/companies/hooks/useCompanies";
 import type {
   CompanyListItem,
@@ -37,6 +40,8 @@ export function CompaniesListPage() {
     null,
   );
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [toggleError, setToggleError] = useState<string | null>(null);
+  const [updatingUuid, setUpdatingUuid] = useState<string | null>(null);
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
@@ -47,20 +52,45 @@ export function CompaniesListPage() {
     return () => window.clearTimeout(timer);
   }, [searchInput]);
 
-  const { data, isLoading, isFetching, error } = useCompanies({
+  const listParams = {
     page,
     limit: 10,
     search: search || undefined,
     status: status || undefined,
+    sortBy: "created_at" as const,
+    sortOrder: "desc" as const,
+  };
+
+  const { data, isLoading, isFetching, error } = useCompanies(listParams);
+  const { data: statsData } = useCompanies({
+    page: 1,
+    limit: 100,
     sortBy: "created_at",
     sortOrder: "desc",
   });
 
   const deleteCompany = useDeleteCompany();
+  const updateActive = useUpdateCompanyActive();
 
   const handleStatusChange = (value: CompanyStatus | "") => {
     setStatus(value);
     setPage(1);
+  };
+
+  const handleToggleActive = async (
+    company: CompanyListItem,
+    isActive: boolean,
+  ) => {
+    setToggleError(null);
+    setUpdatingUuid(company.uuid);
+
+    try {
+      await updateActive.mutateAsync({ uuid: company.uuid, isActive });
+    } catch (toggleErr) {
+      setToggleError(getApiErrorMessage(toggleErr));
+    } finally {
+      setUpdatingUuid(null);
+    }
   };
 
   const handleDelete = async () => {
@@ -83,29 +113,35 @@ export function CompaniesListPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Companies</h1>
-          <p className="text-muted-foreground">
-            Manage tenant companies across the platform.
-          </p>
-        </div>
+      <CompanyPageHeader
+        icon={Building2}
+        tone="indigo"
+        title="Companies"
+        description="Manage tenant companies across the platform."
+        action={
+          canCreate ? (
+            <Button asChild className="bg-indigo-600 hover:bg-indigo-700">
+              <Link to={paths.companies.create}>
+                <Plus className="h-4 w-4" />
+                Add Company
+              </Link>
+            </Button>
+          ) : null
+        }
+      />
 
-        {canCreate ? (
-          <Button asChild>
-            <Link to={paths.companies.create}>
-              <Plus className="h-4 w-4" />
-              Add Company
-            </Link>
-          </Button>
-        ) : null}
-      </div>
+      {statsData ? (
+        <CompanyStatsRow
+          companies={statsData.companies}
+          total={statsData.pagination.total}
+        />
+      ) : null}
 
-      <Card>
+      <Card className="border-0 shadow-sm ring-1 ring-border/60">
         <CardHeader>
           <CardTitle>Company Directory</CardTitle>
           <CardDescription>
-            Search, filter, and manage registered companies.
+            Search, filter, activate, and manage registered companies.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -130,14 +166,24 @@ export function CompaniesListPage() {
             </div>
           ) : null}
 
+          {toggleError ? (
+            <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">
+              {toggleError}
+            </div>
+          ) : null}
+
           {!isLoading && !error ? (
             <>
               <CompanyTable
                 companies={companies}
+                updatingUuid={updatingUuid}
                 onDelete={(company) => {
                   setDeleteError(null);
                   setCompanyToDelete(company);
                 }}
+                onToggleActive={(company, isActive) =>
+                  void handleToggleActive(company, isActive)
+                }
               />
 
               {pagination && pagination.totalPages > 1 ? (

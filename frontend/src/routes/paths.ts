@@ -7,5 +7,11 @@ export const paths = {
     details: (uuid: string) => `/companies/${uuid}`,
     edit: (uuid: string) => `/companies/${uuid}/edit`,
   },
+  employees: {
+    list: "/employees",
+    create: "/employees/new",
+    details: (uuid: string) => `/employees/${uuid}`,
+    edit: (uuid: string) => `/employees/${uuid}/edit`,
+  },
   notFound: "*",
 } as const;

@@ -9,12 +9,15 @@ import type {
   PaginatedUsersResult,
   UpdateUserData,
   UserDetail,
+  UserFormOptions,
 } from "./users.types.js";
 import type {
   CreateUserInput,
   ListUsersQuery,
+  ResetUserPasswordInput,
   UpdateUserInput,
   UpdateUserStatusInput,
+  UserFormOptionsQuery,
 } from "./users.validation.js";
 
 export class UsersService {
@@ -256,6 +259,70 @@ export class UsersService {
       userId: existing.id,
       deletedBy,
     });
+  }
+
+  async resetUserPassword(
+    companyId: number,
+    uuid: string,
+    input: ResetUserPasswordInput,
+    updatedBy: number,
+  ): Promise<void> {
+    const existing = await this.usersRepository.findUserRecordByUuid(
+      companyId,
+      uuid,
+    );
+
+    if (!existing) {
+      throw new AppError(404, "User not found");
+    }
+
+    const passwordHash = await bcrypt.hash(input.password, env.BCRYPT_ROUNDS);
+
+    const updated = await this.usersRepository.resetPassword(
+      companyId,
+      existing.id,
+      passwordHash,
+      updatedBy,
+    );
+
+    if (!updated) {
+      throw new AppError(404, "User not found");
+    }
+
+    this.logger.info("User password reset", {
+      companyId,
+      userId: existing.id,
+      updatedBy,
+    });
+  }
+
+  async getFormOptions(
+    companyId: number,
+    query: UserFormOptionsQuery,
+  ): Promise<UserFormOptions> {
+    if (query.branchId) {
+      await this.assertBranchBelongsToCompany(companyId, query.branchId);
+    }
+
+    const [branches, departments, designations, roles, managers] =
+      await Promise.all([
+        this.usersRepository.listBranchOptions(companyId),
+        this.usersRepository.listDepartmentOptions(companyId, query.branchId),
+        this.usersRepository.listDesignationOptions(companyId),
+        this.usersRepository.listRoleOptions(companyId),
+        this.usersRepository.listManagerOptions(
+          companyId,
+          query.excludeUserId,
+        ),
+      ]);
+
+    return {
+      branches,
+      departments,
+      designations,
+      roles,
+      managers,
+    };
   }
 
   private async validateOrganizationReferences(

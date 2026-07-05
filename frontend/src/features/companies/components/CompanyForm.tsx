@@ -1,7 +1,15 @@
 import type { ReactNode } from "react";
+import type { LucideIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2 } from "lucide-react";
+import {
+  Building2,
+  Loader2,
+  MapPin,
+  Phone,
+  Receipt,
+  Settings2,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,12 +22,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { IconBox, type IconBoxTone } from "@/features/companies/components/IconBox";
 import {
   companyDefaultValues,
   companyFormSchema,
   type CompanyFormSchema,
 } from "@/features/companies/schemas/company.schema";
 import { companyStatusOptions } from "@/features/companies/components/CompanyStatusBadge";
+import { cn } from "@/lib/utils";
 
 interface CompanyFormProps {
   defaultValues?: CompanyFormSchema;
@@ -49,175 +59,173 @@ export function CompanyForm({
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Basic Information</CardTitle>
-          <CardDescription>
-            Company identity and primary contact owner details.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="grid gap-4 md:grid-cols-2">
-          <FormField label="Company Code" error={errors.companyCode?.message}>
-            <Input
-              {...register("companyCode")}
-              placeholder="DEMO"
-              disabled={disableCode}
-            />
-          </FormField>
+      <FormSection
+        icon={Building2}
+        tone="indigo"
+        title="Basic Information"
+        description="Company identity and primary contact owner details."
+      >
+        <FormField label="Company Code" error={errors.companyCode?.message}>
+          <Input
+            {...register("companyCode")}
+            placeholder="DEMO"
+            disabled={disableCode}
+          />
+        </FormField>
 
-          <FormField label="Company Name" error={errors.companyName?.message}>
-            <Input {...register("companyName")} placeholder="Acme Realty" />
-          </FormField>
+        <FormField label="Company Name" error={errors.companyName?.message}>
+          <Input {...register("companyName")} placeholder="Acme Realty" />
+        </FormField>
 
-          <FormField label="Legal Name" error={errors.legalName?.message}>
-            <Input {...register("legalName")} placeholder="Acme Realty Pvt Ltd" />
-          </FormField>
+        <FormField label="Legal Name" error={errors.legalName?.message}>
+          <Input {...register("legalName")} placeholder="Acme Realty Pvt Ltd" />
+        </FormField>
 
-          <FormField label="Owner Name" error={errors.ownerName?.message}>
-            <Input {...register("ownerName")} placeholder="John Doe" />
-          </FormField>
-        </CardContent>
-      </Card>
+        <FormField label="Owner Name" error={errors.ownerName?.message}>
+          <Input {...register("ownerName")} placeholder="John Doe" />
+        </FormField>
+      </FormSection>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Tax & Compliance</CardTitle>
-          <CardDescription>GST, PAN, and RERA registration details.</CardDescription>
-        </CardHeader>
-        <CardContent className="grid gap-4 md:grid-cols-3">
-          <FormField label="GST Number" error={errors.gstNumber?.message}>
-            <Input {...register("gstNumber")} placeholder="22AAAAA0000A1Z5" />
-          </FormField>
+      <FormSection
+        icon={Receipt}
+        tone="amber"
+        title="Tax & Compliance"
+        description="GST, PAN, and RERA registration details."
+        columns="grid-cols-1 md:grid-cols-3"
+      >
+        <FormField label="GST Number" error={errors.gstNumber?.message}>
+          <Input {...register("gstNumber")} placeholder="22AAAAA0000A1Z5" />
+        </FormField>
 
-          <FormField label="PAN Number" error={errors.panNumber?.message}>
-            <Input {...register("panNumber")} placeholder="ABCDE1234F" />
-          </FormField>
+        <FormField label="PAN Number" error={errors.panNumber?.message}>
+          <Input {...register("panNumber")} placeholder="ABCDE1234F" />
+        </FormField>
 
-          <FormField label="RERA Number" error={errors.reraNumber?.message}>
-            <Input {...register("reraNumber")} placeholder="RERA/XX/2024/001" />
-          </FormField>
-        </CardContent>
-      </Card>
+        <FormField label="RERA Number" error={errors.reraNumber?.message}>
+          <Input {...register("reraNumber")} placeholder="RERA/XX/2024/001" />
+        </FormField>
+      </FormSection>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Contact Details</CardTitle>
-          <CardDescription>Primary communication channels.</CardDescription>
-        </CardHeader>
-        <CardContent className="grid gap-4 md:grid-cols-2">
-          <FormField label="Email" error={errors.email?.message}>
-            <Input {...register("email")} type="email" placeholder="info@company.com" />
-          </FormField>
+      <FormSection
+        icon={Phone}
+        tone="emerald"
+        title="Contact Details"
+        description="Primary communication channels."
+      >
+        <FormField label="Email" error={errors.email?.message}>
+          <Input {...register("email")} type="email" placeholder="info@company.com" />
+        </FormField>
 
-          <FormField label="Phone" error={errors.phone?.message}>
-            <Input {...register("phone")} placeholder="+91 9876543210" />
-          </FormField>
+        <FormField label="Phone" error={errors.phone?.message}>
+          <Input {...register("phone")} placeholder="+91 9876543210" />
+        </FormField>
 
-          <FormField label="Alternate Phone" error={errors.alternatePhone?.message}>
-            <Input {...register("alternatePhone")} placeholder="+91 9876543211" />
-          </FormField>
+        <FormField label="Alternate Phone" error={errors.alternatePhone?.message}>
+          <Input {...register("alternatePhone")} placeholder="+91 9876543211" />
+        </FormField>
 
-          <FormField label="Website" error={errors.website?.message}>
-            <Input {...register("website")} placeholder="https://company.com" />
-          </FormField>
-        </CardContent>
-      </Card>
+        <FormField label="Website" error={errors.website?.message}>
+          <Input {...register("website")} placeholder="https://company.com" />
+        </FormField>
+      </FormSection>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Address</CardTitle>
-          <CardDescription>Registered business address.</CardDescription>
-        </CardHeader>
-        <CardContent className="grid gap-4 md:grid-cols-2">
-          <FormField
-            label="Address Line 1"
-            error={errors.addressLine1?.message}
-            className="md:col-span-2"
-          >
-            <Input {...register("addressLine1")} placeholder="Street address" />
-          </FormField>
+      <FormSection
+        icon={MapPin}
+        tone="rose"
+        title="Address"
+        description="Registered business address."
+      >
+        <FormField
+          label="Address Line 1"
+          error={errors.addressLine1?.message}
+          className="md:col-span-2"
+        >
+          <Input {...register("addressLine1")} placeholder="Street address" />
+        </FormField>
 
-          <FormField
-            label="Address Line 2"
-            error={errors.addressLine2?.message}
-            className="md:col-span-2"
-          >
-            <Input {...register("addressLine2")} placeholder="Suite, floor, etc." />
-          </FormField>
+        <FormField
+          label="Address Line 2"
+          error={errors.addressLine2?.message}
+          className="md:col-span-2"
+        >
+          <Input {...register("addressLine2")} placeholder="Suite, floor, etc." />
+        </FormField>
 
-          <FormField label="City" error={errors.city?.message}>
-            <Input {...register("city")} placeholder="Mumbai" />
-          </FormField>
+        <FormField label="City" error={errors.city?.message}>
+          <Input {...register("city")} placeholder="Mumbai" />
+        </FormField>
 
-          <FormField label="State" error={errors.state?.message}>
-            <Input {...register("state")} placeholder="Maharashtra" />
-          </FormField>
+        <FormField label="State" error={errors.state?.message}>
+          <Input {...register("state")} placeholder="Maharashtra" />
+        </FormField>
 
-          <FormField label="Country" error={errors.country?.message}>
-            <Input {...register("country")} placeholder="India" />
-          </FormField>
+        <FormField label="Country" error={errors.country?.message}>
+          <Input {...register("country")} placeholder="India" />
+        </FormField>
 
-          <FormField label="Postal Code" error={errors.postalCode?.message}>
-            <Input {...register("postalCode")} placeholder="400001" />
-          </FormField>
-        </CardContent>
-      </Card>
+        <FormField label="Postal Code" error={errors.postalCode?.message}>
+          <Input {...register("postalCode")} placeholder="400001" />
+        </FormField>
+      </FormSection>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Settings</CardTitle>
-          <CardDescription>Regional preferences, status, and trial period.</CardDescription>
-        </CardHeader>
-        <CardContent className="grid gap-4 md:grid-cols-2">
-          <FormField label="Timezone" error={errors.timezone?.message}>
-            <Input {...register("timezone")} placeholder="Asia/Kolkata" />
-          </FormField>
+      <FormSection
+        icon={Settings2}
+        tone="violet"
+        title="Settings"
+        description="Regional preferences, status, and trial period."
+      >
+        <FormField label="Timezone" error={errors.timezone?.message}>
+          <Input {...register("timezone")} placeholder="Asia/Kolkata" />
+        </FormField>
 
-          <FormField label="Currency" error={errors.currency?.message}>
-            <Input {...register("currency")} placeholder="INR" />
-          </FormField>
+        <FormField label="Currency" error={errors.currency?.message}>
+          <Input {...register("currency")} placeholder="INR" />
+        </FormField>
 
-          <FormField label="Status" error={errors.status?.message}>
-            <Select {...register("status")}>
-              {companyStatusOptions.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </Select>
-          </FormField>
+        <FormField label="Status" error={errors.status?.message}>
+          <Select {...register("status")}>
+            {companyStatusOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </Select>
+        </FormField>
 
-          <div />
+        <div />
 
-          <FormField label="Trial Start Date" error={errors.trialStartDate?.message}>
-            <Input {...register("trialStartDate")} type="date" />
-          </FormField>
+        <FormField label="Trial Start Date" error={errors.trialStartDate?.message}>
+          <Input {...register("trialStartDate")} type="date" />
+        </FormField>
 
-          <FormField label="Trial End Date" error={errors.trialEndDate?.message}>
-            <Input {...register("trialEndDate")} type="date" />
-          </FormField>
+        <FormField label="Trial End Date" error={errors.trialEndDate?.message}>
+          <Input {...register("trialEndDate")} type="date" />
+        </FormField>
 
-          <FormField
-            label="Notes"
-            error={errors.notes?.message}
-            className="md:col-span-2"
-          >
-            <Textarea
-              {...register("notes")}
-              placeholder="Internal notes about this company..."
-              rows={4}
-            />
-          </FormField>
-        </CardContent>
-      </Card>
+        <FormField
+          label="Notes"
+          error={errors.notes?.message}
+          className="md:col-span-2"
+        >
+          <Textarea
+            {...register("notes")}
+            placeholder="Internal notes about this company..."
+            rows={4}
+          />
+        </FormField>
+      </FormSection>
 
-      <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+      <div className="flex flex-col-reverse gap-3 rounded-xl border bg-muted/20 p-4 sm:flex-row sm:justify-end">
         {onCancel ? (
           <Button type="button" variant="outline" onClick={onCancel}>
             Cancel
           </Button>
         ) : null}
-        <Button type="submit" disabled={isSubmitting}>
+        <Button
+          type="submit"
+          disabled={isSubmitting}
+          className="bg-indigo-600 hover:bg-indigo-700"
+        >
           {isSubmitting ? (
             <>
               <Loader2 className="h-4 w-4 animate-spin" />
@@ -229,6 +237,37 @@ export function CompanyForm({
         </Button>
       </div>
     </form>
+  );
+}
+
+function FormSection({
+  icon,
+  tone,
+  title,
+  description,
+  columns = "grid-cols-1 md:grid-cols-2",
+  children,
+}: {
+  icon: LucideIcon;
+  tone: IconBoxTone;
+  title: string;
+  description: string;
+  columns?: string;
+  children: ReactNode;
+}) {
+  return (
+    <Card className="overflow-hidden border-0 shadow-sm ring-1 ring-border/60">
+      <CardHeader className="border-b bg-muted/20">
+        <div className="flex items-start gap-3">
+          <IconBox icon={icon} tone={tone} />
+          <div>
+            <CardTitle>{title}</CardTitle>
+            <CardDescription>{description}</CardDescription>
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent className={cn("grid gap-4 pt-6", columns)}>{children}</CardContent>
+    </Card>
   );
 }
 

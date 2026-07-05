@@ -236,6 +236,29 @@ export class CompaniesRepository {
     return this.findByUuid(updated[0].uuid);
   }
 
+  async updateCompanyActive(
+    companyId: number,
+    isActive: boolean,
+    updatedBy: number,
+  ): Promise<CompanyDetail | null> {
+    const updated = await this.db("companies")
+      .where({ id: companyId })
+      .whereNull("deleted_at")
+      .update({
+        is_active: isActive,
+        status: isActive ? "ACTIVE" : "SUSPENDED",
+        updated_by: updatedBy,
+        updated_at: this.db.fn.now(),
+      })
+      .returning("uuid");
+
+    if (!updated.length) {
+      return null;
+    }
+
+    return this.findByUuid(updated[0].uuid);
+  }
+
   async softDeleteCompany(companyId: number, deletedBy: number): Promise<boolean> {
     const deleted = await this.db("companies")
       .where({ id: companyId })

@@ -167,6 +167,37 @@ export interface PaginatedUsersResult {
   };
 }
 
+export interface LookupOption {
+  id: number;
+  uuid: string;
+  name: string;
+}
+
+export interface DepartmentLookupOption extends LookupOption {
+  branchId: number;
+}
+
+export interface RoleLookupOption extends LookupOption {
+  code: string;
+}
+
+export interface ManagerLookupOption {
+  id: number;
+  uuid: string;
+  employeeCode: string;
+  displayName: string | null;
+  firstName: string;
+  lastName: string | null;
+}
+
+export interface UserFormOptions {
+  branches: LookupOption[];
+  departments: DepartmentLookupOption[];
+  designations: LookupOption[];
+  roles: RoleLookupOption[];
+  managers: ManagerLookupOption[];
+}
+
 export interface OrgEntityCheck {
   id: number;
   company_id: number;

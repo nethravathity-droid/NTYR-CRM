@@ -48,6 +48,13 @@ export const companiesService = {
     return response.data.data.company;
   },
 
+  async updateActive(uuid: string, isActive: boolean): Promise<CompanyDetail> {
+    const response = await apiClient.patch<
+      ApiResponse<{ company: CompanyDetail }>
+    >(`/companies/${uuid}/active`, { isActive });
+    return response.data.data.company;
+  },
+
   async remove(uuid: string): Promise<void> {
     await apiClient.delete(`/companies/${uuid}`);
   },

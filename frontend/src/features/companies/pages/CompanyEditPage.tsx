@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { useNavigate, useParams } from "react-router-dom";
+import { Pencil } from "lucide-react";
 import { Loading } from "@/components/shared/Loading";
 import { CompanyForm } from "@/features/companies/components/CompanyForm";
+import { CompanyPageHeader } from "@/features/companies/components/CompanyPageHeader";
 import {
   useCompany,
   useUpdateCompany,
@@ -49,22 +49,12 @@ export function CompanyEditPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-3">
-        <Button variant="ghost" size="icon" asChild>
-          <Link
-            to={paths.companies.details(company.uuid)}
-            aria-label="Back to company details"
-          >
-            <ArrowLeft className="h-4 w-4" />
-          </Link>
-        </Button>
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Edit Company</h1>
-          <p className="text-muted-foreground">
-            Update details for {company.companyName}.
-          </p>
-        </div>
-      </div>
+      <CompanyPageHeader
+        icon={Pencil}
+        tone="violet"
+        title="Edit Company"
+        description={`Update details for ${company.companyName}.`}
+      />
 
       {submitError ? (
         <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">

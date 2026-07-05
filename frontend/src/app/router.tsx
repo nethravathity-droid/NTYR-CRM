@@ -6,10 +6,15 @@ import { CompaniesListPage } from "@/features/companies/pages/CompaniesListPage"
 import { CompanyCreatePage } from "@/features/companies/pages/CompanyCreatePage";
 import { CompanyDetailsPage } from "@/features/companies/pages/CompanyDetailsPage";
 import { CompanyEditPage } from "@/features/companies/pages/CompanyEditPage";
+import { EmployeeCreatePage } from "@/features/employees/pages/EmployeeCreatePage";
+import { EmployeeDetailsPage } from "@/features/employees/pages/EmployeeDetailsPage";
+import { EmployeeEditPage } from "@/features/employees/pages/EmployeeEditPage";
+import { EmployeesListPage } from "@/features/employees/pages/EmployeesListPage";
 import { DashboardPage } from "@/pages/DashboardPage";
 import { NotFoundPage } from "@/pages/NotFoundPage";
 import { PermissionRoute } from "@/routes/PermissionRoute";
 import { ProtectedRoute } from "@/routes/ProtectedRoute";
+import { SuperAdminRoute } from "@/routes/SuperAdminRoute";
 import { paths } from "@/routes/paths";
 
 export const router = createBrowserRouter([
@@ -38,32 +43,72 @@ export const router = createBrowserRouter([
       {
         path: "companies",
         element: (
-          <PermissionRoute permission="companies.view">
-            <CompaniesListPage />
-          </PermissionRoute>
+          <SuperAdminRoute>
+            <PermissionRoute permission="companies.view">
+              <CompaniesListPage />
+            </PermissionRoute>
+          </SuperAdminRoute>
         ),
       },
       {
         path: "companies/new",
         element: (
-          <PermissionRoute permission="companies.create">
-            <CompanyCreatePage />
-          </PermissionRoute>
+          <SuperAdminRoute>
+            <PermissionRoute permission="companies.create">
+              <CompanyCreatePage />
+            </PermissionRoute>
+          </SuperAdminRoute>
         ),
       },
       {
         path: "companies/:uuid",
         element: (
-          <PermissionRoute permission="companies.view">
-            <CompanyDetailsPage />
-          </PermissionRoute>
+          <SuperAdminRoute>
+            <PermissionRoute permission="companies.view">
+              <CompanyDetailsPage />
+            </PermissionRoute>
+          </SuperAdminRoute>
         ),
       },
       {
         path: "companies/:uuid/edit",
         element: (
-          <PermissionRoute permission="companies.update">
-            <CompanyEditPage />
+          <SuperAdminRoute>
+            <PermissionRoute permission="companies.update">
+              <CompanyEditPage />
+            </PermissionRoute>
+          </SuperAdminRoute>
+        ),
+      },
+      {
+        path: "employees",
+        element: (
+          <PermissionRoute permission="users.view">
+            <EmployeesListPage />
+          </PermissionRoute>
+        ),
+      },
+      {
+        path: "employees/new",
+        element: (
+          <PermissionRoute permission="users.create">
+            <EmployeeCreatePage />
+          </PermissionRoute>
+        ),
+      },
+      {
+        path: "employees/:uuid",
+        element: (
+          <PermissionRoute permission="users.view">
+            <EmployeeDetailsPage />
+          </PermissionRoute>
+        ),
+      },
+      {
+        path: "employees/:uuid/edit",
+        element: (
+          <PermissionRoute permission="users.update">
+            <EmployeeEditPage />
           </PermissionRoute>
         ),
       },

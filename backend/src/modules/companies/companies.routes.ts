@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { authenticate } from "../../common/middleware/authenticate.js";
-import { authorize } from "../../common/middleware/authorize.js";
+import { authorize, authorizeRoles } from "../../common/middleware/authorize.js";
 import { validate } from "../../common/utils/validate.js";
 import { CompaniesController } from "./companies.controller.js";
 import { companiesService } from "./companies.service.js";
@@ -9,6 +9,7 @@ import {
   deleteCompanySchema,
   getCompanySchema,
   listCompaniesSchema,
+  updateCompanyActiveSchema,
   updateCompanySchema,
   updateCompanyStatusSchema,
 } from "./companies.validation.js";
@@ -18,6 +19,7 @@ const companiesController = new CompaniesController(companiesService);
 const router = Router();
 
 router.use(authenticate);
+router.use(authorizeRoles("PLATFORM_SUPER_ADMIN"));
 
 router.get(
   "/",
@@ -52,6 +54,13 @@ router.patch(
   authorize("companies.update"),
   validate(updateCompanyStatusSchema),
   companiesController.updateStatus,
+);
+
+router.patch(
+  "/:uuid/active",
+  authorize("companies.update"),
+  validate(updateCompanyActiveSchema),
+  companiesController.updateActive,
 );
 
 router.delete(

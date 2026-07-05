@@ -439,6 +439,91 @@ export class UsersRepository {
     return Boolean(existing);
   }
 
+  async resetPassword(
+    companyId: number,
+    userId: number,
+    passwordHash: string,
+    updatedBy: number,
+  ): Promise<boolean> {
+    const updated = await this.db("users")
+      .where({ id: userId, company_id: companyId })
+      .whereNull("deleted_at")
+      .update({
+        password_hash: passwordHash,
+        password_changed_at: this.db.fn.now(),
+        failed_login_attempts: 0,
+        account_locked_until: null,
+        updated_by: updatedBy,
+        updated_at: this.db.fn.now(),
+      });
+
+    return updated > 0;
+  }
+
+  async listBranchOptions(companyId: number) {
+    return this.db("branches")
+      .select("id", "uuid", "branch_name as name")
+      .where({ company_id: companyId })
+      .whereNull("deleted_at")
+      .orderBy("branch_name", "asc");
+  }
+
+  async listDepartmentOptions(companyId: number, branchId?: number) {
+    const query = this.db("departments")
+      .select(
+        "id",
+        "uuid",
+        "department_name as name",
+        "branch_id as branchId",
+      )
+      .where({ company_id: companyId })
+      .whereNull("deleted_at")
+      .orderBy("department_name", "asc");
+
+    if (branchId) {
+      query.where("branch_id", branchId);
+    }
+
+    return query;
+  }
+
+  async listDesignationOptions(companyId: number) {
+    return this.db("designations")
+      .select("id", "uuid", "designation_name as name")
+      .where({ company_id: companyId })
+      .whereNull("deleted_at")
+      .orderBy("designation_name", "asc");
+  }
+
+  async listRoleOptions(companyId: number) {
+    return this.db("roles")
+      .select("id", "uuid", "role_code as code", "role_name as name")
+      .where({ company_id: companyId })
+      .whereNull("deleted_at")
+      .orderBy("role_name", "asc");
+  }
+
+  async listManagerOptions(companyId: number, excludeUserId?: number) {
+    const query = this.db("users")
+      .select(
+        "id",
+        "uuid",
+        "employee_code as employeeCode",
+        "display_name as displayName",
+        "first_name as firstName",
+        "last_name as lastName",
+      )
+      .where({ company_id: companyId, status: "ACTIVE" })
+      .whereNull("deleted_at")
+      .orderBy("first_name", "asc");
+
+    if (excludeUserId) {
+      query.whereNot("id", excludeUserId);
+    }
+
+    return query;
+  }
+
   private mapToListItem(row: Record<string, unknown>): UserListItem {
     return {
       id: row.id as number,

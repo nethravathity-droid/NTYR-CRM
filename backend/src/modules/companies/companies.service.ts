@@ -7,6 +7,7 @@ import type { CompanyDetail, PaginatedCompaniesResult } from "./companies.types.
 import type {
   CreateCompanyInput,
   ListCompaniesQuery,
+  UpdateCompanyActiveInput,
   UpdateCompanyInput,
   UpdateCompanyStatusInput,
 } from "./companies.validation.js";
@@ -122,6 +123,38 @@ export class CompaniesService {
     this.logger.info("Company status updated", {
       companyId: company.id,
       status: input.status,
+      updatedBy,
+    });
+
+    return company;
+  }
+
+  async updateCompanyActive(
+    uuid: string,
+    input: UpdateCompanyActiveInput,
+    updatedBy: number,
+  ): Promise<CompanyDetail> {
+    const existing = await this.companiesRepository.findRecordByUuid(uuid);
+
+    if (!existing) {
+      throw new AppError(404, "Company not found");
+    }
+
+    this.assertProtectedCompany(existing.company_code, "activate or deactivate");
+
+    const company = await this.companiesRepository.updateCompanyActive(
+      existing.id,
+      input.isActive,
+      updatedBy,
+    );
+
+    if (!company) {
+      throw new AppError(404, "Company not found");
+    }
+
+    this.logger.info("Company active state updated", {
+      companyId: company.id,
+      isActive: input.isActive,
       updatedBy,
     });
 

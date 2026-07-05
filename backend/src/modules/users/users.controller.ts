@@ -1,4 +1,5 @@
 import type { Request, Response } from "express";
+import type { z } from "zod";
 import { asyncHandler } from "../../common/utils/asyncHandler.js";
 import type { UsersService } from "./users.service.js";
 import type {
@@ -6,10 +7,11 @@ import type {
   deleteUserSchema,
   getUserSchema,
   listUsersSchema,
+  resetUserPasswordSchema,
   updateUserSchema,
   updateUserStatusSchema,
+  userFormOptionsSchema,
 } from "./users.validation.js";
-import type { z } from "zod";
 
 type ListUsersRequest = Request & {
   validated: z.infer<typeof listUsersSchema>;
@@ -23,6 +25,12 @@ type UpdateUserRequest = Request & {
 };
 type UpdateUserStatusRequest = Request & {
   validated: z.infer<typeof updateUserStatusSchema>;
+};
+type ResetUserPasswordRequest = Request & {
+  validated: z.infer<typeof resetUserPasswordSchema>;
+};
+type UserFormOptionsRequest = Request & {
+  validated: z.infer<typeof userFormOptionsSchema>;
 };
 type DeleteUserRequest = Request & {
   validated: z.infer<typeof deleteUserSchema>;
@@ -42,6 +50,23 @@ export class UsersController {
       data: result,
     });
   });
+
+  getFormOptions = asyncHandler(
+    async (req: Request, res: Response): Promise<void> => {
+      const { query } = (req as UserFormOptionsRequest).validated;
+
+      const options = await this.usersService.getFormOptions(
+        req.user!.companyId,
+        query,
+      );
+
+      res.status(200).json({
+        success: true,
+        message: "User form options retrieved successfully",
+        data: options,
+      });
+    },
+  );
 
   getByUuid = asyncHandler(
     async (req: Request, res: Response): Promise<void> => {
@@ -108,6 +133,24 @@ export class UsersController {
         success: true,
         message: "User status updated successfully",
         data: { user },
+      });
+    },
+  );
+
+  resetPassword = asyncHandler(
+    async (req: Request, res: Response): Promise<void> => {
+      const { params, body } = (req as ResetUserPasswordRequest).validated;
+
+      await this.usersService.resetUserPassword(
+        req.user!.companyId,
+        params.uuid,
+        body,
+        req.user!.id,
+      );
+
+      res.status(200).json({
+        success: true,
+        message: "Password reset successfully",
       });
     },
   );

@@ -79,6 +79,12 @@ export const updateCompanyStatusSchema = uuidParamSchema.extend({
   }),
 });
 
+export const updateCompanyActiveSchema = uuidParamSchema.extend({
+  body: z.object({
+    isActive: z.boolean(),
+  }),
+});
+
 export const getCompanySchema = uuidParamSchema;
 export const deleteCompanySchema = uuidParamSchema;
 
@@ -87,4 +93,7 @@ export type CreateCompanyInput = z.infer<typeof createCompanySchema>["body"];
 export type UpdateCompanyInput = z.infer<typeof updateCompanySchema>["body"];
 export type UpdateCompanyStatusInput = z.infer<
   typeof updateCompanyStatusSchema
+>["body"];
+export type UpdateCompanyActiveInput = z.infer<
+  typeof updateCompanyActiveSchema
 >["body"];

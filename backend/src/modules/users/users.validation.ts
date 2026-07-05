@@ -114,9 +114,28 @@ export const updateUserStatusSchema = uuidParamSchema.extend({
 export const getUserSchema = uuidParamSchema;
 export const deleteUserSchema = uuidParamSchema;
 
+export const resetUserPasswordSchema = uuidParamSchema.extend({
+  body: z.object({
+    password: passwordSchema,
+  }),
+});
+
+export const userFormOptionsSchema = z.object({
+  query: z.object({
+    branchId: z.coerce.number().int().positive().optional(),
+    excludeUserId: z.coerce.number().int().positive().optional(),
+  }),
+});
+
 export type ListUsersQuery = z.infer<typeof listUsersSchema>["query"];
 export type CreateUserInput = z.infer<typeof createUserSchema>["body"];
 export type UpdateUserInput = z.infer<typeof updateUserSchema>["body"];
 export type UpdateUserStatusInput = z.infer<
   typeof updateUserStatusSchema
 >["body"];
+export type ResetUserPasswordInput = z.infer<
+  typeof resetUserPasswordSchema
+>["body"];
+export type UserFormOptionsQuery = z.infer<
+  typeof userFormOptionsSchema
+>["query"];

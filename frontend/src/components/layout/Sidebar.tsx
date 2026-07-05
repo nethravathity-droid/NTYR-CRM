@@ -11,10 +11,19 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { env } from "@/config/env";
+import { useAuth } from "@/features/auth/hooks/useAuth";
 import { usePermissions } from "@/hooks/usePermissions";
 import { paths } from "@/routes/paths";
 
-const navigation = [
+type NavItem = {
+  label: string;
+  href: string;
+  icon: typeof LayoutDashboard;
+  permission: string | null;
+  disabled: boolean;
+};
+
+const navigation: NavItem[] = [
   {
     label: "Dashboard",
     href: paths.dashboard,
@@ -31,10 +40,10 @@ const navigation = [
   },
   {
     label: "Users",
-    href: "#",
+    href: paths.employees.list,
     icon: Users,
     permission: "users.view",
-    disabled: true,
+    disabled: false,
   },
   {
     label: "Leads",
@@ -78,21 +87,27 @@ const navigation = [
     permission: null,
     disabled: true,
   },
-] as const;
+];
 
 export function Sidebar() {
+  const { user } = useAuth();
   const { hasPermission } = usePermissions();
+  const isSuperAdmin = user?.role.code === "PLATFORM_SUPER_ADMIN";
 
   const visibleNavigation = navigation.filter((item) => {
     if (item.disabled) {
       return false;
     }
 
-    if (!item.permission) {
-      return true;
+    if (item.label === "Companies") {
+      return isSuperAdmin && hasPermission("companies.view");
     }
 
-    return hasPermission(item.permission);
+    if (item.permission) {
+      return hasPermission(item.permission);
+    }
+
+    return true;
   });
 
   const disabledNavigation = navigation.filter((item) => item.disabled);

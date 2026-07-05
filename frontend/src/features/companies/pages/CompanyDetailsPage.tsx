@@ -3,11 +3,13 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import {
   ArrowLeft,
   Building2,
+  CalendarDays,
   Globe,
   Mail,
   MapPin,
   Pencil,
   Phone,
+  Receipt,
   Trash2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -18,19 +20,24 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Loading } from "@/components/shared/Loading";
+import { CompanyActiveSwitch } from "@/features/companies/components/CompanyActiveSwitch";
 import { CompanyStatusBadge } from "@/features/companies/components/CompanyStatusBadge";
 import { CompanyStatusSelect } from "@/features/companies/components/CompanyStatusSelect";
 import { DeleteCompanyDialog } from "@/features/companies/components/DeleteCompanyDialog";
+import { IconBox } from "@/features/companies/components/IconBox";
 import {
   useCompany,
   useDeleteCompany,
+  useUpdateCompanyActive,
   useUpdateCompanyStatus,
 } from "@/features/companies/hooks/useCompanies";
 import type { CompanyStatus } from "@/features/companies/types/company.types";
 import { usePermissions } from "@/hooks/usePermissions";
 import { getApiErrorMessage } from "@/lib/api/client";
 import { paths } from "@/routes/paths";
+import { cn } from "@/lib/utils";
 
 function DetailItem({
   label,
@@ -40,11 +47,38 @@ function DetailItem({
   value: string | null | undefined;
 }) {
   return (
-    <div>
-      <p className="text-xs uppercase tracking-wide text-muted-foreground">
+    <div className="rounded-lg bg-muted/30 p-3">
+      <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
         {label}
       </p>
-      <p className="mt-1 text-sm font-medium">{value || "—"}</p>
+      <p className="mt-1 text-sm font-semibold">{value || "—"}</p>
+    </div>
+  );
+}
+
+function ContactRow({
+  icon: Icon,
+  value,
+  href,
+  tone,
+}: {
+  icon: typeof Mail;
+  value: string;
+  href?: string;
+  tone: "blue" | "emerald" | "violet" | "cyan";
+}) {
+  const content = href ? (
+    <a href={href} target="_blank" rel="noreferrer" className="hover:underline">
+      {value}
+    </a>
+  ) : (
+    value
+  );
+
+  return (
+    <div className="flex items-center gap-3 rounded-lg border bg-background/80 p-3">
+      <IconBox icon={Icon} tone={tone} size="sm" />
+      <span className="text-sm font-medium">{content}</span>
     </div>
   );
 }
@@ -58,6 +92,7 @@ export function CompanyDetailsPage() {
 
   const { data: company, isLoading, error } = useCompany(uuid);
   const updateStatus = useUpdateCompanyStatus();
+  const updateActive = useUpdateCompanyActive();
   const deleteCompany = useDeleteCompany();
 
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -76,6 +111,20 @@ export function CompanyDetailsPage() {
       await updateStatus.mutateAsync({ uuid, status });
     } catch (statusError) {
       setActionError(getApiErrorMessage(statusError));
+    }
+  };
+
+  const handleActiveChange = async (isActive: boolean) => {
+    if (!uuid || !company || company.isActive === isActive) {
+      return;
+    }
+
+    setActionError(null);
+
+    try {
+      await updateActive.mutateAsync({ uuid, isActive });
+    } catch (activeError) {
+      setActionError(getApiErrorMessage(activeError));
     }
   };
 
@@ -106,45 +155,81 @@ export function CompanyDetailsPage() {
     );
   }
 
+  const initials = company.companyName
+    .split(" ")
+    .map((part) => part[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-        <div className="flex items-start gap-3">
-          <Button variant="ghost" size="icon" asChild>
-            <Link to={paths.companies.list} aria-label="Back to companies">
-              <ArrowLeft className="h-4 w-4" />
-            </Link>
-          </Button>
-
-          <div>
-            <div className="flex flex-wrap items-center gap-3">
-              <h1 className="text-3xl font-bold tracking-tight">
-                {company.companyName}
-              </h1>
-              <CompanyStatusBadge status={company.status} />
-            </div>
-            <p className="mt-1 text-muted-foreground">
-              {company.companyCode} · Owned by {company.ownerName}
-            </p>
-          </div>
-        </div>
-
-        <div className="flex flex-wrap gap-2">
-          {canUpdate ? (
-            <Button variant="outline" asChild>
-              <Link to={paths.companies.edit(company.uuid)}>
-                <Pencil className="h-4 w-4" />
-                Edit
+      <div className="overflow-hidden rounded-2xl border bg-gradient-to-br from-indigo-600 via-violet-600 to-cyan-600 p-6 text-white shadow-lg">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+          <div className="flex items-start gap-4">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-white hover:bg-white/10"
+              asChild
+            >
+              <Link to={paths.companies.list} aria-label="Back to companies">
+                <ArrowLeft className="h-4 w-4" />
               </Link>
             </Button>
-          ) : null}
 
-          {canDelete && !isPlatformCompany ? (
-            <Button variant="destructive" onClick={() => setShowDeleteDialog(true)}>
-              <Trash2 className="h-4 w-4" />
-              Delete
-            </Button>
-          ) : null}
+            <div className="flex items-start gap-4">
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/15 text-lg font-bold backdrop-blur">
+                {initials}
+              </div>
+              <div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <h1 className="text-3xl font-bold tracking-tight">
+                    {company.companyName}
+                  </h1>
+                  <CompanyStatusBadge status={company.status} />
+                  <Badge
+                    variant="outline"
+                    className={cn(
+                      "border-white/30 bg-white/10 text-white",
+                      !company.isActive && "bg-rose-500/20",
+                    )}
+                  >
+                    {company.isActive ? "Access Enabled" : "Access Disabled"}
+                  </Badge>
+                </div>
+                <p className="mt-1 text-indigo-100">
+                  {company.companyCode} · Owned by {company.ownerName}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            {canUpdate ? (
+              <Button
+                variant="secondary"
+                className="bg-white text-indigo-700 hover:bg-indigo-50"
+                asChild
+              >
+                <Link to={paths.companies.edit(company.uuid)}>
+                  <Pencil className="h-4 w-4" />
+                  Edit
+                </Link>
+              </Button>
+            ) : null}
+
+            {canDelete && !isPlatformCompany ? (
+              <Button
+                variant="destructive"
+                className="bg-rose-600 hover:bg-rose-700"
+                onClick={() => setShowDeleteDialog(true)}
+              >
+                <Trash2 className="h-4 w-4" />
+                Delete
+              </Button>
+            ) : null}
+          </div>
         </div>
       </div>
 
@@ -155,15 +240,19 @@ export function CompanyDetailsPage() {
       ) : null}
 
       <div className="grid gap-4 lg:grid-cols-3">
-        <Card className="lg:col-span-2">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Building2 className="h-5 w-5" />
-              Company Overview
-            </CardTitle>
-            <CardDescription>Core business and compliance information.</CardDescription>
+        <Card className="border-0 shadow-sm ring-1 ring-border/60 lg:col-span-2">
+          <CardHeader className="border-b bg-muted/20">
+            <div className="flex items-center gap-3">
+              <IconBox icon={Building2} tone="indigo" />
+              <div>
+                <CardTitle>Company Overview</CardTitle>
+                <CardDescription>
+                  Core business and compliance information.
+                </CardDescription>
+              </div>
+            </div>
           </CardHeader>
-          <CardContent className="grid gap-6 sm:grid-cols-2">
+          <CardContent className="grid gap-4 pt-6 sm:grid-cols-2">
             <DetailItem label="Company Code" value={company.companyCode} />
             <DetailItem label="Legal Name" value={company.legalName} />
             <DetailItem label="Owner" value={company.ownerName} />
@@ -187,94 +276,102 @@ export function CompanyDetailsPage() {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Status</CardTitle>
-            <CardDescription>Control tenant access and lifecycle.</CardDescription>
+        <Card className="border-0 shadow-sm ring-1 ring-border/60">
+          <CardHeader className="border-b bg-muted/20">
+            <div className="flex items-center gap-3">
+              <IconBox icon={CalendarDays} tone="amber" />
+              <div>
+                <CardTitle>Status & Access</CardTitle>
+                <CardDescription>Control tenant lifecycle.</CardDescription>
+              </div>
+            </div>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-5 pt-6">
             {canUpdate ? (
-              <CompanyStatusSelect
-                value={company.status}
-                disabled={isPlatformCompany}
-                isUpdating={updateStatus.isPending}
-                onChange={(status) => void handleStatusChange(status)}
-              />
-            ) : (
-              <CompanyStatusBadge status={company.status} />
-            )}
+              <>
+                <CompanyStatusSelect
+                  value={company.status}
+                  disabled={isPlatformCompany}
+                  isUpdating={updateStatus.isPending}
+                  onChange={(status) => void handleStatusChange(status)}
+                />
 
-            <DetailItem
-              label="Active Flag"
-              value={company.isActive ? "Yes" : "No"}
-            />
+                <CompanyActiveSwitch
+                  checked={company.isActive}
+                  disabled={isPlatformCompany}
+                  isUpdating={updateActive.isPending}
+                  onCheckedChange={(isActive) => void handleActiveChange(isActive)}
+                />
+              </>
+            ) : (
+              <>
+                <CompanyStatusBadge status={company.status} />
+                <DetailItem
+                  label="Active Flag"
+                  value={company.isActive ? "Yes" : "No"}
+                />
+              </>
+            )}
           </CardContent>
         </Card>
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Phone className="h-5 w-5" />
-              Contact
-            </CardTitle>
+        <Card className="border-0 shadow-sm ring-1 ring-border/60">
+          <CardHeader className="border-b bg-muted/20">
+            <div className="flex items-center gap-3">
+              <IconBox icon={Phone} tone="emerald" />
+              <CardTitle>Contact</CardTitle>
+            </div>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center gap-3">
-              <Mail className="h-4 w-4 text-muted-foreground" />
-              <span>{company.email}</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <Phone className="h-4 w-4 text-muted-foreground" />
-              <span>{company.phone}</span>
-            </div>
+          <CardContent className="space-y-3 pt-6">
+            <ContactRow icon={Mail} value={company.email} tone="blue" />
+            <ContactRow icon={Phone} value={company.phone} tone="emerald" />
             {company.alternatePhone ? (
-              <div className="flex items-center gap-3">
-                <Phone className="h-4 w-4 text-muted-foreground" />
-                <span>{company.alternatePhone}</span>
-              </div>
+              <ContactRow
+                icon={Phone}
+                value={company.alternatePhone}
+                tone="violet"
+              />
             ) : null}
             {company.website ? (
-              <div className="flex items-center gap-3">
-                <Globe className="h-4 w-4 text-muted-foreground" />
-                <a
-                  href={company.website}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-primary hover:underline"
-                >
-                  {company.website}
-                </a>
-              </div>
+              <ContactRow
+                icon={Globe}
+                value={company.website}
+                href={company.website}
+                tone="cyan"
+              />
             ) : null}
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <MapPin className="h-5 w-5" />
-              Address
-            </CardTitle>
+        <Card className="border-0 shadow-sm ring-1 ring-border/60">
+          <CardHeader className="border-b bg-muted/20">
+            <div className="flex items-center gap-3">
+              <IconBox icon={MapPin} tone="rose" />
+              <CardTitle>Address</CardTitle>
+            </div>
           </CardHeader>
-          <CardContent className="space-y-2 text-sm">
-            <p>{company.addressLine1}</p>
+          <CardContent className="space-y-2 pt-6 text-sm">
+            <p className="font-medium">{company.addressLine1}</p>
             {company.addressLine2 ? <p>{company.addressLine2}</p> : null}
-            <p>
+            <p className="text-muted-foreground">
               {company.city}, {company.state} {company.postalCode}
             </p>
-            <p>{company.country}</p>
+            <p className="text-muted-foreground">{company.country}</p>
           </CardContent>
         </Card>
       </div>
 
       {company.notes ? (
-        <Card>
-          <CardHeader>
-            <CardTitle>Notes</CardTitle>
+        <Card className="border-0 shadow-sm ring-1 ring-border/60">
+          <CardHeader className="border-b bg-muted/20">
+            <div className="flex items-center gap-3">
+              <IconBox icon={Receipt} tone="violet" />
+              <CardTitle>Notes</CardTitle>
+            </div>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-6">
             <p className="whitespace-pre-wrap text-sm text-muted-foreground">
               {company.notes}
             </p>

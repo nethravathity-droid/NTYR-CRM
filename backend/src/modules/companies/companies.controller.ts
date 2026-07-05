@@ -7,6 +7,7 @@ import type {
   deleteCompanySchema,
   getCompanySchema,
   listCompaniesSchema,
+  updateCompanyActiveSchema,
   updateCompanySchema,
   updateCompanyStatusSchema,
 } from "./companies.validation.js";
@@ -25,6 +26,9 @@ type UpdateCompanyRequest = Request & {
 };
 type UpdateCompanyStatusRequest = Request & {
   validated: z.infer<typeof updateCompanyStatusSchema>;
+};
+type UpdateCompanyActiveRequest = Request & {
+  validated: z.infer<typeof updateCompanyActiveSchema>;
 };
 type DeleteCompanyRequest = Request & {
   validated: z.infer<typeof deleteCompanySchema>;
@@ -103,6 +107,24 @@ export class CompaniesController {
       res.status(200).json({
         success: true,
         message: "Company status updated successfully",
+        data: { company },
+      });
+    },
+  );
+
+  updateActive = asyncHandler(
+    async (req: Request, res: Response): Promise<void> => {
+      const { params, body } = (req as UpdateCompanyActiveRequest).validated;
+
+      const company = await this.companiesService.updateCompanyActive(
+        params.uuid,
+        body,
+        req.user!.id,
+      );
+
+      res.status(200).json({
+        success: true,
+        message: `Company ${body.isActive ? "activated" : "deactivated"} successfully`,
         data: { company },
       });
     },
