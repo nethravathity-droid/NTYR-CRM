@@ -102,6 +102,26 @@ export const PERMISSIONS = [
     module: "branches",
   },
   {
+    code: "departments.view",
+    name: "View Departments",
+    module: "departments",
+  },
+  {
+    code: "departments.create",
+    name: "Create Departments",
+    module: "departments",
+  },
+  {
+    code: "departments.update",
+    name: "Update Departments",
+    module: "departments",
+  },
+  {
+    code: "departments.delete",
+    name: "Delete Departments",
+    module: "departments",
+  },
+  {
     code: "users.view",
     name: "View Users",
     module: "users",

@@ -156,7 +156,9 @@ async function seedCompanyBundle(
     const permissionId = permissionMap.get(permissionCode);
 
     if (!permissionId) {
-      throw new Error(`Permission not found: ${permissionCode}`);
+      throw new Error(
+        `Permission "${permissionCode}" is not defined in seed constants. Available: ${[...permissionMap.keys()].join(", ")}`,
+      );
     }
 
     await ensureRolePermission(trx, roleId, permissionId, grants);

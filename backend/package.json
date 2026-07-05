@@ -8,7 +8,8 @@
     "build": "tsc",
     "start": "node dist/server.js",
     "typecheck": "tsc --noEmit",
-    "seed": "tsx src/database/seeds/index.ts"
+    "seed": "tsx src/database/seeds/index.ts",
+    "db:test": "tsx src/database/test-connection.ts"
   },
   "keywords": ["real-estate", "crm", "saas"],
   "author": "",

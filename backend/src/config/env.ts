@@ -33,6 +33,28 @@ const envSchema = z
       .default(30),
   })
   .superRefine((data, ctx) => {
+    if (data.DB_USER.toLowerCase() === "postgre") {
+      ctx.addIssue({
+        code: "custom",
+        path: ["DB_USER"],
+        message:
+          'DB_USER is "postgre" — did you mean "postgres"? Check backend/.env and any system environment variables.',
+      });
+    }
+
+    if (
+      !data.DATABASE_URL &&
+      (data.DB_PASSWORD === "YOUR_POSTGRES_PASSWORD" ||
+        data.DB_PASSWORD === "your_password")
+    ) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["DB_PASSWORD"],
+        message:
+          "DB_PASSWORD is still a placeholder. Set your real PostgreSQL password in backend/.env",
+      });
+    }
+
     if (!data.DATABASE_URL) {
       if (!data.DB_NAME) {
         ctx.addIssue({
