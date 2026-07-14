@@ -161,26 +161,6 @@ export const PERMISSIONS = [
     name: "Delete Roles",
     module: "roles",
   },
-  {
-    code: "leads.view",
-    name: "View Leads",
-    module: "leads",
-  },
-  {
-    code: "leads.create",
-    name: "Create Leads",
-    module: "leads",
-  },
-  {
-    code: "leads.update",
-    name: "Update Leads",
-    module: "leads",
-  },
-  {
-    code: "leads.delete",
-    name: "Delete Leads",
-    module: "leads",
-  },
 ] as const;
 
 export const FULL_ACCESS = {
