@@ -32,16 +32,13 @@ export class DashboardService {
   ) {}
 
   async getSummary(context: DashboardContext): Promise<DashboardSummary> {
-    const [totalEmployees, totalCompanies, totalLeads] = await Promise.all([
+    const [totalEmployees, totalCompanies] = await Promise.all([
       context.isPlatformScope
         ? this.dashboardRepository.countAllEmployees()
         : this.dashboardRepository.countEmployees(context.companyId),
       context.isPlatformScope
         ? this.dashboardRepository.countAllCompanies()
         : Promise.resolve(1),
-      context.isPlatformScope
-        ? this.dashboardRepository.countAllLeads()
-        : this.dashboardRepository.countLeads(context.companyId),
     ]);
 
     this.logger.debug("Dashboard summary loaded", {
@@ -52,10 +49,7 @@ export class DashboardService {
     return {
       totalEmployees,
       totalCompanies,
-      totalLeads,
-      totalBookings: PLACEHOLDER_SUMMARY_FIELDS.totalBookings,
-      totalRevenue: PLACEHOLDER_SUMMARY_FIELDS.totalRevenue,
-      pendingFollowups: PLACEHOLDER_SUMMARY_FIELDS.pendingFollowups,
+      ...PLACEHOLDER_SUMMARY_FIELDS,
     };
   }
 
@@ -134,39 +128,7 @@ export class DashboardService {
       return this.buildEmployeeChart(context, range);
     }
 
-    if (metric === "leads") {
-      return this.buildLeadChart(context, range);
-    }
-
     return this.buildPlaceholderChart(metric, range);
-  }
-
-  private async buildLeadChart(
-    context: DashboardContext,
-    range: DashboardChartRange,
-  ): Promise<DashboardChart> {
-    const months = RANGE_MONTHS[range];
-    const labels = this.buildMonthLabels(months);
-    const rows = await this.dashboardRepository.getLeadGrowthByMonth(
-      context,
-      months,
-    );
-
-    const countsByPeriod = new Map(
-      rows.map((row) => [row.period, Number(row.count)]),
-    );
-
-    return {
-      metric: "leads",
-      range,
-      labels,
-      datasets: [
-        {
-          label: "New Leads",
-          data: labels.map((label) => countsByPeriod.get(label) ?? 0),
-        },
-      ],
-    };
   }
 
   private async buildEmployeeChart(

@@ -37,54 +37,6 @@ export class DashboardRepository {
     return Number(result?.total ?? 0);
   }
 
-  async countLeads(companyId: number): Promise<number> {
-    const result = await this.db("leads")
-      .where({ company_id: companyId })
-      .whereNull("deleted_at")
-      .count("id as total")
-      .first<{ total: string }>();
-
-    return Number(result?.total ?? 0);
-  }
-
-  async countAllLeads(): Promise<number> {
-    const result = await this.db("leads")
-      .whereNull("deleted_at")
-      .count("id as total")
-      .first<{ total: string }>();
-
-    return Number(result?.total ?? 0);
-  }
-
-  async getLeadGrowthByMonth(
-    context: DashboardContext,
-    months: number,
-  ): Promise<EmployeeGrowthRecord[]> {
-    const query = this.db("leads")
-      .whereNull("deleted_at")
-      .where(
-        "created_at",
-        ">=",
-        this.db.raw("date_trunc('month', NOW()) - ?::interval", [
-          `${months - 1} months`,
-        ]),
-      );
-
-    if (!context.isPlatformScope) {
-      query.where({ company_id: context.companyId });
-    }
-
-    return query
-      .select(
-        this.db.raw(
-          "to_char(date_trunc('month', created_at), 'YYYY-MM') as period",
-        ),
-      )
-      .count("id as count")
-      .groupByRaw("date_trunc('month', created_at)")
-      .orderByRaw("date_trunc('month', created_at) asc");
-  }
-
   async getRecentUserActivities(
     companyId: number,
     limit: number,
