@@ -47,17 +47,17 @@ const navigation: NavItem[] = [
   },
   {
     label: "Leads",
-    href: "#",
+    href: paths.leads.list,
     icon: UserSquare2,
-    permission: null,
-    disabled: true,
+    permission: "leads.view",
+    disabled: false,
   },
   {
     label: "Follow-ups",
-    href: "#",
+    href: paths.followups.list,
     icon: CalendarClock,
-    permission: null,
-    disabled: true,
+    permission: "leads.view",
+    disabled: false,
   },
   {
     label: "Projects",

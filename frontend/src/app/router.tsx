@@ -10,6 +10,16 @@ import { EmployeeCreatePage } from "@/features/employees/pages/EmployeeCreatePag
 import { EmployeeDetailsPage } from "@/features/employees/pages/EmployeeDetailsPage";
 import { EmployeeEditPage } from "@/features/employees/pages/EmployeeEditPage";
 import { EmployeesListPage } from "@/features/employees/pages/EmployeesListPage";
+import { LeadAssignPage } from "@/features/leads/pages/LeadAssignPage";
+import { LeadCreatePage } from "@/features/leads/pages/LeadCreatePage";
+import { LeadDetailsPage } from "@/features/leads/pages/LeadDetailsPage";
+import { LeadEditPage } from "@/features/leads/pages/LeadEditPage";
+import { LeadImportPage } from "@/features/leads/pages/LeadImportPage";
+import { FollowupCalendarPage } from "@/features/followups/pages/FollowupCalendarPage";
+import { FollowupCreatePage } from "@/features/followups/pages/FollowupCreatePage";
+import { FollowupEditPage } from "@/features/followups/pages/FollowupEditPage";
+import { FollowupTimelinePage } from "@/features/followups/pages/FollowupTimelinePage";
+import { FollowupsListPage } from "@/features/followups/pages/FollowupsListPage";
 import { DashboardPage } from "@/pages/DashboardPage";
 import { NotFoundPage } from "@/pages/NotFoundPage";
 import { PermissionRoute } from "@/routes/PermissionRoute";
@@ -109,6 +119,94 @@ export const router = createBrowserRouter([
         element: (
           <PermissionRoute permission="users.update">
             <EmployeeEditPage />
+          </PermissionRoute>
+        ),
+      },
+      {
+        path: "leads",
+        element: (
+          <PermissionRoute permission="leads.view">
+            <LeadAssignPage />
+          </PermissionRoute>
+        ),
+      },
+      {
+        path: "leads/new",
+        element: (
+          <PermissionRoute permission="leads.create">
+            <LeadCreatePage />
+          </PermissionRoute>
+        ),
+      },
+      {
+        path: "leads/import",
+        element: (
+          <PermissionRoute permission="leads.create">
+            <LeadImportPage />
+          </PermissionRoute>
+        ),
+      },
+      {
+        path: "leads/assign",
+        element: (
+          <PermissionRoute permission="leads.update">
+            <LeadAssignPage />
+          </PermissionRoute>
+        ),
+      },
+      {
+        path: "leads/:uuid",
+        element: (
+          <PermissionRoute permission="leads.view">
+            <LeadDetailsPage />
+          </PermissionRoute>
+        ),
+      },
+      {
+        path: "leads/:uuid/edit",
+        element: (
+          <PermissionRoute permission="leads.update">
+            <LeadEditPage />
+          </PermissionRoute>
+        ),
+      },
+      {
+        path: "followups",
+        element: (
+          <PermissionRoute permission="leads.view">
+            <FollowupsListPage />
+          </PermissionRoute>
+        ),
+      },
+      {
+        path: "followups/new",
+        element: (
+          <PermissionRoute permission="leads.create">
+            <FollowupCreatePage />
+          </PermissionRoute>
+        ),
+      },
+      {
+        path: "followups/calendar",
+        element: (
+          <PermissionRoute permission="leads.view">
+            <FollowupCalendarPage />
+          </PermissionRoute>
+        ),
+      },
+      {
+        path: "followups/:uuid/edit",
+        element: (
+          <PermissionRoute permission="leads.update">
+            <FollowupEditPage />
+          </PermissionRoute>
+        ),
+      },
+      {
+        path: "followups/:uuid/timeline",
+        element: (
+          <PermissionRoute permission="leads.view">
+            <FollowupTimelinePage />
           </PermissionRoute>
         ),
       },

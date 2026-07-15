@@ -2,6 +2,7 @@ import { Router } from "express";
 import authRoutes from "../modules/auth/auth.routes.js";
 import companiesRoutes from "../modules/companies/companies.routes.js";
 import dashboardRoutes from "../modules/dashboard/dashboard.routes.js";
+import followupsRoutes from "../modules/followups/followup.routes.js";
 import leadsRoutes from "../modules/leads/leads.routes.js";
 import usersRoutes from "../modules/users/users.routes.js";
 
@@ -12,6 +13,7 @@ router.use("/companies", companiesRoutes);
 router.use("/dashboard", dashboardRoutes);
 router.use("/users", usersRoutes);
 router.use("/leads", leadsRoutes);
+router.use("/followups", followupsRoutes);
 
 router.get("/health", (_req, res) => {
   res.status(200).json({

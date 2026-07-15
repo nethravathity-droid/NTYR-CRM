@@ -21,5 +21,12 @@ export const paths = {
     details: (uuid: string) => `/leads/${uuid}`,
     edit: (uuid: string) => `/leads/${uuid}/edit`,
   },
+  followups: {
+    list: "/followups",
+    create: "/followups/new",
+    edit: (uuid: string) => `/followups/${uuid}/edit`,
+    timeline: (uuid: string) => `/followups/${uuid}/timeline`,
+    calendar: "/followups/calendar",
+  },
   notFound: "*",
 } as const;
