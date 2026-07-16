@@ -120,6 +120,19 @@ export const paths = {
     edit: (uuid: string) => rolePath(`/payments/${uuid}/edit`),
     receipt: (uuid: string) => rolePath(`/payments/${uuid}/receipt`),
   },
+  calls: {
+    get dashboard() {
+      return rolePath("/calls");
+    },
+    get list() {
+      return rolePath("/calls/list");
+    },
+    get create() {
+      return rolePath("/calls/new");
+    },
+    details: (uuid: string) => rolePath(`/calls/${uuid}`),
+    edit: (uuid: string) => rolePath(`/calls/${uuid}/edit`),
+  },
   reports: {
     get dashboard() {
       return rolePath("/reports");

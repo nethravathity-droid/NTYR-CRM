@@ -7,7 +7,6 @@ import {
   CreditCard,
   LayoutDashboard,
   MapPinned,
-  PhoneCall,
   Users,
   UserSquare2,
 } from "lucide-react";
@@ -95,13 +94,6 @@ const navigation: NavItem[] = [
     icon: BarChart3,
     permission: "reports.view",
     disabled: false,
-  },
-  {
-    label: "Calls",
-    href: "#",
-    icon: PhoneCall,
-    permission: null,
-    disabled: true,
   },
 ];
 

@@ -271,6 +271,26 @@ export const PERMISSIONS = [
     name: "Export Reports",
     module: "reports",
   },
+  {
+    code: "calls.view",
+    name: "View Calls",
+    module: "calls",
+  },
+  {
+    code: "calls.create",
+    name: "Create Calls",
+    module: "calls",
+  },
+  {
+    code: "calls.update",
+    name: "Update Calls",
+    module: "calls",
+  },
+  {
+    code: "calls.delete",
+    name: "Delete Calls",
+    module: "calls",
+  },
 ] as const;
 
 export const FULL_ACCESS = {
@@ -304,6 +324,9 @@ export const DEMO_RBAC_ROLES = [
       "payments.update",
       "reports.view",
       "reports.export",
+      "calls.view",
+      "calls.create",
+      "calls.update",
     ],
     user: {
       employeeCode: "MGR001",
@@ -325,6 +348,9 @@ export const DEMO_RBAC_ROLES = [
       "leads.view",
       "leads.create",
       "leads.update",
+      "calls.view",
+      "calls.create",
+      "calls.update",
     ],
     user: {
       employeeCode: "TC001",
@@ -352,6 +378,9 @@ export const DEMO_RBAC_ROLES = [
       "bookings.create",
       "bookings.update",
       "payments.view",
+      "calls.view",
+      "calls.create",
+      "calls.update",
     ],
     user: {
       employeeCode: "SE001",

@@ -15,6 +15,7 @@
     "db:visits": "tsx src/database/apply-visits-schema.ts",
     "db:bookings": "tsx src/database/apply-bookings-schema.ts",
     "db:payments": "tsx src/database/apply-payments-schema.ts",
+    "db:calls": "tsx src/database/apply-calls-schema.ts",
     "db:test": "tsx src/database/test-connection.ts"
   },
   "keywords": [

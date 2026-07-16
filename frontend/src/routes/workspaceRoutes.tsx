@@ -53,6 +53,11 @@ import { PaymentReportPage } from "@/features/reports/pages/PaymentReportPage";
 import { ReportsDashboardPage } from "@/features/reports/pages/ReportsDashboardPage";
 import { SalesReportPage } from "@/features/reports/pages/SalesReportPage";
 import { VisitReportPage } from "@/features/reports/pages/VisitReportPage";
+import { CallCreatePage } from "@/features/calls/pages/CallCreatePage";
+import { CallDetailsPage } from "@/features/calls/pages/CallDetailsPage";
+import { CallEditPage } from "@/features/calls/pages/CallEditPage";
+import { CallsDashboardPage } from "@/features/calls/pages/CallsDashboardPage";
+import { CallsListPage } from "@/features/calls/pages/CallsListPage";
 import { DashboardPage } from "@/pages/DashboardPage";
 import { PermissionRoute } from "@/routes/PermissionRoute";
 import { SuperAdminRoute } from "@/routes/SuperAdminRoute";
@@ -65,6 +70,7 @@ export type WorkspaceRouteOptions = {
   includeVisits?: boolean;
   includeBookings?: boolean;
   includePayments?: boolean;
+  includeCalls?: boolean;
   includeReports?: boolean;
 };
 
@@ -89,6 +95,7 @@ export function createWorkspaceRoutes(options: WorkspaceRouteOptions = {}): Rout
     includeVisits = true,
     includeBookings = true,
     includePayments = true,
+    includeCalls = true,
     includeReports = false,
   } = options;
 
@@ -180,6 +187,16 @@ export function createWorkspaceRoutes(options: WorkspaceRouteOptions = {}): Rout
     );
   }
 
+  if (includeCalls) {
+    routes.push(
+      { path: "calls", element: withPermission("calls.view", <CallsDashboardPage />) },
+      { path: "calls/list", element: withPermission("calls.view", <CallsListPage />) },
+      { path: "calls/new", element: withPermission("calls.create", <CallCreatePage />) },
+      { path: "calls/:uuid/edit", element: withPermission("calls.update", <CallEditPage />) },
+      { path: "calls/:uuid", element: withPermission("calls.view", <CallDetailsPage />) },
+    );
+  }
+
   if (includeReports) {
     routes.push(
       { path: "reports", element: withPermission("reports.view", <ReportsDashboardPage />) },
@@ -202,6 +219,7 @@ export const superAdminWorkspaceRoutes = createWorkspaceRoutes({
   includeVisits: false,
   includeBookings: false,
   includePayments: false,
+  includeCalls: false,
 });
 
 export const adminWorkspaceRoutes = createWorkspaceRoutes({

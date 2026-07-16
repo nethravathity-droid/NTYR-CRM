@@ -86,19 +86,18 @@ const paymentsItem = (): NavItem => ({
   permission: "payments.view",
 });
 
+const callsItem = (): NavItem => ({
+  label: "Calls",
+  href: rolePath("/calls"),
+  icon: PhoneCall,
+  permission: "calls.view",
+});
+
 const reportsItem = (): NavItem => ({
   label: "Reports",
   href: rolePath("/reports"),
   icon: BarChart3,
   permission: "reports.view",
-});
-
-const callsPlaceholder = (): NavItem => ({
-  label: "Calls",
-  href: "#",
-  icon: PhoneCall,
-  permission: null,
-  disabled: true,
 });
 
 export function getNavigationForRole(roleCode: RoleCode): NavItem[] {
@@ -116,13 +115,14 @@ export function getNavigationForRole(roleCode: RoleCode): NavItem[] {
         bookingsItem(),
         paymentsItem(),
         reportsItem(),
-        callsPlaceholder(),
+        callsItem(),
       ];
     case ROLE_CODES.MANAGER:
       return [
         dashboardItem(),
         leadsItem(),
         followupsItem(),
+        callsItem(),
         projectsItem(),
         visitsItem(),
         bookingsItem(),
@@ -130,12 +130,13 @@ export function getNavigationForRole(roleCode: RoleCode): NavItem[] {
         reportsItem(),
       ];
     case ROLE_CODES.TELECALLER:
-      return [dashboardItem(), leadsItem(), followupsItem()];
+      return [dashboardItem(), leadsItem(), followupsItem(), callsItem()];
     case ROLE_CODES.SALES_EXECUTIVE:
       return [
         dashboardItem(),
         leadsItem(),
         followupsItem(),
+        callsItem(),
         visitsItem(),
         bookingsItem(),
         paymentsItem(),
