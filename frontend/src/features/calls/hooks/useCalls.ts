@@ -21,10 +21,11 @@ export function useCalls(params: ListCallsParams) {
   });
 }
 
-export function useCallSummary(params: { fromDate?: string; toDate?: string } = {}) {
+export function useCallSummary(params: { fromDate?: string; toDate?: string } = {}, options?: { enabled?: boolean }) {
   return useQuery({
     queryKey: callKeys.summary(params),
     queryFn: () => callsService.getSummary(params),
+    enabled: options?.enabled ?? true,
   });
 }
 

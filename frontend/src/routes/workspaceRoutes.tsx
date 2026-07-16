@@ -58,11 +58,24 @@ import { CallDetailsPage } from "@/features/calls/pages/CallDetailsPage";
 import { CallEditPage } from "@/features/calls/pages/CallEditPage";
 import { CallsDashboardPage } from "@/features/calls/pages/CallsDashboardPage";
 import { CallsListPage } from "@/features/calls/pages/CallsListPage";
-import { DashboardPage } from "@/pages/DashboardPage";
+import {
+  CompanyAdminDashboardPage,
+  ManagerDashboardPage,
+  SalesExecutiveDashboardPage,
+  SuperAdminDashboardPage,
+  TelecallerDashboardPage,
+} from "@/features/dashboards";
+import { ActivityLogPage } from "@/features/platform/pages/ActivityLogPage";
+import { PlatformAnalyticsPage } from "@/features/platform/pages/PlatformAnalyticsPage";
+import { SubscriptionsPage } from "@/features/platform/pages/SubscriptionsPage";
+import { SettingsPage } from "@/features/settings/pages/SettingsPage";
 import { PermissionRoute } from "@/routes/PermissionRoute";
 import { SuperAdminRoute } from "@/routes/SuperAdminRoute";
 
 export type WorkspaceRouteOptions = {
+  dashboardElement?: ReactElement;
+  includeSettings?: boolean;
+  includePlatform?: boolean;
   includeCompanies?: boolean;
   includeEmployees?: boolean;
   includeLeads?: boolean;
@@ -88,6 +101,9 @@ function withSuperAdminPermission(permission: string, element: ReactElement) {
 
 export function createWorkspaceRoutes(options: WorkspaceRouteOptions = {}): RouteObject[] {
   const {
+    dashboardElement,
+    includeSettings = true,
+    includePlatform = false,
     includeCompanies = false,
     includeEmployees = false,
     includeLeads = true,
@@ -102,9 +118,21 @@ export function createWorkspaceRoutes(options: WorkspaceRouteOptions = {}): Rout
   const routes: RouteObject[] = [
     {
       path: "dashboard",
-      element: <DashboardPage />,
+      element: dashboardElement ?? <SuperAdminDashboardPage />,
     },
   ];
+
+  if (includeSettings) {
+    routes.push({ path: "settings", element: <SettingsPage /> });
+  }
+
+  if (includePlatform) {
+    routes.push(
+      { path: "subscriptions", element: withSuperAdminPermission("companies.view", <SubscriptionsPage />) },
+      { path: "activity-log", element: withSuperAdminPermission("companies.view", <ActivityLogPage />) },
+      { path: "analytics", element: withSuperAdminPermission("companies.view", <PlatformAnalyticsPage />) },
+    );
+  }
 
   if (includeCompanies) {
     routes.push(
@@ -214,6 +242,8 @@ export function createWorkspaceRoutes(options: WorkspaceRouteOptions = {}): Rout
 }
 
 export const superAdminWorkspaceRoutes = createWorkspaceRoutes({
+  dashboardElement: <SuperAdminDashboardPage />,
+  includePlatform: true,
   includeCompanies: true,
   includeLeads: false,
   includeVisits: false,
@@ -223,23 +253,27 @@ export const superAdminWorkspaceRoutes = createWorkspaceRoutes({
 });
 
 export const adminWorkspaceRoutes = createWorkspaceRoutes({
+  dashboardElement: <CompanyAdminDashboardPage />,
   includeEmployees: true,
   includeProjects: true,
   includeReports: true,
 });
 
 export const managerWorkspaceRoutes = createWorkspaceRoutes({
+  dashboardElement: <ManagerDashboardPage />,
   includeProjects: true,
   includeReports: true,
 });
 
 export const telecallerWorkspaceRoutes = createWorkspaceRoutes({
+  dashboardElement: <TelecallerDashboardPage />,
   includeVisits: false,
   includeBookings: false,
   includePayments: false,
 });
 
 export const salesWorkspaceRoutes = createWorkspaceRoutes({
+  dashboardElement: <SalesExecutiveDashboardPage />,
   includeVisits: true,
   includeBookings: true,
   includePayments: true,

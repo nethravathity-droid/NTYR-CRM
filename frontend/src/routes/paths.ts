@@ -8,6 +8,20 @@ export const paths = {
   get dashboard() {
     return rolePath("/dashboard");
   },
+  get settings() {
+    return rolePath("/settings");
+  },
+  platform: {
+    get subscriptions() {
+      return rolePath("/subscriptions");
+    },
+    get activityLog() {
+      return rolePath("/activity-log");
+    },
+    get analytics() {
+      return rolePath("/analytics");
+    },
+  },
   companies: {
     get list() {
       return rolePath("/companies");

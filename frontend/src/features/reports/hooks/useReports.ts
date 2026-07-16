@@ -14,8 +14,12 @@ export const reportKeys = {
   payments: (params: ReportFiltersParams) => [...reportKeys.all, "payments", params] as const,
 };
 
-export function useDashboardReport(params: ReportFiltersParams) {
-  return useQuery({ queryKey: reportKeys.dashboard(params), queryFn: () => reportsService.getDashboard(params) });
+export function useDashboardReport(params: ReportFiltersParams, options?: { enabled?: boolean }) {
+  return useQuery({
+    queryKey: reportKeys.dashboard(params),
+    queryFn: () => reportsService.getDashboard(params),
+    enabled: options?.enabled ?? true,
+  });
 }
 
 export function useLeadReport(params: ReportFiltersParams) {

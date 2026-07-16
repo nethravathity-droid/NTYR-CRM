@@ -21,17 +21,19 @@ export function useFollowups(params: ListFollowupsParams) {
   });
 }
 
-export function useTodayFollowups() {
+export function useTodayFollowups(options?: { enabled?: boolean }) {
   return useQuery({
     queryKey: followupKeys.today(),
     queryFn: () => followupsService.getToday(),
+    enabled: options?.enabled ?? true,
   });
 }
 
-export function useOverdueFollowups() {
+export function useOverdueFollowups(options?: { enabled?: boolean }) {
   return useQuery({
     queryKey: followupKeys.overdue(),
     queryFn: () => followupsService.getOverdue(),
+    enabled: options?.enabled ?? true,
   });
 }
 

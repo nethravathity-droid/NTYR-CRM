@@ -103,3 +103,24 @@
     @apply bg-background text-foreground antialiased;
   }
 }
+
+@layer utilities {
+  .premium-shell {
+    background:
+      radial-gradient(circle at top left, color-mix(in oklab, var(--primary) 8%, transparent), transparent 40%),
+      radial-gradient(circle at top right, color-mix(in oklab, var(--color-cyan-500, #06b6d4) 8%, transparent), transparent 35%),
+      var(--background);
+  }
+
+  .glass-panel {
+    @apply border-border/60 bg-card/75 backdrop-blur-xl;
+  }
+
+  .premium-sidebar {
+    @apply border-sidebar-border/70 bg-sidebar/85 text-sidebar-foreground backdrop-blur-2xl;
+  }
+
+  .premium-header {
+    @apply border-b border-border/60 bg-background/75 backdrop-blur-xl;
+  }
+}
