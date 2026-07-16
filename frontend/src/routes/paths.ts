@@ -38,5 +38,20 @@ export const paths = {
     towers: (uuid: string) => `/projects/${uuid}/towers`,
     units: (uuid?: string) => (uuid ? `/projects/${uuid}/units` : "/projects/units"),
   },
+  visits: {
+    list: "/visits",
+    create: "/visits/new",
+    details: (uuid: string) => `/visits/${uuid}`,
+    edit: (uuid: string) => `/visits/${uuid}/edit`,
+    calendar: "/visits/calendar",
+  },
+  bookings: {
+    list: "/bookings",
+    create: "/bookings/new",
+    approvals: "/bookings/approvals",
+    details: (uuid: string) => `/bookings/${uuid}`,
+    edit: (uuid: string) => `/bookings/${uuid}/edit`,
+    documents: (uuid: string) => `/bookings/${uuid}/documents`,
+  },
   notFound: "*",
 } as const;

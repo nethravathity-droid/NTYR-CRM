@@ -68,17 +68,17 @@ const navigation: NavItem[] = [
   },
   {
     label: "Visits",
-    href: "#",
+    href: paths.visits.list,
     icon: MapPinned,
-    permission: null,
-    disabled: true,
+    permission: "visits.view",
+    disabled: false,
   },
   {
     label: "Bookings",
-    href: "#",
+    href: paths.bookings.list,
     icon: CreditCard,
-    permission: null,
-    disabled: true,
+    permission: "bookings.view",
+    disabled: false,
   },
   {
     label: "Calls",

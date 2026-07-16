@@ -29,6 +29,17 @@ import { ProjectEditPage } from "@/features/properties/pages/ProjectEditPage";
 import { ProjectTowersPage } from "@/features/properties/pages/ProjectTowersPage";
 import { ProjectsListPage } from "@/features/properties/pages/ProjectsListPage";
 import { UnitsManagementPage } from "@/features/properties/pages/UnitsManagementPage";
+import { VisitCalendarPage } from "@/features/visits/pages/VisitCalendarPage";
+import { VisitCreatePage } from "@/features/visits/pages/VisitCreatePage";
+import { VisitDetailsPage } from "@/features/visits/pages/VisitDetailsPage";
+import { VisitEditPage } from "@/features/visits/pages/VisitEditPage";
+import { VisitsListPage } from "@/features/visits/pages/VisitsListPage";
+import { BookingApprovalPage } from "@/features/bookings/pages/BookingApprovalPage";
+import { BookingCreatePage } from "@/features/bookings/pages/BookingCreatePage";
+import { BookingDetailsPage } from "@/features/bookings/pages/BookingDetailsPage";
+import { BookingDocumentsPage } from "@/features/bookings/pages/BookingDocumentsPage";
+import { BookingEditPage } from "@/features/bookings/pages/BookingEditPage";
+import { BookingsListPage } from "@/features/bookings/pages/BookingsListPage";
 import { DashboardPage } from "@/pages/DashboardPage";
 import { NotFoundPage } from "@/pages/NotFoundPage";
 import { PermissionRoute } from "@/routes/PermissionRoute";
@@ -288,6 +299,94 @@ export const router = createBrowserRouter([
         element: (
           <PermissionRoute permission="projects.view">
             <UnitsManagementPage />
+          </PermissionRoute>
+        ),
+      },
+      {
+        path: "visits",
+        element: (
+          <PermissionRoute permission="visits.view">
+            <VisitsListPage />
+          </PermissionRoute>
+        ),
+      },
+      {
+        path: "visits/new",
+        element: (
+          <PermissionRoute permission="visits.create">
+            <VisitCreatePage />
+          </PermissionRoute>
+        ),
+      },
+      {
+        path: "visits/calendar",
+        element: (
+          <PermissionRoute permission="visits.view">
+            <VisitCalendarPage />
+          </PermissionRoute>
+        ),
+      },
+      {
+        path: "visits/:uuid",
+        element: (
+          <PermissionRoute permission="visits.view">
+            <VisitDetailsPage />
+          </PermissionRoute>
+        ),
+      },
+      {
+        path: "visits/:uuid/edit",
+        element: (
+          <PermissionRoute permission="visits.update">
+            <VisitEditPage />
+          </PermissionRoute>
+        ),
+      },
+      {
+        path: "bookings",
+        element: (
+          <PermissionRoute permission="bookings.view">
+            <BookingsListPage />
+          </PermissionRoute>
+        ),
+      },
+      {
+        path: "bookings/new",
+        element: (
+          <PermissionRoute permission="bookings.create">
+            <BookingCreatePage />
+          </PermissionRoute>
+        ),
+      },
+      {
+        path: "bookings/approvals",
+        element: (
+          <PermissionRoute permission="bookings.update">
+            <BookingApprovalPage />
+          </PermissionRoute>
+        ),
+      },
+      {
+        path: "bookings/:uuid/documents",
+        element: (
+          <PermissionRoute permission="bookings.update">
+            <BookingDocumentsPage />
+          </PermissionRoute>
+        ),
+      },
+      {
+        path: "bookings/:uuid/edit",
+        element: (
+          <PermissionRoute permission="bookings.update">
+            <BookingEditPage />
+          </PermissionRoute>
+        ),
+      },
+      {
+        path: "bookings/:uuid",
+        element: (
+          <PermissionRoute permission="bookings.view">
+            <BookingDetailsPage />
           </PermissionRoute>
         ),
       },
