@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/card";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { useDashboardSummary } from "@/features/dashboard/hooks/useDashboard";
+import { useRole } from "@/hooks/useRole";
 import { getApiErrorMessage } from "@/lib/api/client";
 
 function formatRevenue(value: number): string {
@@ -45,6 +46,7 @@ function MetricText({
 
 export function DashboardPage() {
   const { user } = useAuth();
+  const { roleName } = useRole();
   const { data: summary, isLoading, error } = useDashboardSummary();
   const hasError = Boolean(error);
 
@@ -55,9 +57,9 @@ export function DashboardPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+        <h1 className="text-3xl font-bold tracking-tight">{roleName ?? "Dashboard"}</h1>
         <p className="text-muted-foreground">
-          Welcome back, {displayName}. Your workspace is ready.
+          Welcome back, {displayName}. Your {roleName?.toLowerCase() ?? "role"} workspace is ready.
         </p>
       </div>
 
