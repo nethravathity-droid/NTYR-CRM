@@ -11,10 +11,10 @@ import {
 } from "@/layouts/role-layouts";
 import { LoginPage } from "@/features/auth/pages/LoginPage";
 import { ForbiddenPage } from "@/pages/ForbiddenPage";
-import { NotFoundPage } from "@/pages/NotFoundPage";
 import { ProtectedRoute } from "@/routes/ProtectedRoute";
 import { RoleRootRedirect } from "@/routes/RoleRootRedirect";
 import { RoleRoute } from "@/routes/RoleRoute";
+import { LegacyOrNotFound, RoleWorkspaceFallback } from "@/routes/LegacyOrNotFound";
 import { paths } from "@/routes/paths";
 import { ROLE_CODES, type RoleCode } from "@/lib/rbac/roles";
 import {
@@ -41,6 +41,7 @@ function createRoleWorkspace(
     children: [
       { index: true, element: <Navigate to="dashboard" replace /> },
       ...children,
+      { path: "*", element: <RoleWorkspaceFallback /> },
     ],
   };
 }
@@ -110,6 +111,6 @@ export const router = createBrowserRouter([
   },
   {
     path: "*",
-    element: <NotFoundPage />,
+    element: <LegacyOrNotFound />,
   },
 ]);

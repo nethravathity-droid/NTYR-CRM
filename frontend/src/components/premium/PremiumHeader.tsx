@@ -22,8 +22,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ThemeToggle } from "@/components/shared/ThemeToggle";
 import { useAuth } from "@/features/auth/hooks/useAuth";
-import { useRecentActivities } from "@/features/dashboard/hooks/useDashboard";
 import { useOverdueFollowups, useTodayFollowups } from "@/features/followups/hooks/useFollowups";
+import type { FollowupListItem } from "@/features/followups/types/followup.types";
 import { usePermissions } from "@/hooks/usePermissions";
 import { useShell } from "@/context/ShellContext";
 import { paths } from "@/routes/paths";
@@ -38,6 +38,34 @@ function formatHeaderDate() {
   });
 }
 
+function formatFollowupTime(time: string) {
+  return time.slice(0, 5);
+}
+
+function FollowupNotificationItem({
+  followup,
+  variant,
+  onSelect,
+}: {
+  followup: FollowupListItem;
+  variant: "overdue" | "today";
+  onSelect: () => void;
+}) {
+  return (
+    <DropdownMenuItem onClick={onSelect} className="whitespace-normal">
+      <div className="w-full">
+        <p className="font-medium">{followup.customerName}</p>
+        <p className="text-xs text-muted-foreground">
+          {followup.followupDate} · {formatFollowupTime(followup.followupTime)} · {followup.type}
+        </p>
+        <p className={`text-xs ${variant === "overdue" ? "text-[#EF4444]" : "text-[#2563EB]"}`}>
+          {variant === "overdue" ? "Overdue follow-up" : "Due today"}
+        </p>
+      </div>
+    </DropdownMenuItem>
+  );
+}
+
 export function PremiumHeader() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
@@ -45,13 +73,20 @@ export function PremiumHeader() {
   const { hasPermission } = usePermissions();
   const canViewFollowups = hasPermission("leads.view");
 
-  const { data: activities = [] } = useRecentActivities(8);
   const { data: todayFollowups = [] } = useTodayFollowups({ enabled: canViewFollowups });
   const { data: overdueFollowups = [] } = useOverdueFollowups({ enabled: canViewFollowups });
 
   const notificationCount = useMemo(
-    () => (canViewFollowups ? todayFollowups.length + overdueFollowups.length : 0) + Math.min(activities.length, 3),
-    [activities.length, canViewFollowups, overdueFollowups.length, todayFollowups.length],
+    () => (canViewFollowups ? todayFollowups.length + overdueFollowups.length : 0),
+    [canViewFollowups, overdueFollowups.length, todayFollowups.length],
+  );
+
+  const followupNotifications = useMemo(
+    () => [
+      ...overdueFollowups.map((followup) => ({ followup, variant: "overdue" as const })),
+      ...todayFollowups.map((followup) => ({ followup, variant: "today" as const })),
+    ],
+    [overdueFollowups, todayFollowups],
   );
 
   const displayName =
@@ -158,29 +193,36 @@ export function PremiumHeader() {
                 ) : null}
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-80 rounded-[18px]">
-              <DropdownMenuLabel>Notifications</DropdownMenuLabel>
+            <DropdownMenuContent align="end" className="max-h-96 w-80 overflow-y-auto rounded-[18px]">
+              <DropdownMenuLabel>Follow-up Notifications</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              {canViewFollowups && overdueFollowups.length > 0 ? (
-                <DropdownMenuItem onClick={() => navigate(paths.followups.list)}>
-                  {overdueFollowups.length} overdue follow-ups
-                </DropdownMenuItem>
-              ) : null}
-              {canViewFollowups && todayFollowups.length > 0 ? (
-                <DropdownMenuItem onClick={() => navigate(paths.followups.today)}>
-                  {todayFollowups.length} follow-ups due today
-                </DropdownMenuItem>
-              ) : null}
-              {activities.slice(0, 4).map((activity) => (
-                <DropdownMenuItem key={activity.id} className="whitespace-normal">
-                  <div>
-                    <p className="font-medium">{activity.title}</p>
-                    <p className="text-xs text-muted-foreground">{activity.description}</p>
-                  </div>
-                </DropdownMenuItem>
-              ))}
-              {notificationCount === 0 ? (
-                <DropdownMenuItem disabled>No new notifications</DropdownMenuItem>
+              {!canViewFollowups ? (
+                <DropdownMenuItem disabled>Follow-ups not available</DropdownMenuItem>
+              ) : followupNotifications.length === 0 ? (
+                <DropdownMenuItem disabled>No follow-up notifications</DropdownMenuItem>
+              ) : (
+                followupNotifications.slice(0, 12).map(({ followup, variant }) => (
+                  <FollowupNotificationItem
+                    key={followup.uuid}
+                    followup={followup}
+                    variant={variant}
+                    onSelect={() =>
+                      navigate(
+                        variant === "overdue"
+                          ? paths.followups.timeline(followup.uuid)
+                          : paths.followups.today,
+                      )
+                    }
+                  />
+                ))
+              )}
+              {canViewFollowups && followupNotifications.length > 0 ? (
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => navigate(paths.followups.today)}>
+                    View today&apos;s follow-ups
+                  </DropdownMenuItem>
+                </>
               ) : null}
             </DropdownMenuContent>
           </DropdownMenu>
