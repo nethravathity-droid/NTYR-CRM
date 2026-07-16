@@ -8,6 +8,8 @@ interface ShellContextValue {
   setCommandOpen: (open: boolean) => void;
   searchOpen: boolean;
   setSearchOpen: (open: boolean) => void;
+  searchQuery: string;
+  setSearchQuery: (query: string) => void;
 }
 
 const ShellContext = createContext<ShellContextValue | null>(null);
@@ -16,6 +18,7 @@ export function ShellProvider({ children }: { children: ReactNode }) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [commandOpen, setCommandOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const value = useMemo<ShellContextValue>(
     () => ({
@@ -26,8 +29,10 @@ export function ShellProvider({ children }: { children: ReactNode }) {
       setCommandOpen,
       searchOpen,
       setSearchOpen,
+      searchQuery,
+      setSearchQuery,
     }),
-    [sidebarCollapsed, commandOpen, searchOpen],
+    [sidebarCollapsed, commandOpen, searchOpen, searchQuery],
   );
 
   return <ShellContext.Provider value={value}>{children}</ShellContext.Provider>;

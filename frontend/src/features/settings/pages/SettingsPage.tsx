@@ -1,16 +1,36 @@
+import { useEffect, useMemo } from "react";
+import { useSearchParams } from "react-router-dom";
 import { GlassCard, SectionHeader } from "@/components/premium/PremiumCards";
 import { ThemeToggle } from "@/components/shared/ThemeToggle";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+
+const TABS = [
+  { id: "profile", label: "My Profile" },
+  { id: "company", label: "Company" },
+  { id: "appearance", label: "Appearance" },
+  { id: "permissions", label: "Permissions" },
+] as const;
 
 export function SettingsPage() {
   const { user } = useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeTab = searchParams.get("tab") ?? "profile";
+
+  useEffect(() => {
+    const section = document.getElementById(activeTab);
+    section?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [activeTab]);
+
+  const displayName = useMemo(
+    () =>
+      user?.user.displayName ??
+      `${user?.user.firstName ?? ""} ${user?.user.lastName ?? ""}`.trim(),
+    [user],
+  );
 
   if (!user) return null;
-
-  const displayName =
-    user.user.displayName ??
-    `${user.user.firstName} ${user.user.lastName ?? ""}`.trim();
 
   return (
     <div className="space-y-8">
@@ -19,9 +39,23 @@ export function SettingsPage() {
         <p className="text-muted-foreground">Your profile, workspace, and application preferences.</p>
       </div>
 
+      <div className="flex flex-wrap gap-2">
+        {TABS.map((tab) => (
+          <Button
+            key={tab.id}
+            variant={activeTab === tab.id ? "default" : "outline"}
+            className="rounded-[14px]"
+            onClick={() => setSearchParams({ tab: tab.id })}
+          >
+            {tab.label}
+          </Button>
+        ))}
+      </div>
+
       <div className="grid gap-6 xl:grid-cols-2">
+        <div id="profile" className="scroll-mt-24">
         <GlassCard className="p-5">
-          <SectionHeader title="Profile" description="Your account details" />
+          <SectionHeader title="My Profile" description="Your account details" />
           <dl className="space-y-4 text-sm">
             <div className="flex justify-between gap-4">
               <dt className="text-muted-foreground">Name</dt>
@@ -55,9 +89,11 @@ export function SettingsPage() {
             </div>
           </dl>
         </GlassCard>
+        </div>
 
+        <div id="company" className="scroll-mt-24">
         <GlassCard className="p-5">
-          <SectionHeader title="Workspace" description="Company and role context" />
+          <SectionHeader title="Company" description="Workspace and role context" />
           <dl className="space-y-4 text-sm">
             <div className="flex justify-between gap-4">
               <dt className="text-muted-foreground">Company</dt>
@@ -85,7 +121,9 @@ export function SettingsPage() {
             </div>
           </dl>
         </GlassCard>
+        </div>
 
+        <div id="appearance" className="scroll-mt-24">
         <GlassCard className="p-5">
           <SectionHeader title="Appearance" description="Theme and display preferences" />
           <div className="flex items-center justify-between rounded-xl border p-4">
@@ -96,7 +134,9 @@ export function SettingsPage() {
             <ThemeToggle />
           </div>
         </GlassCard>
+        </div>
 
+        <div id="permissions" className="scroll-mt-24">
         <GlassCard className="p-5">
           <SectionHeader title="Permissions" description="Capabilities granted to your role" />
           <div className="flex flex-wrap gap-2">
@@ -105,6 +145,7 @@ export function SettingsPage() {
             ))}
           </div>
         </GlassCard>
+        </div>
       </div>
     </div>
   );

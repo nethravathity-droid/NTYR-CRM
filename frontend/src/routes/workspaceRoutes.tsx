@@ -69,6 +69,8 @@ import { ActivityLogPage } from "@/features/platform/pages/ActivityLogPage";
 import { PlatformAnalyticsPage } from "@/features/platform/pages/PlatformAnalyticsPage";
 import { SubscriptionsPage } from "@/features/platform/pages/SubscriptionsPage";
 import { SettingsPage } from "@/features/settings/pages/SettingsPage";
+import { MessagesPage } from "@/features/messages/pages/MessagesPage";
+import { NotificationsPage } from "@/features/notifications/pages/NotificationsPage";
 import { PermissionRoute } from "@/routes/PermissionRoute";
 import { SuperAdminRoute } from "@/routes/SuperAdminRoute";
 
@@ -123,7 +125,11 @@ export function createWorkspaceRoutes(options: WorkspaceRouteOptions = {}): Rout
   ];
 
   if (includeSettings) {
-    routes.push({ path: "settings", element: <SettingsPage /> });
+    routes.push(
+      { path: "settings", element: <SettingsPage /> },
+      { path: "messages", element: <MessagesPage /> },
+      { path: "notifications", element: <NotificationsPage /> },
+    );
   }
 
   if (includePlatform) {

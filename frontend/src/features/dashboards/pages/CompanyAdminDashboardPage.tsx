@@ -7,6 +7,8 @@ import { DashboardRightPanel } from "@/features/dashboards/components/DashboardR
 import { SalesPipelineKanban } from "@/features/dashboards/components/SalesPipelineKanban";
 import { useAdminDashboard } from "@/features/dashboards/hooks/useAdminDashboard";
 import { GlassCard } from "@/components/premium/PremiumCards";
+import { DashboardDateRangePicker } from "@/components/premium/DashboardDateRangePicker";
+import { useDashboardDate } from "@/context/DashboardDateContext";
 
 function formatToday() {
   return new Date().toLocaleDateString(undefined, {
@@ -19,7 +21,8 @@ function formatToday() {
 
 export function CompanyAdminDashboardPage() {
   const { user } = useAuth();
-  const data = useAdminDashboard();
+  const { range } = useDashboardDate();
+  const data = useAdminDashboard(range);
   const quickActions = buildAdminQuickActions(data.hasPermission);
 
   return (
@@ -36,10 +39,13 @@ export function CompanyAdminDashboardPage() {
                 {user?.company.name ?? "Company"} executive dashboard — live CRM performance, pipeline, and collections.
               </p>
             </div>
-            <div className="rounded-[18px] bg-white/15 px-5 py-3 backdrop-blur-sm">
-              <p className="text-xs uppercase tracking-wide text-white/70">Current Company</p>
-              <p className="text-lg font-semibold">{user?.company.name}</p>
-              <p className="text-xs text-white/75">{user?.company.code} · {user?.role.name}</p>
+            <div className="flex flex-col items-end gap-3">
+              <DashboardDateRangePicker variant="hero" />
+              <div className="rounded-[18px] bg-white/15 px-5 py-3 backdrop-blur-sm">
+                <p className="text-xs uppercase tracking-wide text-white/70">Current Company</p>
+                <p className="text-lg font-semibold">{user?.company.name}</p>
+                <p className="text-xs text-white/75">{user?.company.code} · {user?.role.name}</p>
+              </div>
             </div>
           </div>
           <div className="pointer-events-none absolute -right-8 -top-8 h-40 w-40 rounded-full bg-white/10" />
@@ -49,7 +55,7 @@ export function CompanyAdminDashboardPage() {
 
       <AdminQuickActions actions={quickActions} />
 
-      <AdminKpiSection kpis={data.kpis} loading={data.isLoading} />
+      <AdminKpiSection kpis={data.kpis} dateRange={range} loading={data.isLoading} />
 
       <div className="grid gap-6 2xl:grid-cols-[minmax(0,1fr)_320px]">
         <div className="min-w-0 space-y-6">
@@ -58,6 +64,7 @@ export function CompanyAdminDashboardPage() {
               dailyReport={data.dailyReport}
               monthlyReport={data.monthlyReport}
               employeeReport={data.employeeReport}
+              dateRange={range}
             />
           ) : null}
 

@@ -11,6 +11,16 @@ export const paths = {
   get settings() {
     return rolePath("/settings");
   },
+  messages: {
+    get list() {
+      return rolePath("/messages");
+    },
+  },
+  notifications: {
+    get list() {
+      return rolePath("/notifications");
+    },
+  },
   platform: {
     get subscriptions() {
       return rolePath("/subscriptions");

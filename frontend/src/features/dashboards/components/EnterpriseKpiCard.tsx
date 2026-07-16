@@ -1,4 +1,5 @@
 import type { LucideIcon } from "lucide-react";
+import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -9,6 +10,7 @@ interface EnterpriseKpiCardProps {
   icon: LucideIcon;
   accent?: "primary" | "secondary" | "success" | "warning" | "danger" | "purple";
   loading?: boolean;
+  to?: string;
 }
 
 const accentStyles = {
@@ -27,8 +29,9 @@ export function EnterpriseKpiCard({
   icon: Icon,
   accent = "primary",
   loading,
+  to,
 }: EnterpriseKpiCardProps) {
-  return (
+  const content = (
     <div className="app-panel group p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 space-y-2">
@@ -45,6 +48,14 @@ export function EnterpriseKpiCard({
         </div>
       </div>
     </div>
+  );
+
+  if (!to) return content;
+
+  return (
+    <Link to={to} className="block rounded-[18px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB]">
+      {content}
+    </Link>
   );
 }
 

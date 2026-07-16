@@ -4,6 +4,7 @@ import { PremiumHeader } from "@/components/premium/PremiumHeader";
 import { PremiumSidebar } from "@/components/premium/PremiumSidebar";
 import { Loading } from "@/components/shared/Loading";
 import { ShellProvider, useShell } from "@/context/ShellContext";
+import { DashboardDateProvider } from "@/context/DashboardDateContext";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { getNavigationSectionsForRole, getWorkspaceLabel } from "@/lib/rbac/navigation";
 import { getRoleDashboardPath, isRoleCode, setActiveRoleCode, type RoleCode } from "@/lib/rbac/roles";
@@ -56,7 +57,9 @@ function AppShellInner({ roleCode }: AppShellProps) {
 export function AppShell({ roleCode }: AppShellProps) {
   return (
     <ShellProvider>
-      <AppShellInner roleCode={roleCode} />
+      <DashboardDateProvider>
+        <AppShellInner roleCode={roleCode} />
+      </DashboardDateProvider>
     </ShellProvider>
   );
 }

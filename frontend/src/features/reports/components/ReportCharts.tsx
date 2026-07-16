@@ -3,6 +3,7 @@ import {
   Bar,
   BarChart,
   CartesianGrid,
+  Cell,
   Legend,
   Line,
   LineChart,
@@ -12,13 +13,20 @@ import {
   Tooltip,
   XAxis,
   YAxis,
-  Cell,
 } from "recharts";
 import type { BreakdownItem, ChartData } from "@/features/reports/types/report.types";
 
 const COLORS = ["#2563EB", "#14B8A6", "#10B981", "#F59E0B", "#EF4444", "#8B5CF6", "#6366F1"];
 
-export function BreakdownBarChart({ title, data }: { title: string; data: BreakdownItem[] }) {
+export function BreakdownBarChart({
+  title,
+  data,
+  onSegmentClick,
+}: {
+  title: string;
+  data: BreakdownItem[];
+  onSegmentClick?: (item: BreakdownItem) => void;
+}) {
   return (
     <Card>
       <CardHeader><CardTitle>{title}</CardTitle></CardHeader>
@@ -29,7 +37,18 @@ export function BreakdownBarChart({ title, data }: { title: string; data: Breakd
             <XAxis dataKey="label" tick={{ fontSize: 12 }} />
             <YAxis allowDecimals={false} />
             <Tooltip />
-            <Bar dataKey="value" fill="#2563EB" radius={[6, 6, 0, 0]} />
+            <Legend />
+            <Bar
+              dataKey="value"
+              fill="#2563EB"
+              radius={[6, 6, 0, 0]}
+              cursor={onSegmentClick ? "pointer" : undefined}
+              onClick={(entry) => {
+                if (onSegmentClick && entry?.payload) {
+                  onSegmentClick(entry.payload as BreakdownItem);
+                }
+              }}
+            />
           </BarChart>
         </ResponsiveContainer>
       </CardContent>
@@ -37,17 +56,40 @@ export function BreakdownBarChart({ title, data }: { title: string; data: Breakd
   );
 }
 
-export function BreakdownPieChart({ title, data }: { title: string; data: BreakdownItem[] }) {
+export function BreakdownPieChart({
+  title,
+  data,
+  onSegmentClick,
+}: {
+  title: string;
+  data: BreakdownItem[];
+  onSegmentClick?: (item: BreakdownItem) => void;
+}) {
   return (
     <Card>
       <CardHeader><CardTitle>{title}</CardTitle></CardHeader>
       <CardContent className="h-72">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
-            <Pie data={data} dataKey="value" nameKey="label" cx="50%" cy="50%" outerRadius={90} label>
+            <Pie
+              data={data}
+              dataKey="value"
+              nameKey="label"
+              cx="50%"
+              cy="50%"
+              outerRadius={90}
+              label
+              cursor={onSegmentClick ? "pointer" : undefined}
+              onClick={(entry) => {
+                if (onSegmentClick && entry?.payload) {
+                  onSegmentClick(entry.payload as BreakdownItem);
+                }
+              }}
+            >
               {data.map((_, index) => <Cell key={index} fill={COLORS[index % COLORS.length]} />)}
             </Pie>
             <Tooltip />
+            <Legend />
           </PieChart>
         </ResponsiveContainer>
       </CardContent>
@@ -55,7 +97,15 @@ export function BreakdownPieChart({ title, data }: { title: string; data: Breakd
   );
 }
 
-export function TrendLineChart({ title, chart }: { title: string; chart: ChartData }) {
+export function TrendLineChart({
+  title,
+  chart,
+  onPointClick,
+}: {
+  title: string;
+  chart: ChartData;
+  onPointClick?: (label: string, datasetLabel: string) => void;
+}) {
   const data = chart.labels.map((label, index) => {
     const point: Record<string, string | number> = { label };
     chart.datasets.forEach((dataset) => {
@@ -76,7 +126,34 @@ export function TrendLineChart({ title, chart }: { title: string; chart: ChartDa
             <Tooltip />
             <Legend />
             {chart.datasets.map((dataset, index) => (
-              <Line key={dataset.label} type="monotone" dataKey={dataset.label} stroke={COLORS[index % COLORS.length]} strokeWidth={2} dot={false} />
+              <Line
+                key={dataset.label}
+                type="monotone"
+                dataKey={dataset.label}
+                stroke={COLORS[index % COLORS.length]}
+                strokeWidth={2}
+                dot={
+                  onPointClick
+                    ? (props) => {
+                        const { cx, cy, payload } = props as { cx?: number; cy?: number; payload?: { label?: string } };
+                        if (cx == null || cy == null) return null;
+                        return (
+                          <circle
+                            cx={cx}
+                            cy={cy}
+                            r={4}
+                            fill={COLORS[index % COLORS.length]}
+                            style={{ cursor: "pointer" }}
+                            onClick={() => {
+                              if (payload?.label) onPointClick(payload.label, dataset.label);
+                            }}
+                          />
+                        );
+                      }
+                    : false
+                }
+                activeDot={{ r: 6, cursor: onPointClick ? "pointer" : undefined }}
+              />
             ))}
           </LineChart>
         </ResponsiveContainer>

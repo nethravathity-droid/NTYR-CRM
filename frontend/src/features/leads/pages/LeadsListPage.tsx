@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import {
   ChevronLeft,
   ChevronRight,
@@ -40,6 +40,7 @@ import { paths } from "@/routes/paths";
 
 export function LeadsListPage() {
   const { hasPermission } = usePermissions();
+  const [searchParams] = useSearchParams();
   const canCreate = hasPermission("leads.create");
   const canUpdate = hasPermission("leads.update");
 
@@ -65,6 +66,18 @@ export function LeadsListPage() {
     }, 300);
     return () => window.clearTimeout(timer);
   }, [searchInput]);
+
+  useEffect(() => {
+    const nextStatus = searchParams.get("status");
+    const nextLeadSource = searchParams.get("leadSource");
+    const nextSearch = searchParams.get("search");
+    if (nextStatus) setStatus(nextStatus as LeadStatus);
+    if (nextLeadSource) setLeadSource(nextLeadSource);
+    if (nextSearch) {
+      setSearchInput(nextSearch);
+      setSearch(nextSearch);
+    }
+  }, [searchParams]);
 
   const listParams = {
     page,

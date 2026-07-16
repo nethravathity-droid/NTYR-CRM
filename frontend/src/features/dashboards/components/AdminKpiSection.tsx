@@ -15,6 +15,8 @@ import {
 } from "lucide-react";
 import { formatCurrency } from "@/features/payments/types/payment.types";
 import { EnterpriseKpiCard, KpiGridSkeleton } from "@/features/dashboards/components/EnterpriseKpiCard";
+import { getKpiNavigationTarget } from "@/lib/dashboard/navigation";
+import type { DashboardDateRange } from "@/lib/dashboard/date-range";
 
 interface AdminKpiSectionProps {
   kpis: {
@@ -34,10 +36,11 @@ interface AdminKpiSectionProps {
     soldUnits: number;
     pendingPayments: number;
   };
+  dateRange: DashboardDateRange;
   loading?: boolean;
 }
 
-export function AdminKpiSection({ kpis, loading }: AdminKpiSectionProps) {
+export function AdminKpiSection({ kpis, dateRange, loading }: AdminKpiSectionProps) {
   if (loading) return <KpiGridSkeleton count={15} />;
 
   const cards = [
@@ -61,7 +64,11 @@ export function AdminKpiSection({ kpis, loading }: AdminKpiSectionProps) {
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
       {cards.map((card) => (
-        <EnterpriseKpiCard key={card.label} {...card} />
+        <EnterpriseKpiCard
+          key={card.label}
+          {...card}
+          to={getKpiNavigationTarget(card.label, dateRange)}
+        />
       ))}
     </div>
   );
