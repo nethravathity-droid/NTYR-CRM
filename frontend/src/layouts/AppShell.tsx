@@ -33,17 +33,20 @@ function AppShellInner({ roleCode }: AppShellProps) {
   }
 
   return (
-    <div className="premium-shell min-h-screen">
+    <div className="premium-shell">
       <PremiumSidebar sections={sections} dashboardPath={dashboardPath} workspaceLabel={workspaceLabel} />
+
       <div
         className={cn(
-          "min-h-screen transition-all duration-300",
-          sidebarCollapsed ? "lg:pl-[84px]" : "lg:pl-72",
+          "shell-main",
+          sidebarCollapsed ? "shell-main-collapsed" : "shell-main-expanded",
         )}
       >
         <PremiumHeader />
-        <main className="px-4 pb-8 pt-4 md:px-6 md:pt-6">
-          <Outlet />
+        <main className="shell-content px-4 pb-6 pt-4 md:px-6 md:pb-8 md:pt-6">
+          <div className="mx-auto w-full max-w-[1600px]">
+            <Outlet />
+          </div>
         </main>
       </div>
     </div>

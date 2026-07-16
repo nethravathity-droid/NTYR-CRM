@@ -16,7 +16,7 @@ import {
 } from "recharts";
 import type { BreakdownItem, ChartData } from "@/features/reports/types/report.types";
 
-const COLORS = ["#6366f1", "#06b6d4", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6", "#14b8a6"];
+const COLORS = ["#2563EB", "#14B8A6", "#10B981", "#F59E0B", "#EF4444", "#8B5CF6", "#6366F1"];
 
 export function BreakdownBarChart({ title, data }: { title: string; data: BreakdownItem[] }) {
   return (
@@ -29,7 +29,7 @@ export function BreakdownBarChart({ title, data }: { title: string; data: Breakd
             <XAxis dataKey="label" tick={{ fontSize: 12 }} />
             <YAxis allowDecimals={false} />
             <Tooltip />
-            <Bar dataKey="value" fill="#6366f1" radius={[4, 4, 0, 0]} />
+            <Bar dataKey="value" fill="#2563EB" radius={[6, 6, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </CardContent>

@@ -42,30 +42,42 @@ export function PremiumSidebar({ sections, dashboardPath, workspaceLabel }: Prem
     return () => window.removeEventListener("resize", onResize);
   }, []);
 
+  useEffect(() => {
+    document.body.style.overflow = mobileOpen ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [mobileOpen]);
+
   const sidebarContent = (
     <>
-      <div className="flex h-16 items-center justify-between border-b border-sidebar-border/60 px-4">
+      <div className="flex h-16 shrink-0 items-center justify-between border-b border-sidebar-border px-4">
         {!sidebarCollapsed ? (
           <div className="min-w-0">
             <p className="truncate text-xs uppercase tracking-[0.2em] text-sidebar-foreground/60">Enterprise CRM</p>
-            <p className="truncate font-semibold">{env.VITE_APP_NAME}</p>
+            <p className="truncate font-semibold text-sidebar-foreground">{env.VITE_APP_NAME}</p>
           </div>
         ) : (
-          <Sparkles className="mx-auto h-5 w-5 text-primary" />
+          <Sparkles className="mx-auto h-5 w-5 text-[#60A5FA]" />
         )}
-        <Button variant="ghost" size="icon" className="hidden lg:inline-flex" onClick={toggleSidebar}>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="hidden text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground lg:inline-flex"
+          onClick={toggleSidebar}
+        >
           {sidebarCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
         </Button>
       </div>
 
       {!sidebarCollapsed ? (
-        <div className="border-b border-sidebar-border/60 px-4 py-3">
+        <div className="shrink-0 border-b border-sidebar-border px-4 py-3">
           <p className="text-xs font-medium uppercase tracking-wider text-sidebar-foreground/50">Workspace</p>
-          <p className="truncate text-sm font-medium">{workspaceLabel}</p>
+          <p className="truncate text-sm font-medium text-sidebar-foreground">{workspaceLabel}</p>
         </div>
       ) : null}
 
-      <nav className="flex-1 space-y-5 overflow-y-auto p-3">
+      <nav className="min-h-0 flex-1 space-y-5 overflow-y-auto overscroll-contain p-3">
         {visibleSections.map((section) => (
           <div key={section.title}>
             {!sidebarCollapsed ? (
@@ -89,7 +101,7 @@ export function PremiumSidebar({ sections, dashboardPath, workspaceLabel }: Prem
                         sidebarCollapsed && "justify-center px-2",
                         isActive
                           ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-md shadow-primary/10"
-                          : "text-sidebar-foreground/75 hover:bg-sidebar-accent/80 hover:text-sidebar-accent-foreground",
+                          : "text-sidebar-foreground/75 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
                       )
                     }
                   >
@@ -107,12 +119,18 @@ export function PremiumSidebar({ sections, dashboardPath, workspaceLabel }: Prem
 
   return (
     <>
-      <div className="fixed inset-0 z-40 bg-background/70 backdrop-blur-sm lg:hidden" hidden={!mobileOpen} onClick={() => setMobileOpen(false)} />
+      {mobileOpen ? (
+        <div
+          className="fixed inset-0 z-40 bg-[#0B1F3A]/60 backdrop-blur-sm lg:hidden"
+          onClick={() => setMobileOpen(false)}
+          aria-hidden
+        />
+      ) : null}
 
       <aside
         className={cn(
-          "premium-sidebar fixed inset-y-0 left-0 z-50 flex flex-col border-r transition-all duration-300 lg:translate-x-0",
-          sidebarCollapsed ? "w-[84px]" : "w-72",
+          "premium-sidebar fixed inset-y-0 left-0 z-50 flex flex-col border-r transition-[width,transform] duration-300 ease-in-out lg:translate-x-0",
+          sidebarCollapsed ? "w-[var(--sidebar-width-collapsed)]" : "w-[var(--sidebar-width)]",
           mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
         )}
       >
@@ -122,7 +140,7 @@ export function PremiumSidebar({ sections, dashboardPath, workspaceLabel }: Prem
       <Button
         variant="outline"
         size="sm"
-        className="fixed left-4 top-4 z-30 lg:hidden"
+        className="fixed left-4 top-4 z-[60] border-sidebar-border bg-sidebar text-sidebar-foreground hover:bg-sidebar-accent lg:hidden"
         onClick={() => setMobileOpen(true)}
       >
         Menu

@@ -30,8 +30,12 @@ export function useSalesReport(params: ReportFiltersParams) {
   return useQuery({ queryKey: reportKeys.sales(params), queryFn: () => reportsService.getSales(params) });
 }
 
-export function useEmployeeReport(params: ReportFiltersParams) {
-  return useQuery({ queryKey: reportKeys.employees(params), queryFn: () => reportsService.getEmployees(params) });
+export function useEmployeeReport(params: ReportFiltersParams, options?: { enabled?: boolean }) {
+  return useQuery({
+    queryKey: reportKeys.employees(params),
+    queryFn: () => reportsService.getEmployees(params),
+    enabled: options?.enabled ?? true,
+  });
 }
 
 export function useFollowupReport(params: ReportFiltersParams) {
@@ -46,6 +50,10 @@ export function useBookingReport(params: ReportFiltersParams) {
   return useQuery({ queryKey: reportKeys.bookings(params), queryFn: () => reportsService.getBookings(params) });
 }
 
-export function usePaymentReport(params: ReportFiltersParams) {
-  return useQuery({ queryKey: reportKeys.payments(params), queryFn: () => reportsService.getPayments(params) });
+export function usePaymentReport(params: ReportFiltersParams, options?: { enabled?: boolean }) {
+  return useQuery({
+    queryKey: reportKeys.payments(params),
+    queryFn: () => reportsService.getPayments(params),
+    enabled: options?.enabled ?? true,
+  });
 }

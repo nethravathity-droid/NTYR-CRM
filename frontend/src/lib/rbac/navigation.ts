@@ -68,25 +68,27 @@ export function getNavigationSectionsForRole(roleCode: RoleCode): NavSection[] {
           title: "CRM",
           items: [
             { label: "Leads", href: rolePath("/leads"), icon: UserSquare2, permission: "leads.view" },
+            { label: "Customers", href: rolePath("/leads"), icon: Users, permission: "leads.view" },
             { label: "Calls", href: rolePath("/calls"), icon: PhoneCall, permission: "calls.view" },
             { label: "Follow-ups", href: rolePath("/followups"), icon: CalendarClock, permission: "leads.view" },
-          ],
-        },
-        {
-          title: "Sales & Inventory",
-          items: [
-            { label: "Projects", href: rolePath("/projects"), icon: Building2, permission: "projects.view" },
-            { label: "Inventory", href: rolePath("/projects/inventory"), icon: Package, permission: "projects.view" },
             { label: "Visits", href: rolePath("/visits"), icon: MapPinned, permission: "visits.view" },
             { label: "Bookings", href: rolePath("/bookings"), icon: CreditCard, permission: "bookings.view" },
             { label: "Payments", href: rolePath("/payments"), icon: Banknote, permission: "payments.view" },
           ],
         },
         {
-          title: "People & Insights",
+          title: "Projects & Inventory",
+          items: [
+            { label: "Projects", href: rolePath("/projects"), icon: Building2, permission: "projects.view" },
+            { label: "Inventory", href: rolePath("/projects/inventory"), icon: Package, permission: "projects.view" },
+          ],
+        },
+        {
+          title: "People & Analytics",
           items: [
             { label: "Employees", href: rolePath("/employees"), icon: Users, permission: "users.view" },
             { label: "Reports", href: rolePath("/reports"), icon: BarChart3, permission: "reports.view" },
+            { label: "Analytics", href: rolePath("/reports"), icon: Activity, permission: "reports.view" },
           ],
         },
         {
