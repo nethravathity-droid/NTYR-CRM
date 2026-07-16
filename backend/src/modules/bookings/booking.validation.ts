@@ -27,7 +27,7 @@ const uuidParamSchema = z.object({
 
 const moneySchema = z.coerce.number().min(0);
 
-const bookingBaseSchema = z.object({
+const bookingFieldsSchema = z.object({
   leadId: z.number().int().positive().nullable().optional(),
   customerName: z.string().trim().min(1).max(200),
   projectId: z.number().int().positive(),
@@ -43,7 +43,16 @@ const bookingBaseSchema = z.object({
   salesExecutiveUserId: z.number().int().positive().nullable().optional(),
   branchId: z.number().int().positive().nullable().optional(),
   notes: z.string().trim().max(4000).nullable().optional(),
-}).superRefine((data, ctx) => {
+});
+
+function validateBookingPricing(
+  data: Partial<z.infer<typeof bookingFieldsSchema>>,
+  ctx: z.RefinementCtx,
+): void {
+  if (data.totalUnitPrice == null || data.discountAmount == null || data.finalPrice == null) {
+    return;
+  }
+
   const expectedFinal = Number((data.totalUnitPrice - data.discountAmount).toFixed(2));
   const actualFinal = Number(data.finalPrice.toFixed(2));
   if (expectedFinal !== actualFinal) {
@@ -53,7 +62,9 @@ const bookingBaseSchema = z.object({
       path: ["finalPrice"],
     });
   }
-});
+}
+
+const bookingBaseSchema = bookingFieldsSchema.superRefine(validateBookingPricing);
 
 export const listBookingsSchema = z.object({
   query: z.object({
@@ -73,7 +84,9 @@ export const listBookingsSchema = z.object({
 });
 
 export const createBookingSchema = z.object({ body: bookingBaseSchema });
-export const updateBookingSchema = uuidParamSchema.extend({ body: bookingBaseSchema.partial() });
+export const updateBookingSchema = uuidParamSchema.extend({
+  body: bookingFieldsSchema.partial().superRefine(validateBookingPricing),
+});
 export const getBookingSchema = uuidParamSchema;
 export const deleteBookingSchema = uuidParamSchema;
 export const getBookingAuditSchema = uuidParamSchema;
