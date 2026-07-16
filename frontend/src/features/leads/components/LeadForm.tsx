@@ -289,7 +289,7 @@ export function LeadForm({
 
       <Card>
         <CardHeader className="flex flex-row items-start gap-4 space-y-0">
-          <IconBox icon={MapPin} tone="sky" />
+          <IconBox icon={MapPin} tone="indigo" />
           <div>
             <CardTitle>Notes</CardTitle>
             <CardDescription>Additional information about this lead.</CardDescription>

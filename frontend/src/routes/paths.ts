@@ -23,10 +23,20 @@ export const paths = {
   },
   followups: {
     list: "/followups",
+    today: "/followups/today",
     create: "/followups/new",
     edit: (uuid: string) => `/followups/${uuid}/edit`,
     timeline: (uuid: string) => `/followups/${uuid}/timeline`,
     calendar: "/followups/calendar",
+  },
+  projects: {
+    list: "/projects",
+    create: "/projects/new",
+    inventory: "/projects/inventory",
+    details: (uuid: string) => `/projects/${uuid}`,
+    edit: (uuid: string) => `/projects/${uuid}/edit`,
+    towers: (uuid: string) => `/projects/${uuid}/towers`,
+    units: (uuid?: string) => (uuid ? `/projects/${uuid}/units` : "/projects/units"),
   },
   notFound: "*",
 } as const;

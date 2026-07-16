@@ -21,6 +21,14 @@ import { FollowupCreatePage } from "@/features/followups/pages/FollowupCreatePag
 import { FollowupEditPage } from "@/features/followups/pages/FollowupEditPage";
 import { FollowupTimelinePage } from "@/features/followups/pages/FollowupTimelinePage";
 import { FollowupsListPage } from "@/features/followups/pages/FollowupsListPage";
+import { FollowupTodayPage } from "@/features/followups/pages/FollowupTodayPage";
+import { InventoryDashboardPage } from "@/features/properties/pages/InventoryDashboardPage";
+import { ProjectCreatePage } from "@/features/properties/pages/ProjectCreatePage";
+import { ProjectDetailsPage } from "@/features/properties/pages/ProjectDetailsPage";
+import { ProjectEditPage } from "@/features/properties/pages/ProjectEditPage";
+import { ProjectTowersPage } from "@/features/properties/pages/ProjectTowersPage";
+import { ProjectsListPage } from "@/features/properties/pages/ProjectsListPage";
+import { UnitsManagementPage } from "@/features/properties/pages/UnitsManagementPage";
 import { DashboardPage } from "@/pages/DashboardPage";
 import { NotFoundPage } from "@/pages/NotFoundPage";
 import { PermissionRoute } from "@/routes/PermissionRoute";
@@ -188,6 +196,14 @@ export const router = createBrowserRouter([
         ),
       },
       {
+        path: "followups/today",
+        element: (
+          <PermissionRoute permission="leads.view">
+            <FollowupTodayPage />
+          </PermissionRoute>
+        ),
+      },
+      {
         path: "followups/calendar",
         element: (
           <PermissionRoute permission="leads.view">
@@ -208,6 +224,70 @@ export const router = createBrowserRouter([
         element: (
           <PermissionRoute permission="leads.view">
             <FollowupTimelinePage />
+          </PermissionRoute>
+        ),
+      },
+      {
+        path: "projects",
+        element: (
+          <PermissionRoute permission="projects.view">
+            <ProjectsListPage />
+          </PermissionRoute>
+        ),
+      },
+      {
+        path: "projects/inventory",
+        element: (
+          <PermissionRoute permission="projects.view">
+            <InventoryDashboardPage />
+          </PermissionRoute>
+        ),
+      },
+      {
+        path: "projects/units",
+        element: (
+          <PermissionRoute permission="projects.view">
+            <UnitsManagementPage />
+          </PermissionRoute>
+        ),
+      },
+      {
+        path: "projects/new",
+        element: (
+          <PermissionRoute permission="projects.create">
+            <ProjectCreatePage />
+          </PermissionRoute>
+        ),
+      },
+      {
+        path: "projects/:uuid",
+        element: (
+          <PermissionRoute permission="projects.view">
+            <ProjectDetailsPage />
+          </PermissionRoute>
+        ),
+      },
+      {
+        path: "projects/:uuid/edit",
+        element: (
+          <PermissionRoute permission="projects.update">
+            <ProjectEditPage />
+          </PermissionRoute>
+        ),
+      },
+      {
+        path: "projects/:uuid/towers",
+        element: (
+          <PermissionRoute permission="projects.update">
+            <ProjectTowersPage />
+          </PermissionRoute>
+        ),
+      },
+      {
+        path: "projects/:uuid/units",
+        element: (
+          <PermissionRoute permission="projects.view">
+            <UnitsManagementPage />
           </PermissionRoute>
         ),
       },

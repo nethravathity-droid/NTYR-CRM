@@ -24,7 +24,7 @@ export function LeadStatsRow({ leads, total }: LeadStatsRowProps) {
       label: "New",
       value: newCount,
       icon: Target,
-      tone: "sky" as const,
+      tone: "cyan" as const,
     },
     {
       label: "Assigned",

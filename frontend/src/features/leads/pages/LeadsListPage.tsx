@@ -163,7 +163,7 @@ export function LeadsListPage() {
         tone="indigo"
         title="Lead Management"
         description="Capture, assign, and track sales leads across your organization."
-        actions={
+        action={
           <div className="flex flex-wrap gap-2">
             {canCreate ? (
               <>

@@ -349,6 +349,7 @@ export class LeadsService {
     for (let index = 0; index < rows.length; index += 1) {
       const rowNumber = index + 2;
       const row = rows[index];
+      if (!row) continue;
 
       try {
         if (!row.customerName?.trim()) {
@@ -479,7 +480,8 @@ export class LeadsService {
       throw new AppError(400, "CSV file must contain a header row and data");
     }
 
-    const headers = this.parseCsvLine(lines[0]).map((header) =>
+    const headerLine = lines[0] ?? "";
+    const headers = this.parseCsvLine(headerLine).map((header) =>
       this.normalizeHeader(header),
     );
 
@@ -529,6 +531,9 @@ export class LeadsService {
     }
 
     const sheet = workbook.Sheets[sheetName];
+    if (!sheet) {
+      throw new AppError(400, "Excel file does not contain a valid sheet");
+    }
     const rawRows = utils.sheet_to_json<Record<string, unknown>>(sheet, {
       defval: "",
     });
@@ -577,7 +582,7 @@ export class LeadsService {
         return;
       }
 
-      row[field] = value;
+      (row as unknown as Record<string, unknown>)[field] = value;
     });
 
     return row;

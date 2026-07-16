@@ -119,7 +119,7 @@ export function LeadDetailsPage() {
         tone="indigo"
         title={lead.customerName}
         description={`Lead ${lead.leadNumber} · Created ${formatDate(lead.createdAt)}`}
-        actions={
+        action={
           <div className="flex flex-wrap gap-2">
             {canUpdate ? (
               <Button asChild>
@@ -172,7 +172,7 @@ export function LeadDetailsPage() {
               </div>
 
               <div className="flex items-start gap-3 rounded-xl border p-4">
-                <IconBox icon={Mail} tone="sky" size="sm" />
+                <IconBox icon={Mail} tone="cyan" size="sm" />
                 <div>
                   <p className="text-sm text-muted-foreground">Email</p>
                   <p className="font-medium">{lead.email ?? "—"}</p>

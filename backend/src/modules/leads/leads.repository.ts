@@ -719,7 +719,7 @@ export class LeadsRepository {
 
     if (last?.lead_number) {
       const match = last.lead_number.match(/(\d+)$/);
-      if (match) {
+      if (match?.[1]) {
         next = Number.parseInt(match[1], 10) + 1;
       }
     }
