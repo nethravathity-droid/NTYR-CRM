@@ -12,6 +12,7 @@ import { EmployeeEditPage } from "@/features/employees/pages/EmployeeEditPage";
 import { EmployeesListPage } from "@/features/employees/pages/EmployeesListPage";
 import { LeadAssignPage } from "@/features/leads/pages/LeadAssignPage";
 import { LeadCreatePage } from "@/features/leads/pages/LeadCreatePage";
+import { LeadsListPage } from "@/features/leads/pages/LeadsListPage";
 import { LeadDetailsPage } from "@/features/leads/pages/LeadDetailsPage";
 import { LeadEditPage } from "@/features/leads/pages/LeadEditPage";
 import { LeadImportPage } from "@/features/leads/pages/LeadImportPage";
@@ -126,7 +127,7 @@ export const router = createBrowserRouter([
         path: "leads",
         element: (
           <PermissionRoute permission="leads.view">
-            <LeadAssignPage />
+            <LeadsListPage />
           </PermissionRoute>
         ),
       },

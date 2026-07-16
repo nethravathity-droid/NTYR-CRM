@@ -9,6 +9,7 @@
     "start": "node dist/server.js",
     "typecheck": "tsc --noEmit",
     "seed": "tsx src/database/seeds/index.ts",
+    "db:schema": "tsx src/database/apply-schema.ts",
     "db:test": "tsx src/database/test-connection.ts"
   },
   "keywords": [
