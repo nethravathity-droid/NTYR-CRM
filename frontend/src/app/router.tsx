@@ -1,4 +1,5 @@
 import { createBrowserRouter, Navigate, type RouteObject } from "react-router-dom";
+import type { ReactElement } from "react";
 import { AuthLayout } from "@/layouts/AuthLayout";
 import { ForbiddenLayout } from "@/layouts/ForbiddenLayout";
 import {
@@ -27,7 +28,7 @@ import {
 function createRoleWorkspace(
   path: string,
   allowedRoles: RoleCode[],
-  layout: JSX.Element,
+  layout: ReactElement,
   children: RouteObject[],
 ): RouteObject {
   return {

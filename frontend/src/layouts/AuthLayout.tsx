@@ -3,7 +3,6 @@ import { env } from "@/config/env";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { Loading } from "@/components/shared/Loading";
 import { getRoleDashboardPath, isPathAllowedForRole } from "@/lib/rbac/roles";
-import { paths } from "@/routes/paths";
 
 export function AuthLayout() {
   const { isAuthenticated, isInitializing, user } = useAuth();
