@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt";
 import type { Knex } from "knex";
 import {
+  DEMO_RBAC_ROLES,
   FULL_ACCESS,
   PERMISSIONS,
   SEED,
@@ -221,6 +222,109 @@ async function seedCompanyBundle(
   };
 }
 
+async function seedDemoRbacRoles(
+  trx: Knex.Transaction,
+  permissionMap: Map<string, number>,
+): Promise<void> {
+  const demoCompany = await trx("companies")
+    .where({ company_code: SEED.demo.companyCode })
+    .first<{ id: number }>();
+
+  if (!demoCompany) {
+    throw new Error("Demo company must be seeded before RBAC roles.");
+  }
+
+  const branch = await trx("branches")
+    .where({ company_id: demoCompany.id, branch_code: SEED.demo.branchCode })
+    .first<{ id: number }>();
+
+  const department = await trx("departments")
+    .where({ branch_id: branch?.id, department_code: SEED.demo.departmentCode })
+    .first<{ id: number }>();
+
+  if (!branch || !department) {
+    throw new Error("Demo branch/department not found for RBAC role seeding.");
+  }
+
+  for (const roleSeed of DEMO_RBAC_ROLES) {
+    const { id: designationId } = await findOrCreate(
+      trx,
+      "designations",
+      { company_id: demoCompany.id, designation_code: roleSeed.designationCode },
+      {
+        company_id: demoCompany.id,
+        designation_code: roleSeed.designationCode,
+        designation_name: roleSeed.designationName,
+        status: "ACTIVE",
+      },
+    );
+
+    const { id: roleId } = await findOrCreate(
+      trx,
+      "roles",
+      { company_id: demoCompany.id, role_code: roleSeed.roleCode },
+      {
+        company_id: demoCompany.id,
+        role_code: roleSeed.roleCode,
+        role_name: roleSeed.roleName,
+        description: `${roleSeed.roleName} system role`,
+        is_system: true,
+        status: "ACTIVE",
+      },
+    );
+
+    for (const permissionCode of roleSeed.permissionCodes) {
+      const permissionId = permissionMap.get(permissionCode);
+
+      if (!permissionId) {
+        throw new Error(`Permission "${permissionCode}" is not defined in seed constants.`);
+      }
+
+      await ensureRolePermission(trx, roleId, permissionId, FULL_ACCESS);
+    }
+
+    const existingUserId = await findByIdAllowDeleted(trx, "users", {
+      company_id: demoCompany.id,
+      username: roleSeed.user.username,
+    });
+
+    if (!existingUserId) {
+      const passwordHash = await bcrypt.hash(roleSeed.user.password, BCRYPT_ROUNDS);
+
+      const [createdUser] = await trx("users")
+        .insert({
+          company_id: demoCompany.id,
+          branch_id: branch.id,
+          department_id: department.id,
+          designation_id: designationId,
+          role_id: roleId,
+          employee_code: roleSeed.user.employeeCode,
+          username: roleSeed.user.username,
+          password_hash: passwordHash,
+          first_name: roleSeed.user.firstName,
+          last_name: roleSeed.user.lastName,
+          display_name: roleSeed.user.displayName,
+          official_email: roleSeed.user.officialEmail,
+          mobile: roleSeed.user.mobile,
+          status: "ACTIVE",
+          email_verified: true,
+          mobile_verified: true,
+        })
+        .returning("id");
+
+      await findOrCreate(trx, "employee_profiles", { user_id: createdUser.id }, {
+        company_id: demoCompany.id,
+        user_id: createdUser.id,
+        joining_date: new Date().toISOString().slice(0, 10),
+        personal_email: roleSeed.user.officialEmail,
+        city: SEED.demo.city,
+        state: SEED.demo.state,
+        country: "India",
+      });
+    }
+  }
+}
+
 async function runSeed(): Promise<void> {
   console.log("Starting database seed...\n");
 
@@ -281,6 +385,8 @@ async function runSeed(): Promise<void> {
       },
       permissionMap,
     );
+
+    await seedDemoRbacRoles(trx, permissionMap);
   });
 
   console.log("\nSeed completed successfully.\n");
@@ -295,6 +401,12 @@ async function runSeed(): Promise<void> {
   console.log(`Company Code : ${SEED.demo.companyCode}`);
   console.log(`Username     : ${SEED.demo.user.username}`);
   console.log(`Password     : ${SEED.demo.user.password}`);
+  console.log("");
+  console.log("Demo RBAC Users (company DEMO)");
+  console.log("------------------------------");
+  for (const roleSeed of DEMO_RBAC_ROLES) {
+    console.log(`${roleSeed.roleName.padEnd(16)}: ${roleSeed.user.username} / ${roleSeed.user.password}`);
+  }
   console.log("");
   console.log("Note: Re-running this seed is safe. Existing records are preserved.");
 }

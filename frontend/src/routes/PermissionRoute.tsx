@@ -1,7 +1,6 @@
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { usePermissions } from "@/hooks/usePermissions";
-import { getRoleDashboardPath } from "@/lib/rbac/roles";
 import type { ReactNode } from "react";
 import { paths } from "@/routes/paths";
 

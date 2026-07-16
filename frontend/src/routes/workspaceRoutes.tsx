@@ -1,3 +1,4 @@
+import type { ReactElement } from "react";
 import type { RouteObject } from "react-router-dom";
 import { CompaniesListPage } from "@/features/companies/pages/CompaniesListPage";
 import { CompanyCreatePage } from "@/features/companies/pages/CompanyCreatePage";
@@ -67,11 +68,11 @@ export type WorkspaceRouteOptions = {
   includeReports?: boolean;
 };
 
-function withPermission(permission: string, element: JSX.Element) {
+function withPermission(permission: string, element: ReactElement) {
   return <PermissionRoute permission={permission}>{element}</PermissionRoute>;
 }
 
-function withSuperAdminPermission(permission: string, element: JSX.Element) {
+function withSuperAdminPermission(permission: string, element: ReactElement) {
   return (
     <SuperAdminRoute>
       <PermissionRoute permission={permission}>{element}</PermissionRoute>

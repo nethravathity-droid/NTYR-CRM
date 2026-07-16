@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { paths } from "@/routes/paths";
 
 export function NotFoundPage() {
   return (
@@ -13,7 +12,7 @@ export function NotFoundPage() {
         The page you are looking for does not exist or may have been moved.
       </p>
       <Button asChild>
-        <Link to={paths.dashboard}>Back to dashboard</Link>
+        <Link to="/">Back to dashboard</Link>
       </Button>
     </div>
   );
