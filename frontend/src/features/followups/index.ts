@@ -4,6 +4,7 @@ export * from "./pages/FollowupsListPage";
 export * from "./pages/FollowupCreatePage";
 export * from "./pages/FollowupEditPage";
 export * from "./pages/FollowupTimelinePage";
+export * from "./pages/FollowupTodayPage";
 export * from "./pages/FollowupCalendarPage";
 export * from "./services/followups.service";
 export * from "./types/followup.types";

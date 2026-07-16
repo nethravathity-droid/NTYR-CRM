@@ -17,6 +17,8 @@ export interface FollowupAssignee {
   displayName: string | null;
 }
 
+export type ReminderBefore = 5 | 15 | 30 | 60;
+
 export interface FollowupListItem {
   id: number;
   uuid: string;
@@ -29,7 +31,7 @@ export interface FollowupListItem {
   priority: FollowupPriority;
   status: FollowupStatus;
   notes: string | null;
-  reminderBefore: number;
+  reminderBefore: ReminderBefore;
   nextFollowupDate: string | null;
   createdAt: string;
   updatedAt: string;
@@ -87,7 +89,7 @@ export interface FollowupFormValues {
   priority: FollowupPriority;
   status: FollowupStatus;
   notes: string;
-  reminderBefore: number;
+  reminderBefore: ReminderBefore;
   nextFollowupDate: string;
 }
 

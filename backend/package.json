@@ -10,6 +10,9 @@
     "typecheck": "tsc --noEmit",
     "seed": "tsx src/database/seeds/index.ts",
     "db:schema": "tsx src/database/apply-schema.ts",
+    "db:followups": "tsx src/database/apply-followups-schema.ts",
+    "db:properties": "tsx src/database/apply-properties-schema.ts",
+    "db:visits": "tsx src/database/apply-visits-schema.ts",
     "db:test": "tsx src/database/test-connection.ts"
   },
   "keywords": [

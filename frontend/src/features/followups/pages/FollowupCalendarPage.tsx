@@ -11,12 +11,6 @@ import { paths } from "@/routes/paths";
 
 const WEEKDAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
-function formatMonthKey(date: Date): string {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  return `${year}-${month}`;
-}
-
 function toDateKey(date: Date): string {
   return date.toISOString().slice(0, 10);
 }

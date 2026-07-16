@@ -1,14 +1,9 @@
 import { z } from "zod";
 
-const nullableId = z.preprocess(
-  (value) => (value === "" || value === null || value === undefined || Number.isNaN(value) ? null : value),
-  z.number().int().positive().nullable(),
-);
-
 export const followupFormSchema = z.object({
-  leadId: nullableId,
+  leadId: z.number().int().positive().nullable(),
   customerName: z.string().trim().min(1, "Customer name is required").max(200),
-  assignedUserId: nullableId,
+  assignedUserId: z.number().int().positive().nullable(),
   followupDate: z.string().min(1, "Follow-up date is required"),
   followupTime: z.string().min(1, "Follow-up time is required"),
   type: z.enum(["CALL", "WHATSAPP", "EMAIL", "MEETING", "SITE_VISIT"]),

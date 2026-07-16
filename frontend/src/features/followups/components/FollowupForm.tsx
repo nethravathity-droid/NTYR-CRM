@@ -10,15 +10,15 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { IconBox, type IconBoxTone } from "@/features/companies/components/IconBox";
 import { useFollowupFormOptions } from "@/features/followups/hooks/useFollowups";
-import { FOLLOWUP_PRIORITY_LABELS, FOLLOWUP_STATUS_LABELS, FOLLOWUP_TYPE_LABELS, type FollowupFormValues } from "@/features/followups/types/followup.types";
-import { followupFormSchema, followupDefaultValues } from "@/features/followups/schemas/followup.schema";
+import { FOLLOWUP_PRIORITY_LABELS, FOLLOWUP_STATUS_LABELS, FOLLOWUP_TYPE_LABELS } from "@/features/followups/types/followup.types";
+import { followupFormSchema, followupDefaultValues, type FollowupFormSchema } from "@/features/followups/schemas/followup.schema";
 
 interface FollowupFormProps {
   mode: "create" | "edit";
-  defaultValues?: FollowupFormValues;
+  defaultValues?: FollowupFormSchema;
   submitLabel: string;
   isSubmitting?: boolean;
-  onSubmit: (values: FollowupFormValues) => Promise<void> | void;
+  onSubmit: (values: FollowupFormSchema) => Promise<void> | void;
   onCancel?: () => void;
 }
 
@@ -39,7 +39,7 @@ function FormSection({ icon, tone, title, description, children }: { icon: typeo
 
 export function FollowupForm({ mode: _mode, defaultValues, submitLabel, isSubmitting = false, onSubmit, onCancel }: FollowupFormProps) {
   const { data: options, isLoading: isLoadingOptions } = useFollowupFormOptions();
-  const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<FollowupFormValues>({
+  const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<FollowupFormSchema>({
     resolver: zodResolver(followupFormSchema),
     defaultValues: useMemo(() => defaultValues ?? followupDefaultValues, [defaultValues]),
   });

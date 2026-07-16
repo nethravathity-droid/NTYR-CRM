@@ -4,7 +4,9 @@ import companiesRoutes from "../modules/companies/companies.routes.js";
 import dashboardRoutes from "../modules/dashboard/dashboard.routes.js";
 import followupsRoutes from "../modules/followups/followup.routes.js";
 import leadsRoutes from "../modules/leads/leads.routes.js";
+import { projectsRouter, unitsRouter } from "../modules/properties/property.routes.js";
 import usersRoutes from "../modules/users/users.routes.js";
+import visitsRoutes from "../modules/visits/visit.routes.js";
 
 const router = Router();
 
@@ -14,6 +16,9 @@ router.use("/dashboard", dashboardRoutes);
 router.use("/users", usersRoutes);
 router.use("/leads", leadsRoutes);
 router.use("/followups", followupsRoutes);
+router.use("/projects", projectsRouter);
+router.use("/units", unitsRouter);
+router.use("/visits", visitsRoutes);
 
 router.get("/health", (_req, res) => {
   res.status(200).json({

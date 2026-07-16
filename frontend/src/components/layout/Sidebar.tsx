@@ -61,10 +61,10 @@ const navigation: NavItem[] = [
   },
   {
     label: "Projects",
-    href: "#",
+    href: paths.projects.list,
     icon: Building2,
-    permission: null,
-    disabled: true,
+    permission: "projects.view",
+    disabled: false,
   },
   {
     label: "Visits",

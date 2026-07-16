@@ -181,6 +181,46 @@ export const PERMISSIONS = [
     name: "Delete Leads",
     module: "leads",
   },
+  {
+    code: "projects.view",
+    name: "View Projects",
+    module: "projects",
+  },
+  {
+    code: "projects.create",
+    name: "Create Projects",
+    module: "projects",
+  },
+  {
+    code: "projects.update",
+    name: "Update Projects",
+    module: "projects",
+  },
+  {
+    code: "projects.delete",
+    name: "Delete Projects",
+    module: "projects",
+  },
+  {
+    code: "visits.view",
+    name: "View Visits",
+    module: "visits",
+  },
+  {
+    code: "visits.create",
+    name: "Create Visits",
+    module: "visits",
+  },
+  {
+    code: "visits.update",
+    name: "Update Visits",
+    module: "visits",
+  },
+  {
+    code: "visits.delete",
+    name: "Delete Visits",
+    module: "visits",
+  },
 ] as const;
 
 export const FULL_ACCESS = {

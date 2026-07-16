@@ -5,6 +5,7 @@ import rateLimit from "express-rate-limit";
 import helmet from "helmet";
 import morgan from "morgan";
 import { env } from "./config/env.js";
+import { getUploadsRoot } from "./common/utils/uploads.js";
 import { errorHandler } from "./common/middleware/errorHandler.js";
 import { notFoundHandler } from "./common/middleware/notFound.js";
 import routes from "./routes/index.js";
@@ -48,6 +49,7 @@ const apiLimiter = rateLimit({
 });
 
 app.use("/api/v1", apiLimiter);
+app.use("/uploads", express.static(getUploadsRoot()));
 app.use("/api/v1", routes);
 
 app.use(notFoundHandler);
