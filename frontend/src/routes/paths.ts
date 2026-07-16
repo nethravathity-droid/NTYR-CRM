@@ -62,5 +62,15 @@ export const paths = {
     edit: (uuid: string) => `/payments/${uuid}/edit`,
     receipt: (uuid: string) => `/payments/${uuid}/receipt`,
   },
+  reports: {
+    dashboard: "/reports",
+    leads: "/reports/leads",
+    sales: "/reports/sales",
+    employees: "/reports/employees",
+    followups: "/reports/followups",
+    visits: "/reports/visits",
+    bookings: "/reports/bookings",
+    payments: "/reports/payments",
+  },
   notFound: "*",
 } as const;

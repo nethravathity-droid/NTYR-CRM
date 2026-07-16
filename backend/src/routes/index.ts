@@ -9,6 +9,7 @@ import usersRoutes from "../modules/users/users.routes.js";
 import visitsRoutes from "../modules/visits/visit.routes.js";
 import bookingsRoutes from "../modules/bookings/booking.routes.js";
 import paymentsRoutes from "../modules/payments/payment.routes.js";
+import reportsRoutes from "../modules/reports/reports.routes.js";
 
 const router = Router();
 
@@ -23,6 +24,7 @@ router.use("/units", unitsRouter);
 router.use("/visits", visitsRoutes);
 router.use("/bookings", bookingsRoutes);
 router.use("/payments", paymentsRoutes);
+router.use("/reports", reportsRoutes);
 
 router.get("/health", (_req, res) => {
   res.status(200).json({

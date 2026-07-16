@@ -261,6 +261,16 @@ export const PERMISSIONS = [
     name: "Delete Payments",
     module: "payments",
   },
+  {
+    code: "reports.view",
+    name: "View Reports",
+    module: "reports",
+  },
+  {
+    code: "reports.export",
+    name: "Export Reports",
+    module: "reports",
+  },
 ] as const;
 
 export const FULL_ACCESS = {

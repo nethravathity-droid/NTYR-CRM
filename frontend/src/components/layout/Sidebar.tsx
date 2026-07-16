@@ -1,5 +1,6 @@
 import { NavLink } from "react-router-dom";
 import {
+  BarChart3,
   Building2,
   Banknote,
   CalendarClock,
@@ -86,6 +87,13 @@ const navigation: NavItem[] = [
     href: paths.payments.dashboard,
     icon: Banknote,
     permission: "payments.view",
+    disabled: false,
+  },
+  {
+    label: "Reports",
+    href: paths.reports.dashboard,
+    icon: BarChart3,
+    permission: "reports.view",
     disabled: false,
   },
   {

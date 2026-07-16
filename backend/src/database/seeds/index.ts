@@ -274,6 +274,8 @@ async function runSeed(): Promise<void> {
           "payments.create",
           "payments.update",
           "payments.delete",
+          "reports.view",
+          "reports.export",
         ],
         permissionGrants: FULL_ACCESS,
       },

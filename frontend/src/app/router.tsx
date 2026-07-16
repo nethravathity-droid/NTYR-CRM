@@ -47,6 +47,14 @@ import { PaymentEditPage } from "@/features/payments/pages/PaymentEditPage";
 import { PaymentReceiptPage } from "@/features/payments/pages/PaymentReceiptPage";
 import { PaymentSchedulePage } from "@/features/payments/pages/PaymentSchedulePage";
 import { PaymentsListPage } from "@/features/payments/pages/PaymentsListPage";
+import { BookingReportPage } from "@/features/reports/pages/BookingReportPage";
+import { EmployeeReportPage } from "@/features/reports/pages/EmployeeReportPage";
+import { FollowupReportPage } from "@/features/reports/pages/FollowupReportPage";
+import { LeadReportPage } from "@/features/reports/pages/LeadReportPage";
+import { PaymentReportPage } from "@/features/reports/pages/PaymentReportPage";
+import { ReportsDashboardPage } from "@/features/reports/pages/ReportsDashboardPage";
+import { SalesReportPage } from "@/features/reports/pages/SalesReportPage";
+import { VisitReportPage } from "@/features/reports/pages/VisitReportPage";
 import { DashboardPage } from "@/pages/DashboardPage";
 import { NotFoundPage } from "@/pages/NotFoundPage";
 import { PermissionRoute } from "@/routes/PermissionRoute";
@@ -450,6 +458,70 @@ export const router = createBrowserRouter([
         element: (
           <PermissionRoute permission="payments.view">
             <PaymentDetailsPage />
+          </PermissionRoute>
+        ),
+      },
+      {
+        path: "reports",
+        element: (
+          <PermissionRoute permission="reports.view">
+            <ReportsDashboardPage />
+          </PermissionRoute>
+        ),
+      },
+      {
+        path: "reports/leads",
+        element: (
+          <PermissionRoute permission="reports.view">
+            <LeadReportPage />
+          </PermissionRoute>
+        ),
+      },
+      {
+        path: "reports/sales",
+        element: (
+          <PermissionRoute permission="reports.view">
+            <SalesReportPage />
+          </PermissionRoute>
+        ),
+      },
+      {
+        path: "reports/employees",
+        element: (
+          <PermissionRoute permission="reports.view">
+            <EmployeeReportPage />
+          </PermissionRoute>
+        ),
+      },
+      {
+        path: "reports/followups",
+        element: (
+          <PermissionRoute permission="reports.view">
+            <FollowupReportPage />
+          </PermissionRoute>
+        ),
+      },
+      {
+        path: "reports/visits",
+        element: (
+          <PermissionRoute permission="reports.view">
+            <VisitReportPage />
+          </PermissionRoute>
+        ),
+      },
+      {
+        path: "reports/bookings",
+        element: (
+          <PermissionRoute permission="reports.view">
+            <BookingReportPage />
+          </PermissionRoute>
+        ),
+      },
+      {
+        path: "reports/payments",
+        element: (
+          <PermissionRoute permission="reports.view">
+            <PaymentReportPage />
           </PermissionRoute>
         ),
       },
