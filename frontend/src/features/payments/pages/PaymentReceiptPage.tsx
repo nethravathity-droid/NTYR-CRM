@@ -3,7 +3,6 @@ import { Link, useParams } from "react-router-dom";
 import { FileText, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Loading } from "@/components/shared/Loading";
 import { CompanyPageHeader } from "@/features/companies/components/CompanyPageHeader";
 import { PaymentStatusBadge } from "@/features/payments/components/PaymentStatusBadge";
