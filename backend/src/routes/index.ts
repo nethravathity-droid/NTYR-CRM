@@ -7,6 +7,8 @@ import leadsRoutes from "../modules/leads/leads.routes.js";
 import { projectsRouter, unitsRouter } from "../modules/properties/property.routes.js";
 import usersRoutes from "../modules/users/users.routes.js";
 import visitsRoutes from "../modules/visits/visit.routes.js";
+import bookingsRoutes from "../modules/bookings/booking.routes.js";
+import paymentsRoutes from "../modules/payments/payment.routes.js";
 
 const router = Router();
 
@@ -19,6 +21,8 @@ router.use("/followups", followupsRoutes);
 router.use("/projects", projectsRouter);
 router.use("/units", unitsRouter);
 router.use("/visits", visitsRoutes);
+router.use("/bookings", bookingsRoutes);
+router.use("/payments", paymentsRoutes);
 
 router.get("/health", (_req, res) => {
   res.status(200).json({

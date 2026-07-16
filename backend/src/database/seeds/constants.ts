@@ -221,6 +221,46 @@ export const PERMISSIONS = [
     name: "Delete Visits",
     module: "visits",
   },
+  {
+    code: "bookings.view",
+    name: "View Bookings",
+    module: "bookings",
+  },
+  {
+    code: "bookings.create",
+    name: "Create Bookings",
+    module: "bookings",
+  },
+  {
+    code: "bookings.update",
+    name: "Update Bookings",
+    module: "bookings",
+  },
+  {
+    code: "bookings.delete",
+    name: "Delete Bookings",
+    module: "bookings",
+  },
+  {
+    code: "payments.view",
+    name: "View Payments",
+    module: "payments",
+  },
+  {
+    code: "payments.create",
+    name: "Create Payments",
+    module: "payments",
+  },
+  {
+    code: "payments.update",
+    name: "Update Payments",
+    module: "payments",
+  },
+  {
+    code: "payments.delete",
+    name: "Delete Payments",
+    module: "payments",
+  },
 ] as const;
 
 export const FULL_ACCESS = {

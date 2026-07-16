@@ -40,6 +40,13 @@ import { BookingDetailsPage } from "@/features/bookings/pages/BookingDetailsPage
 import { BookingDocumentsPage } from "@/features/bookings/pages/BookingDocumentsPage";
 import { BookingEditPage } from "@/features/bookings/pages/BookingEditPage";
 import { BookingsListPage } from "@/features/bookings/pages/BookingsListPage";
+import { PaymentCreatePage } from "@/features/payments/pages/PaymentCreatePage";
+import { PaymentDashboardPage } from "@/features/payments/pages/PaymentDashboardPage";
+import { PaymentDetailsPage } from "@/features/payments/pages/PaymentDetailsPage";
+import { PaymentEditPage } from "@/features/payments/pages/PaymentEditPage";
+import { PaymentReceiptPage } from "@/features/payments/pages/PaymentReceiptPage";
+import { PaymentSchedulePage } from "@/features/payments/pages/PaymentSchedulePage";
+import { PaymentsListPage } from "@/features/payments/pages/PaymentsListPage";
 import { DashboardPage } from "@/pages/DashboardPage";
 import { NotFoundPage } from "@/pages/NotFoundPage";
 import { PermissionRoute } from "@/routes/PermissionRoute";
@@ -387,6 +394,62 @@ export const router = createBrowserRouter([
         element: (
           <PermissionRoute permission="bookings.view">
             <BookingDetailsPage />
+          </PermissionRoute>
+        ),
+      },
+      {
+        path: "payments",
+        element: (
+          <PermissionRoute permission="payments.view">
+            <PaymentDashboardPage />
+          </PermissionRoute>
+        ),
+      },
+      {
+        path: "payments/list",
+        element: (
+          <PermissionRoute permission="payments.view">
+            <PaymentsListPage />
+          </PermissionRoute>
+        ),
+      },
+      {
+        path: "payments/new",
+        element: (
+          <PermissionRoute permission="payments.create">
+            <PaymentCreatePage />
+          </PermissionRoute>
+        ),
+      },
+      {
+        path: "payments/schedule",
+        element: (
+          <PermissionRoute permission="payments.view">
+            <PaymentSchedulePage />
+          </PermissionRoute>
+        ),
+      },
+      {
+        path: "payments/:uuid/receipt",
+        element: (
+          <PermissionRoute permission="payments.view">
+            <PaymentReceiptPage />
+          </PermissionRoute>
+        ),
+      },
+      {
+        path: "payments/:uuid/edit",
+        element: (
+          <PermissionRoute permission="payments.update">
+            <PaymentEditPage />
+          </PermissionRoute>
+        ),
+      },
+      {
+        path: "payments/:uuid",
+        element: (
+          <PermissionRoute permission="payments.view">
+            <PaymentDetailsPage />
           </PermissionRoute>
         ),
       },
