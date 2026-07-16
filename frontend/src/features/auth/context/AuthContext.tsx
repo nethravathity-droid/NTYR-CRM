@@ -9,6 +9,7 @@ import {
 } from "react";
 import { authService } from "@/features/auth/services/auth.service";
 import type { CurrentUser, LoginPayload } from "@/features/auth/types/auth.types";
+import { setActiveRoleCode } from "@/lib/rbac/roles";
 import { tokenStorage } from "@/lib/storage/token.storage";
 import { getApiErrorMessage } from "@/lib/api/client";
 
@@ -38,6 +39,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     const currentUser = await authService.getCurrentUser();
+    setActiveRoleCode(currentUser.role.code);
     setUser(currentUser);
   }, []);
 
@@ -68,6 +70,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         result.tokens.refreshToken,
       );
       setUser(result.user);
+      setActiveRoleCode(result.user.role.code);
     } catch (error) {
       throw new Error(getApiErrorMessage(error));
     } finally {
@@ -88,6 +91,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Clear local session even if API logout fails
     } finally {
       tokenStorage.clearTokens();
+      setActiveRoleCode(undefined);
       setUser(null);
       setIsLoading(false);
     }

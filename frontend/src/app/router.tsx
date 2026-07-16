@@ -1,66 +1,48 @@
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, Navigate, type RouteObject } from "react-router-dom";
 import { AuthLayout } from "@/layouts/AuthLayout";
-import { DashboardLayout } from "@/layouts/DashboardLayout";
+import { ForbiddenLayout } from "@/layouts/ForbiddenLayout";
+import {
+  AdminLayout,
+  ManagerLayout,
+  SalesLayout,
+  SuperAdminLayout,
+  TelecallerLayout,
+} from "@/layouts/role-layouts";
 import { LoginPage } from "@/features/auth/pages/LoginPage";
-import { CompaniesListPage } from "@/features/companies/pages/CompaniesListPage";
-import { CompanyCreatePage } from "@/features/companies/pages/CompanyCreatePage";
-import { CompanyDetailsPage } from "@/features/companies/pages/CompanyDetailsPage";
-import { CompanyEditPage } from "@/features/companies/pages/CompanyEditPage";
-import { EmployeeCreatePage } from "@/features/employees/pages/EmployeeCreatePage";
-import { EmployeeDetailsPage } from "@/features/employees/pages/EmployeeDetailsPage";
-import { EmployeeEditPage } from "@/features/employees/pages/EmployeeEditPage";
-import { EmployeesListPage } from "@/features/employees/pages/EmployeesListPage";
-import { LeadAssignPage } from "@/features/leads/pages/LeadAssignPage";
-import { LeadCreatePage } from "@/features/leads/pages/LeadCreatePage";
-import { LeadsListPage } from "@/features/leads/pages/LeadsListPage";
-import { LeadDetailsPage } from "@/features/leads/pages/LeadDetailsPage";
-import { LeadEditPage } from "@/features/leads/pages/LeadEditPage";
-import { LeadImportPage } from "@/features/leads/pages/LeadImportPage";
-import { FollowupCalendarPage } from "@/features/followups/pages/FollowupCalendarPage";
-import { FollowupCreatePage } from "@/features/followups/pages/FollowupCreatePage";
-import { FollowupEditPage } from "@/features/followups/pages/FollowupEditPage";
-import { FollowupTimelinePage } from "@/features/followups/pages/FollowupTimelinePage";
-import { FollowupsListPage } from "@/features/followups/pages/FollowupsListPage";
-import { FollowupTodayPage } from "@/features/followups/pages/FollowupTodayPage";
-import { InventoryDashboardPage } from "@/features/properties/pages/InventoryDashboardPage";
-import { ProjectCreatePage } from "@/features/properties/pages/ProjectCreatePage";
-import { ProjectDetailsPage } from "@/features/properties/pages/ProjectDetailsPage";
-import { ProjectEditPage } from "@/features/properties/pages/ProjectEditPage";
-import { ProjectTowersPage } from "@/features/properties/pages/ProjectTowersPage";
-import { ProjectsListPage } from "@/features/properties/pages/ProjectsListPage";
-import { UnitsManagementPage } from "@/features/properties/pages/UnitsManagementPage";
-import { VisitCalendarPage } from "@/features/visits/pages/VisitCalendarPage";
-import { VisitCreatePage } from "@/features/visits/pages/VisitCreatePage";
-import { VisitDetailsPage } from "@/features/visits/pages/VisitDetailsPage";
-import { VisitEditPage } from "@/features/visits/pages/VisitEditPage";
-import { VisitsListPage } from "@/features/visits/pages/VisitsListPage";
-import { BookingApprovalPage } from "@/features/bookings/pages/BookingApprovalPage";
-import { BookingCreatePage } from "@/features/bookings/pages/BookingCreatePage";
-import { BookingDetailsPage } from "@/features/bookings/pages/BookingDetailsPage";
-import { BookingDocumentsPage } from "@/features/bookings/pages/BookingDocumentsPage";
-import { BookingEditPage } from "@/features/bookings/pages/BookingEditPage";
-import { BookingsListPage } from "@/features/bookings/pages/BookingsListPage";
-import { PaymentCreatePage } from "@/features/payments/pages/PaymentCreatePage";
-import { PaymentDashboardPage } from "@/features/payments/pages/PaymentDashboardPage";
-import { PaymentDetailsPage } from "@/features/payments/pages/PaymentDetailsPage";
-import { PaymentEditPage } from "@/features/payments/pages/PaymentEditPage";
-import { PaymentReceiptPage } from "@/features/payments/pages/PaymentReceiptPage";
-import { PaymentSchedulePage } from "@/features/payments/pages/PaymentSchedulePage";
-import { PaymentsListPage } from "@/features/payments/pages/PaymentsListPage";
-import { BookingReportPage } from "@/features/reports/pages/BookingReportPage";
-import { EmployeeReportPage } from "@/features/reports/pages/EmployeeReportPage";
-import { FollowupReportPage } from "@/features/reports/pages/FollowupReportPage";
-import { LeadReportPage } from "@/features/reports/pages/LeadReportPage";
-import { PaymentReportPage } from "@/features/reports/pages/PaymentReportPage";
-import { ReportsDashboardPage } from "@/features/reports/pages/ReportsDashboardPage";
-import { SalesReportPage } from "@/features/reports/pages/SalesReportPage";
-import { VisitReportPage } from "@/features/reports/pages/VisitReportPage";
-import { DashboardPage } from "@/pages/DashboardPage";
+import { ForbiddenPage } from "@/pages/ForbiddenPage";
 import { NotFoundPage } from "@/pages/NotFoundPage";
-import { PermissionRoute } from "@/routes/PermissionRoute";
 import { ProtectedRoute } from "@/routes/ProtectedRoute";
-import { SuperAdminRoute } from "@/routes/SuperAdminRoute";
+import { RoleRootRedirect } from "@/routes/RoleRootRedirect";
+import { RoleRoute } from "@/routes/RoleRoute";
 import { paths } from "@/routes/paths";
+import { ROLE_CODES, type RoleCode } from "@/lib/rbac/roles";
+import {
+  adminWorkspaceRoutes,
+  managerWorkspaceRoutes,
+  salesWorkspaceRoutes,
+  superAdminWorkspaceRoutes,
+  telecallerWorkspaceRoutes,
+} from "@/routes/workspaceRoutes";
+
+function createRoleWorkspace(
+  path: string,
+  allowedRoles: RoleCode[],
+  layout: JSX.Element,
+  children: RouteObject[],
+): RouteObject {
+  return {
+    path,
+    element: (
+      <ProtectedRoute>
+        <RoleRoute allowedRoles={allowedRoles}>{layout}</RoleRoute>
+      </ProtectedRoute>
+    ),
+    children: [
+      { index: true, element: <Navigate to="dashboard" replace /> },
+      ...children,
+    ],
+  };
+}
 
 export const router = createBrowserRouter([
   {
@@ -74,456 +56,54 @@ export const router = createBrowserRouter([
     ],
   },
   {
-    path: paths.dashboard,
+    path: "/",
     element: (
       <ProtectedRoute>
-        <DashboardLayout />
+        <RoleRootRedirect />
+      </ProtectedRoute>
+    ),
+  },
+  createRoleWorkspace(
+    "/super-admin",
+    [ROLE_CODES.PLATFORM_SUPER_ADMIN],
+    <SuperAdminLayout />,
+    superAdminWorkspaceRoutes,
+  ),
+  createRoleWorkspace(
+    "/admin",
+    [ROLE_CODES.COMPANY_ADMIN],
+    <AdminLayout />,
+    adminWorkspaceRoutes,
+  ),
+  createRoleWorkspace(
+    "/manager",
+    [ROLE_CODES.MANAGER],
+    <ManagerLayout />,
+    managerWorkspaceRoutes,
+  ),
+  createRoleWorkspace(
+    "/telecaller",
+    [ROLE_CODES.TELECALLER],
+    <TelecallerLayout />,
+    telecallerWorkspaceRoutes,
+  ),
+  createRoleWorkspace(
+    "/sales",
+    [ROLE_CODES.SALES_EXECUTIVE],
+    <SalesLayout />,
+    salesWorkspaceRoutes,
+  ),
+  {
+    path: paths.forbidden,
+    element: (
+      <ProtectedRoute>
+        <ForbiddenLayout />
       </ProtectedRoute>
     ),
     children: [
       {
         index: true,
-        element: <DashboardPage />,
-      },
-      {
-        path: "companies",
-        element: (
-          <SuperAdminRoute>
-            <PermissionRoute permission="companies.view">
-              <CompaniesListPage />
-            </PermissionRoute>
-          </SuperAdminRoute>
-        ),
-      },
-      {
-        path: "companies/new",
-        element: (
-          <SuperAdminRoute>
-            <PermissionRoute permission="companies.create">
-              <CompanyCreatePage />
-            </PermissionRoute>
-          </SuperAdminRoute>
-        ),
-      },
-      {
-        path: "companies/:uuid",
-        element: (
-          <SuperAdminRoute>
-            <PermissionRoute permission="companies.view">
-              <CompanyDetailsPage />
-            </PermissionRoute>
-          </SuperAdminRoute>
-        ),
-      },
-      {
-        path: "companies/:uuid/edit",
-        element: (
-          <SuperAdminRoute>
-            <PermissionRoute permission="companies.update">
-              <CompanyEditPage />
-            </PermissionRoute>
-          </SuperAdminRoute>
-        ),
-      },
-      {
-        path: "employees",
-        element: (
-          <PermissionRoute permission="users.view">
-            <EmployeesListPage />
-          </PermissionRoute>
-        ),
-      },
-      {
-        path: "employees/new",
-        element: (
-          <PermissionRoute permission="users.create">
-            <EmployeeCreatePage />
-          </PermissionRoute>
-        ),
-      },
-      {
-        path: "employees/:uuid",
-        element: (
-          <PermissionRoute permission="users.view">
-            <EmployeeDetailsPage />
-          </PermissionRoute>
-        ),
-      },
-      {
-        path: "employees/:uuid/edit",
-        element: (
-          <PermissionRoute permission="users.update">
-            <EmployeeEditPage />
-          </PermissionRoute>
-        ),
-      },
-      {
-        path: "leads",
-        element: (
-          <PermissionRoute permission="leads.view">
-            <LeadsListPage />
-          </PermissionRoute>
-        ),
-      },
-      {
-        path: "leads/new",
-        element: (
-          <PermissionRoute permission="leads.create">
-            <LeadCreatePage />
-          </PermissionRoute>
-        ),
-      },
-      {
-        path: "leads/import",
-        element: (
-          <PermissionRoute permission="leads.create">
-            <LeadImportPage />
-          </PermissionRoute>
-        ),
-      },
-      {
-        path: "leads/assign",
-        element: (
-          <PermissionRoute permission="leads.update">
-            <LeadAssignPage />
-          </PermissionRoute>
-        ),
-      },
-      {
-        path: "leads/:uuid",
-        element: (
-          <PermissionRoute permission="leads.view">
-            <LeadDetailsPage />
-          </PermissionRoute>
-        ),
-      },
-      {
-        path: "leads/:uuid/edit",
-        element: (
-          <PermissionRoute permission="leads.update">
-            <LeadEditPage />
-          </PermissionRoute>
-        ),
-      },
-      {
-        path: "followups",
-        element: (
-          <PermissionRoute permission="leads.view">
-            <FollowupsListPage />
-          </PermissionRoute>
-        ),
-      },
-      {
-        path: "followups/new",
-        element: (
-          <PermissionRoute permission="leads.create">
-            <FollowupCreatePage />
-          </PermissionRoute>
-        ),
-      },
-      {
-        path: "followups/today",
-        element: (
-          <PermissionRoute permission="leads.view">
-            <FollowupTodayPage />
-          </PermissionRoute>
-        ),
-      },
-      {
-        path: "followups/calendar",
-        element: (
-          <PermissionRoute permission="leads.view">
-            <FollowupCalendarPage />
-          </PermissionRoute>
-        ),
-      },
-      {
-        path: "followups/:uuid/edit",
-        element: (
-          <PermissionRoute permission="leads.update">
-            <FollowupEditPage />
-          </PermissionRoute>
-        ),
-      },
-      {
-        path: "followups/:uuid/timeline",
-        element: (
-          <PermissionRoute permission="leads.view">
-            <FollowupTimelinePage />
-          </PermissionRoute>
-        ),
-      },
-      {
-        path: "projects",
-        element: (
-          <PermissionRoute permission="projects.view">
-            <ProjectsListPage />
-          </PermissionRoute>
-        ),
-      },
-      {
-        path: "projects/inventory",
-        element: (
-          <PermissionRoute permission="projects.view">
-            <InventoryDashboardPage />
-          </PermissionRoute>
-        ),
-      },
-      {
-        path: "projects/units",
-        element: (
-          <PermissionRoute permission="projects.view">
-            <UnitsManagementPage />
-          </PermissionRoute>
-        ),
-      },
-      {
-        path: "projects/new",
-        element: (
-          <PermissionRoute permission="projects.create">
-            <ProjectCreatePage />
-          </PermissionRoute>
-        ),
-      },
-      {
-        path: "projects/:uuid",
-        element: (
-          <PermissionRoute permission="projects.view">
-            <ProjectDetailsPage />
-          </PermissionRoute>
-        ),
-      },
-      {
-        path: "projects/:uuid/edit",
-        element: (
-          <PermissionRoute permission="projects.update">
-            <ProjectEditPage />
-          </PermissionRoute>
-        ),
-      },
-      {
-        path: "projects/:uuid/towers",
-        element: (
-          <PermissionRoute permission="projects.update">
-            <ProjectTowersPage />
-          </PermissionRoute>
-        ),
-      },
-      {
-        path: "projects/:uuid/units",
-        element: (
-          <PermissionRoute permission="projects.view">
-            <UnitsManagementPage />
-          </PermissionRoute>
-        ),
-      },
-      {
-        path: "visits",
-        element: (
-          <PermissionRoute permission="visits.view">
-            <VisitsListPage />
-          </PermissionRoute>
-        ),
-      },
-      {
-        path: "visits/new",
-        element: (
-          <PermissionRoute permission="visits.create">
-            <VisitCreatePage />
-          </PermissionRoute>
-        ),
-      },
-      {
-        path: "visits/calendar",
-        element: (
-          <PermissionRoute permission="visits.view">
-            <VisitCalendarPage />
-          </PermissionRoute>
-        ),
-      },
-      {
-        path: "visits/:uuid",
-        element: (
-          <PermissionRoute permission="visits.view">
-            <VisitDetailsPage />
-          </PermissionRoute>
-        ),
-      },
-      {
-        path: "visits/:uuid/edit",
-        element: (
-          <PermissionRoute permission="visits.update">
-            <VisitEditPage />
-          </PermissionRoute>
-        ),
-      },
-      {
-        path: "bookings",
-        element: (
-          <PermissionRoute permission="bookings.view">
-            <BookingsListPage />
-          </PermissionRoute>
-        ),
-      },
-      {
-        path: "bookings/new",
-        element: (
-          <PermissionRoute permission="bookings.create">
-            <BookingCreatePage />
-          </PermissionRoute>
-        ),
-      },
-      {
-        path: "bookings/approvals",
-        element: (
-          <PermissionRoute permission="bookings.update">
-            <BookingApprovalPage />
-          </PermissionRoute>
-        ),
-      },
-      {
-        path: "bookings/:uuid/documents",
-        element: (
-          <PermissionRoute permission="bookings.update">
-            <BookingDocumentsPage />
-          </PermissionRoute>
-        ),
-      },
-      {
-        path: "bookings/:uuid/edit",
-        element: (
-          <PermissionRoute permission="bookings.update">
-            <BookingEditPage />
-          </PermissionRoute>
-        ),
-      },
-      {
-        path: "bookings/:uuid",
-        element: (
-          <PermissionRoute permission="bookings.view">
-            <BookingDetailsPage />
-          </PermissionRoute>
-        ),
-      },
-      {
-        path: "payments",
-        element: (
-          <PermissionRoute permission="payments.view">
-            <PaymentDashboardPage />
-          </PermissionRoute>
-        ),
-      },
-      {
-        path: "payments/list",
-        element: (
-          <PermissionRoute permission="payments.view">
-            <PaymentsListPage />
-          </PermissionRoute>
-        ),
-      },
-      {
-        path: "payments/new",
-        element: (
-          <PermissionRoute permission="payments.create">
-            <PaymentCreatePage />
-          </PermissionRoute>
-        ),
-      },
-      {
-        path: "payments/schedule",
-        element: (
-          <PermissionRoute permission="payments.view">
-            <PaymentSchedulePage />
-          </PermissionRoute>
-        ),
-      },
-      {
-        path: "payments/:uuid/receipt",
-        element: (
-          <PermissionRoute permission="payments.view">
-            <PaymentReceiptPage />
-          </PermissionRoute>
-        ),
-      },
-      {
-        path: "payments/:uuid/edit",
-        element: (
-          <PermissionRoute permission="payments.update">
-            <PaymentEditPage />
-          </PermissionRoute>
-        ),
-      },
-      {
-        path: "payments/:uuid",
-        element: (
-          <PermissionRoute permission="payments.view">
-            <PaymentDetailsPage />
-          </PermissionRoute>
-        ),
-      },
-      {
-        path: "reports",
-        element: (
-          <PermissionRoute permission="reports.view">
-            <ReportsDashboardPage />
-          </PermissionRoute>
-        ),
-      },
-      {
-        path: "reports/leads",
-        element: (
-          <PermissionRoute permission="reports.view">
-            <LeadReportPage />
-          </PermissionRoute>
-        ),
-      },
-      {
-        path: "reports/sales",
-        element: (
-          <PermissionRoute permission="reports.view">
-            <SalesReportPage />
-          </PermissionRoute>
-        ),
-      },
-      {
-        path: "reports/employees",
-        element: (
-          <PermissionRoute permission="reports.view">
-            <EmployeeReportPage />
-          </PermissionRoute>
-        ),
-      },
-      {
-        path: "reports/followups",
-        element: (
-          <PermissionRoute permission="reports.view">
-            <FollowupReportPage />
-          </PermissionRoute>
-        ),
-      },
-      {
-        path: "reports/visits",
-        element: (
-          <PermissionRoute permission="reports.view">
-            <VisitReportPage />
-          </PermissionRoute>
-        ),
-      },
-      {
-        path: "reports/bookings",
-        element: (
-          <PermissionRoute permission="reports.view">
-            <BookingReportPage />
-          </PermissionRoute>
-        ),
-      },
-      {
-        path: "reports/payments",
-        element: (
-          <PermissionRoute permission="reports.view">
-            <PaymentReportPage />
-          </PermissionRoute>
-        ),
+        element: <ForbiddenPage />,
       },
     ],
   },

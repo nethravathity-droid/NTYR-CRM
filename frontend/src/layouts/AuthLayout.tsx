@@ -2,20 +2,26 @@ import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { env } from "@/config/env";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { Loading } from "@/components/shared/Loading";
+import { getRoleDashboardPath, isPathAllowedForRole } from "@/lib/rbac/roles";
 import { paths } from "@/routes/paths";
 
 export function AuthLayout() {
-  const { isAuthenticated, isInitializing } = useAuth();
+  const { isAuthenticated, isInitializing, user } = useAuth();
   const location = useLocation();
-  const redirectPath =
-    (location.state as { from?: { pathname?: string } } | null)?.from
-      ?.pathname ?? paths.dashboard;
+  const fromPath =
+    (location.state as { from?: { pathname?: string } } | null)?.from?.pathname;
 
   if (isInitializing) {
     return <Loading fullScreen label="Checking session..." />;
   }
 
-  if (isAuthenticated) {
+  if (isAuthenticated && user) {
+    const roleDashboard = getRoleDashboardPath(user.role.code);
+    const redirectPath =
+      fromPath && isPathAllowedForRole(fromPath, user.role.code)
+        ? fromPath
+        : roleDashboard;
+
     return <Navigate to={redirectPath} replace />;
   }
 
