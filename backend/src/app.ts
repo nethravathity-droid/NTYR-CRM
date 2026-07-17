@@ -39,7 +39,8 @@ if (env.NODE_ENV !== "test") {
 
 const apiLimiter = rateLimit({
   windowMs: env.RATE_LIMIT_WINDOW_MS,
-  max: env.RATE_LIMIT_MAX,
+  // SPA dashboards fire many parallel queries on load; use a generous cap in development.
+  max: env.NODE_ENV === "development" ? Math.max(env.RATE_LIMIT_MAX, 2_000) : env.RATE_LIMIT_MAX,
   standardHeaders: true,
   legacyHeaders: false,
   message: {

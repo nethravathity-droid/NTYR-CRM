@@ -19,7 +19,7 @@ const envSchema = z
       .int()
       .positive()
       .default(15 * 60 * 1000),
-    RATE_LIMIT_MAX: z.coerce.number().int().positive().default(100),
+    RATE_LIMIT_MAX: z.coerce.number().int().positive().default(500),
     JWT_ACCESS_SECRET: z.string().min(32),
     JWT_REFRESH_SECRET: z.string().min(32),
     JWT_ACCESS_EXPIRES_IN: z.string().default("15m"),

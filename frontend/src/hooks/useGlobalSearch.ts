@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { usePermissions } from "@/hooks/usePermissions";
 import { getCommandItemsForRole, type CommandItem } from "@/lib/rbac/command-items";
 import { isRoleCode } from "@/lib/rbac/roles";
@@ -28,15 +28,22 @@ export function useGlobalSearch(query: string, category: GlobalSearchCategory, n
   );
 
   const trimmed = query.trim();
+  const [debouncedQuery, setDebouncedQuery] = useState(trimmed);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => setDebouncedQuery(trimmed), 300);
+    return () => window.clearTimeout(timer);
+  }, [trimmed]);
+
   const pageResults = useMemo(
     () => (category === "all" || category === "pages" ? filterNavigationItems(navItems, trimmed) : []),
     [category, navItems, trimmed],
   );
 
   const { data: recordResults = [], isFetching: recordsLoading } = useQuery({
-    queryKey: globalSearchKeys.records(trimmed),
-    queryFn: () => searchRecords(trimmed, permissions),
-    enabled: trimmed.length >= 2 && category !== "pages",
+    queryKey: globalSearchKeys.records(debouncedQuery),
+    queryFn: () => searchRecords(debouncedQuery, permissions),
+    enabled: debouncedQuery.length >= 2 && category !== "pages",
     staleTime: 30_000,
   });
 
@@ -57,18 +64,18 @@ export function useGlobalSearch(query: string, category: GlobalSearchCategory, n
     const allowedTypes = typeMap[category];
     const pages = category === "all" || category === "pages" ? pageResults : [];
     const records =
-      trimmed.length >= 2 && category !== "pages"
+      debouncedQuery.length >= 2 && category !== "pages"
         ? allowedTypes === null
           ? recordResults
           : recordResults.filter((result) => allowedTypes.includes(result.type))
         : [];
 
     return [...pages, ...records];
-  }, [category, pageResults, recordResults, trimmed.length]);
+  }, [category, debouncedQuery, pageResults, recordResults]);
 
   return {
     results,
-    isSearching: recordsLoading && trimmed.length >= 2,
+    isSearching: (recordsLoading || debouncedQuery !== trimmed) && trimmed.length >= 2,
     hasQuery: trimmed.length > 0,
   };
 }

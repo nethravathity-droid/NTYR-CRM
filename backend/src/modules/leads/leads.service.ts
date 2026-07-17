@@ -46,6 +46,9 @@ const IMPORT_COLUMN_MAP: Record<string, keyof ImportLeadRow> = {
   status: "status",
   notes: "notes",
   note: "notes",
+  assigneduserid: "assignedUserId",
+  assignedemployeeid: "assignedUserId",
+  employeeid: "assignedUserId",
 };
 
 const DEFAULT_LEAD_SOURCES = [
@@ -574,6 +577,12 @@ export class LeadsService {
         if (normalized === "HOT" || normalized === "WARM" || normalized === "COLD") {
           row.priority = normalized as ImportLeadRow["priority"];
         }
+        return;
+      }
+
+      if (field === "assignedUserId") {
+        const parsed = Number.parseInt(value, 10);
+        row.assignedUserId = Number.isNaN(parsed) ? null : parsed;
         return;
       }
 

@@ -55,6 +55,7 @@ export function useNotifications() {
     queryFn: () =>
       leadsService.list({ page: 1, limit: 8, status: "ASSIGNED", sortBy: "updated_at", sortOrder: "desc" }),
     enabled: canLeads,
+    staleTime: 120_000,
   });
   const { data: todayFollowups = [] } = useTodayFollowups({ enabled: canLeads });
   const { data: overdueFollowups = [] } = useOverdueFollowups({ enabled: canLeads });
@@ -63,17 +64,20 @@ export function useNotifications() {
     queryFn: () =>
       visitsService.list({ page: 1, limit: 8, fromDate: today, sortBy: "visit_date", sortOrder: "asc" }),
     enabled: canVisits,
+    staleTime: 120_000,
   });
   const { data: recentBookings } = useQuery({
     queryKey: ["notifications", "bookings"],
     queryFn: () => bookingsService.list({ page: 1, limit: 8, sortBy: "created_at", sortOrder: "desc" }),
     enabled: canBookings,
+    staleTime: 120_000,
   });
   const { data: recentPayments } = useQuery({
     queryKey: ["notifications", "payments"],
     queryFn: () =>
       paymentsService.list({ page: 1, limit: 8, status: "PAID", sortBy: "payment_date", sortOrder: "desc" }),
     enabled: canPayments,
+    staleTime: 120_000,
   });
 
   const readIds = useMemo(() => {

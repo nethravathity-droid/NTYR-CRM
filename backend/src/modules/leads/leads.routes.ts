@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { Router, type NextFunction, type Request, type Response } from "express";
 import multer from "multer";
 import { authenticate } from "../../common/middleware/authenticate.js";
 import { authorize } from "../../common/middleware/authorize.js";
@@ -60,10 +60,30 @@ router.get(
   leadsController.checkDuplicates,
 );
 
+const handleImportUpload = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): void => {
+  upload.single("file")(req, res, (err: unknown) => {
+    if (err instanceof multer.MulterError) {
+      res.status(400).json({ success: false, message: err.message });
+      return;
+    }
+
+    if (err instanceof Error) {
+      res.status(400).json({ success: false, message: err.message });
+      return;
+    }
+
+    next();
+  });
+};
+
 router.post(
   "/import",
   authorize("leads.create"),
-  upload.single("file"),
+  handleImportUpload,
   leadsController.importLeads,
 );
 

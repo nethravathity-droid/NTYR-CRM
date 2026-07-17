@@ -106,9 +106,6 @@ export const leadsService = {
     const response = await apiClient.post<ApiResponse<ImportLeadsResult>>(
       "/leads/import",
       formData,
-      {
-        headers: { "Content-Type": "multipart/form-data" },
-      },
     );
 
     return response.data.data;

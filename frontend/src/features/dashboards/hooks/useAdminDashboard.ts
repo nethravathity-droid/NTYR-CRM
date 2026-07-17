@@ -70,14 +70,17 @@ export function useAdminDashboard(dateRange: DashboardDateRange = getTodayRange(
   const { data: todayFollowups = [], isLoading: followupsLoading } = useTodayFollowups({
     enabled: canLeads && isTodayOnly,
   });
-  const { data: rangeFollowups, isLoading: rangeFollowupsLoading } = useFollowups({
-    page: 1,
-    limit: 50,
-    fromDate,
-    toDate,
-    sortBy: "followup_date",
-    sortOrder: "asc",
-  });
+  const { data: rangeFollowups, isLoading: rangeFollowupsLoading } = useFollowups(
+    {
+      page: 1,
+      limit: 50,
+      fromDate,
+      toDate,
+      sortBy: "followup_date",
+      sortOrder: "asc",
+    },
+    { enabled: canLeads && !isTodayOnly },
+  );
   const { data: overdueFollowups = [] } = useOverdueFollowups({ enabled: canLeads });
   const { data: payments, isLoading: paymentsLoading } = useCollectionSummary();
   const { data: activities = [], isLoading: activitiesLoading } = useRecentActivities(30);

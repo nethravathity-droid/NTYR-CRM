@@ -21,6 +21,11 @@ apiClient.interceptors.request.use((config: InternalAxiosRequestConfig) => {
     config.headers.Authorization = `Bearer ${token}`;
   }
 
+  // Let axios/browser set the multipart boundary automatically.
+  if (config.data instanceof FormData) {
+    config.headers.set("Content-Type", false);
+  }
+
   return config;
 });
 

@@ -13,11 +13,12 @@ export const followupKeys = {
   formOptions: () => [...followupKeys.all, "form-options"] as const,
 };
 
-export function useFollowups(params: ListFollowupsParams) {
+export function useFollowups(params: ListFollowupsParams, options?: { enabled?: boolean }) {
   return useQuery({
     queryKey: followupKeys.list(params),
     queryFn: () => followupsService.list(params),
     placeholderData: keepPreviousData,
+    enabled: options?.enabled ?? true,
   });
 }
 
