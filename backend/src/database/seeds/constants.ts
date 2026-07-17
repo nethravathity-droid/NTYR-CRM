@@ -370,6 +370,7 @@ export const DEMO_RBAC_ROLES = [
     designationName: "Sales Executive",
     permissionCodes: [
       "leads.view",
+      "leads.create",
       "leads.update",
       "visits.view",
       "visits.create",

@@ -120,12 +120,12 @@ export class FollowupsService {
     return followup;
   }
 
-  async getTodayFollowups(companyId: number) {
-    return this.followupsRepository.findTodayFollowups(companyId);
+  async getTodayFollowups(companyId: number, assignedUserId?: number) {
+    return this.followupsRepository.findTodayFollowups(companyId, assignedUserId);
   }
 
-  async getOverdueFollowups(companyId: number) {
-    return this.followupsRepository.findOverdueFollowups(companyId);
+  async getOverdueFollowups(companyId: number, assignedUserId?: number) {
+    return this.followupsRepository.findOverdueFollowups(companyId, assignedUserId);
   }
 
   async getFormOptions(companyId: number) {

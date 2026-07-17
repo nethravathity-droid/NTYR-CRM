@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
 import type { z } from "zod";
 import { asyncHandler } from "../../common/utils/asyncHandler.js";
+import { withAssignedUserScope } from "../../common/utils/role-scope.js";
 import type { CallsService } from "./call.service.js";
 import type {
   createCallSchema,
@@ -25,7 +26,8 @@ export class CallsController {
 
   list = asyncHandler(async (req: Request, res: Response): Promise<void> => {
     const { query } = (req as ListCallsRequest).validated;
-    const result = await this.callsService.listCalls(req.user!.companyId, query);
+    const scopedQuery = withAssignedUserScope(req.user!.roleCode, req.user!.id, query);
+    const result = await this.callsService.listCalls(req.user!.companyId, scopedQuery);
 
     res.status(200).json({
       success: true,

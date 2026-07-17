@@ -1,17 +1,79 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { GlassCard, SectionHeader } from "@/components/premium/PremiumCards";
 import { ThemeToggle } from "@/components/shared/ThemeToggle";
 import { useAuth } from "@/features/auth/hooks/useAuth";
+import { authService } from "@/features/auth/services/auth.service";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { getApiErrorMessage } from "@/lib/api/client";
 
 const TABS = [
   { id: "profile", label: "My Profile" },
   { id: "company", label: "Company" },
+  { id: "security", label: "Security" },
   { id: "appearance", label: "Appearance" },
   { id: "permissions", label: "Permissions" },
 ] as const;
+
+function ChangePasswordSection() {
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [message, setMessage] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setMessage(null);
+    setError(null);
+    setSaving(true);
+    try {
+      await authService.changePassword({ currentPassword, newPassword, confirmPassword });
+      setMessage("Password updated successfully.");
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+    } catch (err) {
+      setError(getApiErrorMessage(err));
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <form onSubmit={(event) => void handleSubmit(event)} className="space-y-4">
+      <Input
+        type="password"
+        placeholder="Current password"
+        value={currentPassword}
+        onChange={(event) => setCurrentPassword(event.target.value)}
+        required
+      />
+      <Input
+        type="password"
+        placeholder="New password"
+        value={newPassword}
+        onChange={(event) => setNewPassword(event.target.value)}
+        required
+      />
+      <Input
+        type="password"
+        placeholder="Confirm new password"
+        value={confirmPassword}
+        onChange={(event) => setConfirmPassword(event.target.value)}
+        required
+      />
+      {error ? <p className="text-sm text-[#EF4444]">{error}</p> : null}
+      {message ? <p className="text-sm text-[#10B981]">{message}</p> : null}
+      <Button type="submit" disabled={saving} className="rounded-[14px] bg-[#2563EB]">
+        {saving ? "Updating..." : "Update Password"}
+      </Button>
+    </form>
+  );
+}
 
 export function SettingsPage() {
   const { user } = useAuth();
@@ -120,6 +182,13 @@ export function SettingsPage() {
               <dd className="font-medium">{user.department.name}</dd>
             </div>
           </dl>
+        </GlassCard>
+        </div>
+
+        <div id="security" className="scroll-mt-24">
+        <GlassCard className="p-5">
+          <SectionHeader title="Security" description="Update your account password" />
+          <ChangePasswordSection />
         </GlassCard>
         </div>
 

@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
 import type { z } from "zod";
 import { asyncHandler } from "../../common/utils/asyncHandler.js";
+import { shouldRestrictToOwnRecords, withAssignedUserScope } from "../../common/utils/role-scope.js";
 import type { FollowupsService } from "./followup.service.js";
 import type {
   completeFollowupSchema,
@@ -25,7 +26,8 @@ export class FollowupsController {
 
   list = asyncHandler(async (req: Request, res: Response): Promise<void> => {
     const { query } = (req as ListFollowupsRequest).validated;
-    const result = await this.followupsService.listFollowups(req.user!.companyId, query);
+    const scopedQuery = withAssignedUserScope(req.user!.roleCode, req.user!.id, query);
+    const result = await this.followupsService.listFollowups(req.user!.companyId, scopedQuery);
 
     res.status(200).json({
       success: true,
@@ -35,7 +37,10 @@ export class FollowupsController {
   });
 
   getToday = asyncHandler(async (req: Request, res: Response): Promise<void> => {
-    const followups = await this.followupsService.getTodayFollowups(req.user!.companyId);
+    const assignedUserId = shouldRestrictToOwnRecords(req.user!.roleCode)
+      ? req.user!.id
+      : undefined;
+    const followups = await this.followupsService.getTodayFollowups(req.user!.companyId, assignedUserId);
 
     res.status(200).json({
       success: true,
@@ -45,7 +50,10 @@ export class FollowupsController {
   });
 
   getOverdue = asyncHandler(async (req: Request, res: Response): Promise<void> => {
-    const followups = await this.followupsService.getOverdueFollowups(req.user!.companyId);
+    const assignedUserId = shouldRestrictToOwnRecords(req.user!.roleCode)
+      ? req.user!.id
+      : undefined;
+    const followups = await this.followupsService.getOverdueFollowups(req.user!.companyId, assignedUserId);
 
     res.status(200).json({
       success: true,

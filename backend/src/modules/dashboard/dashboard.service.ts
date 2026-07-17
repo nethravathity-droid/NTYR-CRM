@@ -11,13 +11,6 @@ import type {
   DashboardSummary,
 } from "./dashboard.types.js";
 
-const PLACEHOLDER_SUMMARY_FIELDS = {
-  totalLeads: 0,
-  totalBookings: 0,
-  totalRevenue: 0,
-  pendingFollowups: 0,
-} as const;
-
 const RANGE_MONTHS: Record<DashboardChartRange, number> = {
   "7d": 1,
   "30d": 1,
@@ -32,13 +25,16 @@ export class DashboardService {
   ) {}
 
   async getSummary(context: DashboardContext): Promise<DashboardSummary> {
-    const [totalEmployees, totalCompanies] = await Promise.all([
+    const [totalEmployees, totalCompanies, stats] = await Promise.all([
       context.isPlatformScope
         ? this.dashboardRepository.countAllEmployees()
         : this.dashboardRepository.countEmployees(context.companyId),
       context.isPlatformScope
         ? this.dashboardRepository.countAllCompanies()
         : Promise.resolve(1),
+      context.isPlatformScope
+        ? this.dashboardRepository.getPlatformStats()
+        : this.dashboardRepository.getCompanyStats(context.companyId),
     ]);
 
     this.logger.debug("Dashboard summary loaded", {
@@ -49,7 +45,10 @@ export class DashboardService {
     return {
       totalEmployees,
       totalCompanies,
-      ...PLACEHOLDER_SUMMARY_FIELDS,
+      totalLeads: stats.totalLeads,
+      totalBookings: stats.totalBookings,
+      totalRevenue: stats.totalRevenue,
+      pendingFollowups: stats.pendingFollowups,
     };
   }
 
@@ -81,9 +80,11 @@ export class DashboardService {
       }
     }
 
-    const [recentUsers, recentLogins] = await Promise.all([
+    const [recentUsers, recentLogins, recentLeads, recentBookings] = await Promise.all([
       this.dashboardRepository.getRecentUserActivities(context.companyId, limit),
       this.dashboardRepository.getRecentLogins(context.companyId, limit),
+      this.dashboardRepository.getRecentLeadActivities(context.companyId, limit),
+      this.dashboardRepository.getRecentBookingActivities(context.companyId, limit),
     ]);
 
     for (const user of recentUsers) {
@@ -114,6 +115,30 @@ export class DashboardService {
       });
     }
 
+    for (const lead of recentLeads) {
+      activities.push({
+        id: `lead-created-${lead.uuid}`,
+        type: "LEAD_CREATED",
+        title: "Lead created",
+        description: `${lead.customer_name} (${lead.lead_number})`,
+        occurredAt: lead.created_at,
+        actorName: null,
+        referenceId: lead.uuid,
+      });
+    }
+
+    for (const booking of recentBookings) {
+      activities.push({
+        id: `booking-created-${booking.uuid}`,
+        type: "BOOKING_CREATED",
+        title: "Booking created",
+        description: `${booking.customer_name} (${booking.booking_number})`,
+        occurredAt: booking.created_at,
+        actorName: null,
+        referenceId: booking.uuid,
+      });
+    }
+
     return activities
       .sort((a, b) => b.occurredAt.getTime() - a.occurredAt.getTime())
       .slice(0, limit);
@@ -128,7 +153,7 @@ export class DashboardService {
       return this.buildEmployeeChart(context, range);
     }
 
-    return this.buildPlaceholderChart(metric, range);
+    return this.buildMetricChart(context, metric, range);
   }
 
   private async buildEmployeeChart(
@@ -159,15 +184,19 @@ export class DashboardService {
     };
   }
 
-  private buildPlaceholderChart(
+  private async buildMetricChart(
+    context: DashboardContext,
     metric: DashboardChartMetric,
     range: DashboardChartRange,
-  ): DashboardChart {
-    const months = RANGE_MONTHS[range];
-    const labels =
-      range === "7d" || range === "30d"
-        ? this.buildDayLabels(range === "7d" ? 7 : 30)
-        : this.buildMonthLabels(months);
+  ): Promise<DashboardChart> {
+    const useDaily = range === "7d" || range === "30d";
+    const labels = useDaily
+      ? this.buildDayLabels(range === "7d" ? 7 : 30)
+      : this.buildMonthLabels(RANGE_MONTHS[range]);
+
+    const fromDate = labels[0]!;
+    const toDate = labels[labels.length - 1]!;
+    const trunc = useDaily ? "day" : "month";
 
     const datasetLabels: Record<DashboardChartMetric, string> = {
       leads: "Leads",
@@ -176,6 +205,42 @@ export class DashboardService {
       employees: "Employees",
     };
 
+    let rows;
+    if (metric === "leads") {
+      rows = await this.dashboardRepository.getMetricGrowth(
+        context,
+        "leads",
+        "created_at",
+        fromDate,
+        `${toDate} 23:59:59`,
+        trunc,
+        "count",
+      );
+    } else if (metric === "bookings") {
+      rows = await this.dashboardRepository.getMetricGrowth(
+        context,
+        "bookings",
+        "booking_date",
+        fromDate,
+        toDate,
+        trunc,
+        "count",
+      );
+    } else {
+      rows = await this.dashboardRepository.getMetricGrowth(
+        context,
+        "bookings",
+        "booking_date",
+        fromDate,
+        toDate,
+        trunc,
+        "sum",
+        "final_price",
+      );
+    }
+
+    const valuesByPeriod = new Map(rows.map((row) => [row.period, Number(row.value)]));
+
     return {
       metric,
       range,
@@ -183,7 +248,7 @@ export class DashboardService {
       datasets: [
         {
           label: datasetLabels[metric],
-          data: labels.map(() => 0),
+          data: labels.map((label) => valuesByPeriod.get(label) ?? 0),
         },
       ],
     };

@@ -205,7 +205,7 @@ export class FollowupsRepository {
     }, updatedBy);
   }
 
-  async findTodayFollowups(companyId: number): Promise<FollowupListItem[]> {
+  async findTodayFollowups(companyId: number, assignedUserId?: number): Promise<FollowupListItem[]> {
     const rows = await this.db("followups as f")
       .leftJoin("leads as l", "l.id", "f.lead_id")
       .leftJoin("users as u", "u.id", "f.assigned_user_id")
@@ -213,12 +213,15 @@ export class FollowupsRepository {
       .where("f.company_id", companyId)
       .whereNull("f.deleted_at")
       .where("f.followup_date", new Date().toISOString().slice(0, 10))
+      .modify((qb) => {
+        if (assignedUserId) qb.where("f.assigned_user_id", assignedUserId);
+      })
       .orderBy("f.followup_time", "asc");
 
-    return rows.map((row) => this.mapToListItem(row));
+    return (rows as Record<string, unknown>[]).map((row) => this.mapToListItem(row));
   }
 
-  async findOverdueFollowups(companyId: number): Promise<FollowupListItem[]> {
+  async findOverdueFollowups(companyId: number, assignedUserId?: number): Promise<FollowupListItem[]> {
     const rows = await this.db("followups as f")
       .leftJoin("leads as l", "l.id", "f.lead_id")
       .leftJoin("users as u", "u.id", "f.assigned_user_id")
@@ -227,9 +230,12 @@ export class FollowupsRepository {
       .whereNull("f.deleted_at")
       .where("f.followup_date", "<", new Date().toISOString().slice(0, 10))
       .whereIn("f.status", ["PENDING", "RESCHEDULED"])
+      .modify((qb) => {
+        if (assignedUserId) qb.where("f.assigned_user_id", assignedUserId);
+      })
       .orderBy("f.followup_date", "asc");
 
-    return rows.map((row) => this.mapToListItem(row));
+    return (rows as Record<string, unknown>[]).map((row) => this.mapToListItem(row));
   }
 
   async assigneeExists(companyId: number, userId: number): Promise<boolean> {

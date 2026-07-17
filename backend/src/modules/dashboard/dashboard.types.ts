@@ -74,3 +74,29 @@ export interface EmployeeGrowthRecord {
   period: string;
   count: string;
 }
+
+export interface DashboardStats {
+  totalLeads: number;
+  totalBookings: number;
+  totalRevenue: number;
+  pendingFollowups: number;
+}
+
+export interface MetricGrowthRecord {
+  period: string;
+  value: string;
+}
+
+export interface LeadActivityRecord {
+  uuid: string;
+  customer_name: string;
+  lead_number: string;
+  created_at: Date;
+}
+
+export interface BookingActivityRecord {
+  uuid: string;
+  customer_name: string;
+  booking_number: string;
+  created_at: Date;
+}
