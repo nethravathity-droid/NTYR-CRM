@@ -22,6 +22,8 @@ export type NavItem = {
   icon: LucideIcon;
   permission: string | null;
   disabled?: boolean;
+  /** When set, item is not active if location has this query param (for sibling links sharing a path). */
+  excludeQueryParam?: string;
 };
 
 export type NavSection = {
@@ -67,8 +69,8 @@ export function getNavigationSectionsForRole(roleCode: RoleCode): NavSection[] {
         {
           title: "CRM",
           items: [
-            { label: "Leads", href: rolePath("/leads"), icon: UserSquare2, permission: "leads.view" },
-            { label: "Customers", href: rolePath("/leads"), icon: Users, permission: "leads.view" },
+            { label: "Leads", href: rolePath("/leads"), icon: UserSquare2, permission: "leads.view", excludeQueryParam: "tab" },
+            { label: "Customers", href: `${rolePath("/leads")}?tab=customers`, icon: Users, permission: "leads.view" },
             { label: "Calls", href: rolePath("/calls"), icon: PhoneCall, permission: "calls.view" },
             { label: "Follow-ups", href: rolePath("/followups"), icon: CalendarClock, permission: "leads.view" },
             { label: "Visits", href: rolePath("/visits"), icon: MapPinned, permission: "visits.view" },
@@ -87,8 +89,8 @@ export function getNavigationSectionsForRole(roleCode: RoleCode): NavSection[] {
           title: "People & Analytics",
           items: [
             { label: "Employees", href: rolePath("/employees"), icon: Users, permission: "users.view" },
-            { label: "Reports", href: rolePath("/reports"), icon: BarChart3, permission: "reports.view" },
-            { label: "Analytics", href: rolePath("/reports"), icon: Activity, permission: "reports.view" },
+            { label: "Reports", href: rolePath("/reports"), icon: BarChart3, permission: "reports.view", excludeQueryParam: "tab" },
+            { label: "Analytics", href: `${rolePath("/reports")}?tab=analytics`, icon: Activity, permission: "reports.view" },
           ],
         },
         {

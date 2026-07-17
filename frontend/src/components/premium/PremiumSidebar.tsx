@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import { ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -7,6 +7,7 @@ import { env } from "@/config/env";
 import { usePermissions } from "@/hooks/usePermissions";
 import { useShell } from "@/context/ShellContext";
 import type { NavSection } from "@/lib/rbac/navigation";
+import { isNavItemActive } from "@/lib/rbac/nav-active";
 
 interface PremiumSidebarProps {
   sections: NavSection[];
@@ -17,6 +18,7 @@ interface PremiumSidebarProps {
 export function PremiumSidebar({ sections, dashboardPath, workspaceLabel }: PremiumSidebarProps) {
   const { hasPermission } = usePermissions();
   const { sidebarCollapsed, toggleSidebar } = useShell();
+  const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const visibleSections = useMemo(
@@ -88,6 +90,12 @@ export function PremiumSidebar({ sections, dashboardPath, workspaceLabel }: Prem
             <div className="space-y-1">
               {section.items.map((item) => {
                 const Icon = item.icon;
+                const active = isNavItemActive(
+                  item,
+                  location.pathname,
+                  location.search,
+                  dashboardPath,
+                );
                 return (
                   <NavLink
                     key={item.label}
@@ -95,15 +103,13 @@ export function PremiumSidebar({ sections, dashboardPath, workspaceLabel }: Prem
                     end={item.href === dashboardPath}
                     title={sidebarCollapsed ? item.label : undefined}
                     onClick={() => setMobileOpen(false)}
-                    className={({ isActive }) =>
-                      cn(
-                        "group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-all duration-200",
-                        sidebarCollapsed && "justify-center px-2",
-                        isActive
-                          ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-md shadow-primary/10"
-                          : "text-sidebar-foreground/75 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-                      )
-                    }
+                    className={cn(
+                      "group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-all duration-200",
+                      sidebarCollapsed && "justify-center px-2",
+                      active
+                        ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-md shadow-primary/10"
+                        : "text-sidebar-foreground/75 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                    )}
                   >
                     <Icon className="h-4 w-4 shrink-0" />
                     {!sidebarCollapsed ? <span className="truncate">{item.label}</span> : null}

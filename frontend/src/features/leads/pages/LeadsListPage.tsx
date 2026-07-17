@@ -169,13 +169,19 @@ export function LeadsListPage() {
   const leads = data?.leads ?? [];
   const pagination = data?.pagination;
 
+  const isCustomersView = searchParams.get("tab") === "customers";
+
   return (
     <div className="space-y-6">
       <CompanyPageHeader
         icon={UserSquare2}
         tone="indigo"
-        title="Lead Management"
-        description="Capture, assign, and track sales leads across your organization."
+        title={isCustomersView ? "Customers" : "Lead Management"}
+        description={
+          isCustomersView
+            ? "View and manage converted customer records from your pipeline."
+            : "Capture, assign, and track sales leads across your organization."
+        }
         action={
           <div className="flex flex-wrap gap-2">
             {canCreate ? (
