@@ -11,7 +11,7 @@ import {
   Settings,
   UserRound,
 } from "lucide-react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -99,7 +99,6 @@ function NotificationMenuItem({
 export function PremiumHeader() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
   const { setCommandOpen, setSearchOpen, searchQuery, setSearchQuery } = useShell();
   const { hasPermission } = usePermissions();
   const { notifications, unreadCount, markAsRead, markAllAsRead, isRead } = useNotifications();
@@ -137,9 +136,7 @@ export function PremiumHeader() {
     [hasPermission, user?.role.code],
   );
 
-  const showDashboardDatePicker =
-    user?.role.code !== ROLE_CODES.PLATFORM_SUPER_ADMIN &&
-    location.pathname.includes("/dashboard");
+  const showDashboardDatePicker = user?.role.code !== ROLE_CODES.PLATFORM_SUPER_ADMIN;
 
   const handleWhatsAppClick = () => {
     if (isWhatsAppConfigured() && user?.user.mobile) {

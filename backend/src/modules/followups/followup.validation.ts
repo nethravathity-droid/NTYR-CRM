@@ -33,6 +33,14 @@ const uuidParamSchema = z.object({
   }),
 });
 
+export const calendarFollowupsSchema = z.object({
+  query: z.object({
+    fromDate: z.string().min(1, "fromDate is required"),
+    toDate: z.string().min(1, "toDate is required"),
+    assignedUserId: z.coerce.number().int().positive().optional(),
+  }),
+});
+
 export const listFollowupsSchema = z.object({
   query: z.object({
     page: z.coerce.number().int().positive().default(1),
@@ -73,6 +81,7 @@ export const rescheduleFollowupSchema = uuidParamSchema.extend({
 });
 
 export type ListFollowupsQuery = z.infer<typeof listFollowupsSchema>["query"];
+export type CalendarFollowupsQuery = z.infer<typeof calendarFollowupsSchema>["query"];
 export type CreateFollowupInput = z.infer<typeof createFollowupSchema>["body"];
 export type UpdateFollowupInput = z.infer<typeof updateFollowupSchema>["body"];
 export type RescheduleFollowupInput = z.infer<typeof rescheduleFollowupSchema>["body"];

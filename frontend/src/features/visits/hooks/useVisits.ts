@@ -10,6 +10,8 @@ export const visitKeys = {
   detail: (uuid: string) => [...visitKeys.details(), uuid] as const,
   audit: (uuid: string) => [...visitKeys.all, "audit", uuid] as const,
   formOptions: () => [...visitKeys.all, "form-options"] as const,
+  calendar: (fromDate: string, toDate: string) =>
+    [...visitKeys.all, "calendar", fromDate, toDate] as const,
 };
 
 export function useVisits(params: ListVisitsParams) {
@@ -17,6 +19,14 @@ export function useVisits(params: ListVisitsParams) {
     queryKey: visitKeys.list(params),
     queryFn: () => visitsService.list(params),
     placeholderData: keepPreviousData,
+  });
+}
+
+export function useVisitsCalendar(fromDate: string, toDate: string) {
+  return useQuery({
+    queryKey: visitKeys.calendar(fromDate, toDate),
+    queryFn: () => visitsService.getCalendar(fromDate, toDate),
+    enabled: Boolean(fromDate && toDate),
   });
 }
 

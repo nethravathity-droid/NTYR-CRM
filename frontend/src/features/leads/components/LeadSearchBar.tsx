@@ -42,6 +42,13 @@ export function LeadSearchBar({
   onCityChange,
   options,
 }: LeadSearchBarProps) {
+  const statusOptions =
+    options?.statuses ??
+    (Object.keys(LEAD_STATUS_LABELS) as LeadStatus[]);
+  const priorityOptions =
+    options?.priorities ??
+    (Object.keys(LEAD_PRIORITY_LABELS) as LeadPriority[]);
+
   return (
     <div className="space-y-4">
       <div className="relative">
@@ -65,7 +72,7 @@ export function LeadSearchBar({
           onChange={(event) => onStatusChange(event.target.value as LeadStatus | "")}
         >
           <option value="">All statuses</option>
-          {options?.statuses.map((item) => (
+          {statusOptions.map((item) => (
             <option key={item} value={item}>
               {LEAD_STATUS_LABELS[item]}
             </option>
@@ -79,7 +86,7 @@ export function LeadSearchBar({
           }
         >
           <option value="">All priorities</option>
-          {options?.priorities.map((item) => (
+          {priorityOptions.map((item) => (
             <option key={item} value={item}>
               {LEAD_PRIORITY_LABELS[item]}
             </option>

@@ -20,6 +20,13 @@ export class FollowupsService {
     return this.followupsRepository.listFollowups(companyId, query);
   }
 
+  async listFollowupsForCalendar(
+    companyId: number,
+    query: Pick<ListFollowupsQuery, "fromDate" | "toDate" | "assignedUserId">,
+  ) {
+    return this.followupsRepository.listFollowupsForCalendar(companyId, query);
+  }
+
   async getFollowupByUuid(companyId: number, uuid: string): Promise<FollowupDetail> {
     const followup = await this.followupsRepository.findFollowupByUuid(companyId, uuid);
 

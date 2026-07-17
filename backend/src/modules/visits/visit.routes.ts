@@ -5,6 +5,7 @@ import { validate } from "../../common/utils/validate.js";
 import { VisitsController } from "./visit.controller.js";
 import { visitsService } from "./visit.service.js";
 import {
+  calendarVisitsSchema,
   cancelVisitSchema,
   completeVisitSchema,
   createVisitSchema,
@@ -21,6 +22,7 @@ const router = Router();
 router.use(authenticate);
 
 router.get("/form-options", authorize("visits.view"), visitsController.getFormOptions);
+router.get("/calendar", authorize("visits.view"), validate(calendarVisitsSchema), visitsController.calendar);
 router.get("/", authorize("visits.view"), validate(listVisitsSchema), visitsController.list);
 router.get("/:uuid/audit-trail", authorize("visits.view"), validate(getVisitAuditSchema), visitsController.getAuditTrail);
 router.get("/:uuid", authorize("visits.view"), validate(getVisitSchema), visitsController.getByUuid);

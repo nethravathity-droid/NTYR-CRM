@@ -8,7 +8,8 @@ import type { GlobalSearchCategory, GlobalSearchResult } from "@/lib/search/glob
 
 export const globalSearchKeys = {
   all: ["global-search"] as const,
-  records: (query: string) => [...globalSearchKeys.all, "records", query] as const,
+  records: (query: string, category: GlobalSearchCategory) =>
+    [...globalSearchKeys.all, "records", category, query] as const,
 };
 
 export function useGlobalSearch(query: string, category: GlobalSearchCategory, navItems: CommandItem[]) {
@@ -41,8 +42,8 @@ export function useGlobalSearch(query: string, category: GlobalSearchCategory, n
   );
 
   const { data: recordResults = [], isFetching: recordsLoading } = useQuery({
-    queryKey: globalSearchKeys.records(debouncedQuery),
-    queryFn: () => searchRecords(debouncedQuery, permissions),
+    queryKey: globalSearchKeys.records(debouncedQuery, category),
+    queryFn: () => searchRecords(debouncedQuery, permissions, category),
     enabled: debouncedQuery.length >= 2 && category !== "pages",
     staleTime: 30_000,
   });

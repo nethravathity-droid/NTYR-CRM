@@ -156,6 +156,8 @@ export interface ListLeadsQuery {
   propertyType?: string;
   city?: string;
   campaign?: string;
+  fromDate?: string;
+  toDate?: string;
   sortBy:
     | "created_at"
     | "updated_at"

@@ -7,7 +7,7 @@ import { propertiesService } from "@/features/properties/services/properties.ser
 import { visitsService } from "@/features/visits/services/visits.service";
 import type { CommandItem } from "@/lib/rbac/command-items";
 import { matchesQuery } from "@/lib/search/match-query";
-import type { GlobalSearchPermissions, GlobalSearchResult } from "@/lib/search/global-search.types";
+import type { GlobalSearchCategory, GlobalSearchPermissions, GlobalSearchResult } from "@/lib/search/global-search.types";
 import { paths } from "@/routes/paths";
 
 const SEARCH_LIMIT = 5;
@@ -40,6 +40,7 @@ export function filterNavigationItems(items: CommandItem[], query: string): Glob
 export async function searchRecords(
   query: string,
   permissions: GlobalSearchPermissions,
+  category: GlobalSearchCategory = "all",
 ): Promise<GlobalSearchResult[]> {
   const term = query.trim();
   if (term.length < 2) return [];
@@ -48,16 +49,23 @@ export async function searchRecords(
 
   if (permissions.leads) {
     tasks.push(
-      leadsService.list({ page: 1, limit: SEARCH_LIMIT, search: term }).then(({ leads }) =>
-        leads.map((lead) => ({
-          id: `lead-${lead.uuid}`,
-          type: "lead" as const,
-          label: lead.customerName,
-          subtitle: `${lead.leadNumber} · ${lead.mobile}${lead.leadSource ? ` · ${lead.leadSource}` : ""}`,
-          href: paths.leads.details(lead.uuid),
-          group: "Leads",
-        })),
-      ),
+      leadsService
+        .list({
+          page: 1,
+          limit: SEARCH_LIMIT,
+          search: term,
+          ...(category === "customers" ? { status: "BOOKED" as const } : {}),
+        })
+        .then(({ leads }) =>
+          leads.map((lead) => ({
+            id: `lead-${lead.uuid}`,
+            type: "lead" as const,
+            label: lead.customerName,
+            subtitle: `${lead.leadNumber} · ${lead.mobile}${lead.leadSource ? ` · ${lead.leadSource}` : ""}`,
+            href: paths.leads.details(lead.uuid),
+            group: category === "customers" ? "Customers" : "Leads",
+          })),
+        ),
     );
   }
 

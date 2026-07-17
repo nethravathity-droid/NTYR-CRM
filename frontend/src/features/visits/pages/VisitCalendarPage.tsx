@@ -5,8 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MonthCalendarGrid, useCalendarMonthState } from "@/components/calendar/MonthCalendarGrid";
 import { CompanyPageHeader } from "@/features/companies/components/CompanyPageHeader";
-import { useVisits } from "@/features/visits/hooks/useVisits";
+import { useVisitsCalendar } from "@/features/visits/hooks/useVisits";
 import { VISIT_STATUS_LABELS } from "@/features/visits/types/visit.types";
+import { getApiErrorMessage } from "@/lib/api/client";
 import { formatLocalDateLabel, getMonthBounds } from "@/lib/date/local-date";
 import { paths } from "@/routes/paths";
 
@@ -15,24 +16,20 @@ export function VisitCalendarPage() {
   const { currentMonth, setCurrentMonth, selectedDateKey, setSelectedDateKey } = useCalendarMonthState();
 
   const monthBounds = useMemo(() => getMonthBounds(currentMonth), [currentMonth]);
-  const { data, isLoading } = useVisits({
-    page: 1,
-    limit: 500,
-    fromDate: monthBounds.fromDate,
-    toDate: monthBounds.toDate,
-    sortBy: "visit_date",
-    sortOrder: "asc",
-  });
+  const { data: visits = [], isLoading, isError, error } = useVisitsCalendar(
+    monthBounds.fromDate,
+    monthBounds.toDate,
+  );
 
   const visitsByDate = useMemo(() => {
-    const grouped = new Map<string, NonNullable<typeof data>["visits"]>();
-    for (const visit of data?.visits ?? []) {
+    const grouped = new Map<string, typeof visits>();
+    for (const visit of visits) {
       const items = grouped.get(visit.visitDate) ?? [];
       items.push(visit);
       grouped.set(visit.visitDate, items);
     }
     return grouped;
-  }, [data?.visits]);
+  }, [visits]);
 
   const selectedVisits = visitsByDate.get(selectedDateKey) ?? [];
 
@@ -49,6 +46,12 @@ export function VisitCalendarPage() {
           </Button>
         }
       />
+
+      {isError ? (
+        <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">
+          {getApiErrorMessage(error)}
+        </div>
+      ) : null}
 
       <Card>
         <CardHeader>
@@ -93,7 +96,7 @@ export function VisitCalendarPage() {
               <div>
                 <p className="font-medium">{visit.customerName}</p>
                 <p className="text-sm text-muted-foreground">
-                  {visit.visitTime.slice(0, 5)} — {visit.project?.projectName ?? "No project"}
+                  {(visit.visitTime ?? "").slice(0, 5)} — {visit.project?.projectName ?? "No project"}
                 </p>
               </div>
               <span className="text-sm text-muted-foreground">{VISIT_STATUS_LABELS[visit.status]}</span>

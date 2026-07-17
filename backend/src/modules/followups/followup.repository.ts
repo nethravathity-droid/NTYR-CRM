@@ -65,6 +65,27 @@ export class FollowupsRepository {
     };
   }
 
+  async listFollowupsForCalendar(
+    companyId: number,
+    query: Pick<ListFollowupsQuery, "fromDate" | "toDate" | "assignedUserId">,
+  ): Promise<FollowupListItem[]> {
+    const rows = await this.buildListQuery(companyId, {
+      page: 1,
+      limit: 100,
+      fromDate: query.fromDate,
+      toDate: query.toDate,
+      assignedUserId: query.assignedUserId,
+      sortBy: "followup_date",
+      sortOrder: "asc",
+    })
+      .clone()
+      .select(FOLLOWUP_LIST_SELECT)
+      .orderBy("f.followup_date", "asc")
+      .orderBy("f.followup_time", "asc");
+
+    return rows.map((row) => this.mapToListItem(row));
+  }
+
   async findFollowupByUuid(companyId: number, uuid: string): Promise<FollowupDetail | null> {
     const row = await this.db("followups as f")
       .leftJoin("leads as l", "l.id", "f.lead_id")

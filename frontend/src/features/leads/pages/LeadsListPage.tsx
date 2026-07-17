@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import {
   ChevronLeft,
@@ -52,6 +52,8 @@ export function LeadsListPage() {
   const [assignedUserId, setAssignedUserId] = useState("");
   const [leadSource, setLeadSource] = useState("");
   const [city, setCity] = useState("");
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
   const [selectedUuids, setSelectedUuids] = useState<string[]>([]);
   const [bulkStatus, setBulkStatus] = useState<LeadStatus | "">("");
   const [bulkPriority, setBulkPriority] = useState<LeadPriority | "">("");
@@ -71,26 +73,68 @@ export function LeadsListPage() {
     const nextStatus = searchParams.get("status");
     const nextLeadSource = searchParams.get("leadSource");
     const nextSearch = searchParams.get("search");
-    if (nextStatus) setStatus(nextStatus as LeadStatus);
+    const nextFromDate = searchParams.get("fromDate");
+    const nextToDate = searchParams.get("toDate");
+    const isCustomers = searchParams.get("tab") === "customers";
+
+    if (nextStatus) {
+      setStatus(nextStatus as LeadStatus);
+    } else if (isCustomers) {
+      setStatus("BOOKED");
+    } else {
+      setStatus("");
+    }
     if (nextLeadSource) setLeadSource(nextLeadSource);
+    else setLeadSource("");
     if (nextSearch) {
       setSearchInput(nextSearch);
       setSearch(nextSearch);
+    } else {
+      setSearchInput("");
+      setSearch("");
     }
+    if (nextFromDate) setFromDate(nextFromDate);
+    else setFromDate("");
+    if (nextToDate) setToDate(nextToDate);
+    else setToDate("");
+    setPage(1);
   }, [searchParams]);
 
-  const listParams = {
-    page,
-    limit: 10,
-    search: search || undefined,
-    status: status || undefined,
-    priority: priority || undefined,
-    assignedUserId: assignedUserId ? Number(assignedUserId) : undefined,
-    leadSource: leadSource || undefined,
-    city: city || undefined,
-    sortBy: "created_at" as const,
-    sortOrder: "desc" as const,
-  };
+  const isCustomersView = searchParams.get("tab") === "customers";
+
+  const effectiveStatus = useMemo((): LeadStatus | undefined => {
+    if (status) return status;
+    if (isCustomersView) return "BOOKED";
+    return undefined;
+  }, [isCustomersView, status]);
+
+  const listParams = useMemo(
+    () => ({
+      page,
+      limit: 10,
+      search: search || undefined,
+      status: effectiveStatus,
+      priority: priority || undefined,
+      assignedUserId: assignedUserId ? Number(assignedUserId) : undefined,
+      leadSource: leadSource || undefined,
+      city: city || undefined,
+      fromDate: fromDate || undefined,
+      toDate: toDate || undefined,
+      sortBy: "created_at" as const,
+      sortOrder: "desc" as const,
+    }),
+    [
+      assignedUserId,
+      city,
+      effectiveStatus,
+      fromDate,
+      leadSource,
+      page,
+      priority,
+      search,
+      toDate,
+    ],
+  );
 
   const { data, isLoading, isFetching, error } = useLeads(listParams);
   const { data: statsData } = useLeads({
@@ -169,7 +213,7 @@ export function LeadsListPage() {
   const leads = data?.leads ?? [];
   const pagination = data?.pagination;
 
-  const isCustomersView = searchParams.get("tab") === "customers";
+  const resetPage = () => setPage(1);
 
   return (
     <div className="space-y-6">
@@ -229,15 +273,30 @@ export function LeadsListPage() {
             searchInput={searchInput}
             onSearchChange={setSearchInput}
             status={status}
-            onStatusChange={setStatus}
+            onStatusChange={(value) => {
+              setStatus(value);
+              resetPage();
+            }}
             priority={priority}
-            onPriorityChange={setPriority}
+            onPriorityChange={(value) => {
+              setPriority(value);
+              resetPage();
+            }}
             assignedUserId={assignedUserId}
-            onAssignedUserIdChange={setAssignedUserId}
+            onAssignedUserIdChange={(value) => {
+              setAssignedUserId(value);
+              resetPage();
+            }}
             leadSource={leadSource}
-            onLeadSourceChange={setLeadSource}
+            onLeadSourceChange={(value) => {
+              setLeadSource(value);
+              resetPage();
+            }}
             city={city}
-            onCityChange={setCity}
+            onCityChange={(value) => {
+              setCity(value);
+              resetPage();
+            }}
             options={filterOptions}
           />
         </CardContent>

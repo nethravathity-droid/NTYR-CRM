@@ -41,6 +41,13 @@ export const followupsService = {
     return response.data.data;
   },
 
+  async getCalendar(fromDate: string, toDate: string): Promise<FollowupListItem[]> {
+    const response = await apiClient.get<ApiResponse<FollowupListItem[]>>("/followups/calendar", {
+      params: { fromDate, toDate },
+    });
+    return response.data.data;
+  },
+
   async getFormOptions(): Promise<FollowupFormOptions> {
     const response = await apiClient.get<ApiResponse<FollowupFormOptions>>("/followups/form-options");
     return response.data.data;

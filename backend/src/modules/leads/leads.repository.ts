@@ -664,7 +664,7 @@ export class LeadsRepository {
     }
 
     if (query.priority) {
-      baseQuery.where("l.priority", this.toDbPriority(query.priority));
+      baseQuery.whereIn("l.priority", this.toDbPrioritiesForFilter(query.priority));
     }
 
     if (query.assignedUserId) {
@@ -672,7 +672,15 @@ export class LeadsRepository {
     }
 
     if (query.leadSource) {
-      baseQuery.whereILike("l.lead_source", query.leadSource);
+      baseQuery.whereILike("l.lead_source", `%${query.leadSource}%`);
+    }
+
+    if (query.fromDate) {
+      baseQuery.whereRaw("l.created_at::date >= ?", [query.fromDate]);
+    }
+
+    if (query.toDate) {
+      baseQuery.whereRaw("l.created_at::date <= ?", [query.toDate]);
     }
 
     if (query.propertyType) {
@@ -769,6 +777,14 @@ export class LeadsRepository {
 
   private toDbPriority(priority: LeadPriorityApi): LeadPriorityDb {
     return PRIORITY_API_TO_DB[priority];
+  }
+
+  private toDbPrioritiesForFilter(priority: LeadPriorityApi): LeadPriorityDb[] {
+    if (priority === "HOT") {
+      return ["HIGH", "URGENT"];
+    }
+
+    return [this.toDbPriority(priority)];
   }
 
   private toApiPriority(priority: LeadPriorityDb): LeadPriorityApi {

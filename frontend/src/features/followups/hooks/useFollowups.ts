@@ -11,6 +11,8 @@ export const followupKeys = {
   details: () => [...followupKeys.all, "detail"] as const,
   detail: (uuid: string) => [...followupKeys.details(), uuid] as const,
   formOptions: () => [...followupKeys.all, "form-options"] as const,
+  calendar: (fromDate: string, toDate: string) =>
+    [...followupKeys.all, "calendar", fromDate, toDate] as const,
 };
 
 export function useFollowups(params: ListFollowupsParams, options?: { enabled?: boolean }) {
@@ -19,6 +21,14 @@ export function useFollowups(params: ListFollowupsParams, options?: { enabled?: 
     queryFn: () => followupsService.list(params),
     placeholderData: keepPreviousData,
     enabled: options?.enabled ?? true,
+  });
+}
+
+export function useFollowupsCalendar(fromDate: string, toDate: string) {
+  return useQuery({
+    queryKey: followupKeys.calendar(fromDate, toDate),
+    queryFn: () => followupsService.getCalendar(fromDate, toDate),
+    enabled: Boolean(fromDate && toDate),
   });
 }
 

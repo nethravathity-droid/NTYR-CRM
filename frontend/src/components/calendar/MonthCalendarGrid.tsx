@@ -61,46 +61,52 @@ export function MonthCalendarGrid({
         </div>
       </div>
 
-      {isLoading ? <Loading label="Loading calendar..." /> : null}
-
-      <div className="grid grid-cols-7 gap-2">
-        {WEEKDAY_LABELS.map((label) => (
-          <div key={label} className="px-2 py-1 text-center text-xs font-medium text-muted-foreground">
-            {label}
+      <div className="relative">
+        {isLoading ? (
+          <div className="absolute inset-0 z-10 flex items-center justify-center rounded-lg bg-background/70 backdrop-blur-[1px]">
+            <Loading label="Loading calendar..." />
           </div>
-        ))}
-        {calendarDays.map((day, index) => {
-          const count = getCountForDate(day.dateKey);
-          const isSelected = selectedDateKey === day.dateKey;
-          const isToday = day.dateKey === todayKey;
+        ) : null}
 
-          return (
-            <button
-              key={`${day.dateKey}-${index}`}
-              type="button"
-              onClick={() => {
-                if (!day.inCurrentMonth) {
-                  onMonthChange(new Date(day.date.getFullYear(), day.date.getMonth(), 1));
-                }
-                onSelectDate(day.dateKey, day.date);
-              }}
-              className={cn(
-                "min-h-24 rounded-lg border p-2 text-left transition-colors hover:border-primary/40",
-                isSelected ? "border-primary bg-primary/5" : "border-border",
-                !day.inCurrentMonth && "opacity-45",
-              )}
-            >
-              <div className="flex items-center justify-between gap-1">
-                <span className={cn("text-sm font-medium", isToday && "text-primary")}>{day.date.getDate()}</span>
-                {count > 0 ? (
-                  <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs text-primary">
-                    {countLabel(count)}
-                  </span>
-                ) : null}
-              </div>
-            </button>
-          );
-        })}
+        <div className="grid grid-cols-7 gap-2">
+          {WEEKDAY_LABELS.map((label) => (
+            <div key={label} className="px-2 py-1 text-center text-xs font-medium text-muted-foreground">
+              {label}
+            </div>
+          ))}
+          {calendarDays.map((day, index) => {
+            const count = getCountForDate(day.dateKey);
+            const isSelected = selectedDateKey === day.dateKey;
+            const isToday = day.dateKey === todayKey;
+
+            return (
+              <button
+                key={`${day.dateKey}-${index}`}
+                type="button"
+                onClick={() => {
+                  if (!day.inCurrentMonth) {
+                    onMonthChange(new Date(day.date.getFullYear(), day.date.getMonth(), 1));
+                  }
+                  onSelectDate(day.dateKey, day.date);
+                }}
+                className={cn(
+                  "min-h-24 rounded-lg border bg-white p-2 text-left shadow-sm transition-colors hover:border-primary/40 dark:bg-card",
+                  isSelected ? "border-primary bg-primary/5 ring-1 ring-primary/20" : "border-[#E2E8F0] dark:border-border",
+                  !day.inCurrentMonth && "opacity-45",
+                )}
+              >
+                <div className="flex items-center justify-between gap-1">
+                  <span className={cn("text-sm font-semibold", isToday && "text-primary")}>{day.date.getDate()}</span>
+                  {count > 0 ? (
+                    <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+                      {countLabel(count)}
+                    </span>
+                  ) : null}
+                </div>
+              </button>
+            );
+          })}
+        </div>
       </div>
     </div>
   );

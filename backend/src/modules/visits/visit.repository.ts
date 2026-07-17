@@ -74,6 +74,27 @@ export class VisitsRepository {
     };
   }
 
+  async listVisitsForCalendar(
+    companyId: number,
+    query: Pick<ListVisitsQuery, "fromDate" | "toDate" | "assignedUserId">,
+  ): Promise<VisitListItem[]> {
+    const rows = await this.buildListQuery(companyId, {
+      page: 1,
+      limit: 100,
+      fromDate: query.fromDate,
+      toDate: query.toDate,
+      assignedUserId: query.assignedUserId,
+      sortBy: "visit_date",
+      sortOrder: "asc",
+    })
+      .clone()
+      .select(VISIT_LIST_SELECT)
+      .orderBy("v.visit_date", "asc")
+      .orderBy("v.visit_time", "asc");
+
+    return rows.map((row) => this.mapToListItem(row));
+  }
+
   async findVisitByUuid(companyId: number, uuid: string): Promise<VisitDetail | null> {
     const row = await this.buildListQuery(companyId, { page: 1, limit: 1, sortBy: "visit_date", sortOrder: "asc" })
       .clone()

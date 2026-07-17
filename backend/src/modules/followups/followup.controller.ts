@@ -9,11 +9,13 @@ import type {
   deleteFollowupSchema,
   getFollowupSchema,
   listFollowupsSchema,
+  calendarFollowupsSchema,
   rescheduleFollowupSchema,
   updateFollowupSchema,
 } from "./followup.validation.js";
 
 type ListFollowupsRequest = Request & { validated: z.infer<typeof listFollowupsSchema> };
+type CalendarFollowupsRequest = Request & { validated: z.infer<typeof calendarFollowupsSchema> };
 type CreateFollowupRequest = Request & { validated: z.infer<typeof createFollowupSchema> };
 type GetFollowupRequest = Request & { validated: z.infer<typeof getFollowupSchema> };
 type UpdateFollowupRequest = Request & { validated: z.infer<typeof updateFollowupSchema> };
@@ -33,6 +35,21 @@ export class FollowupsController {
       success: true,
       message: "Follow-ups retrieved successfully",
       data: result,
+    });
+  });
+
+  calendar = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+    const { query } = (req as CalendarFollowupsRequest).validated;
+    const scopedQuery = withAssignedUserScope(req.user!.roleCode, req.user!.id, query);
+    const followups = await this.followupsService.listFollowupsForCalendar(
+      req.user!.companyId,
+      scopedQuery,
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Follow-up calendar retrieved successfully",
+      data: followups,
     });
   });
 

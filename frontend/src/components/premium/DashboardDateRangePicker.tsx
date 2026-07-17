@@ -32,7 +32,7 @@ export function DashboardDateRangePicker({ variant = "default" }: { variant?: "d
           )}
         >
           <CalendarDays className="mr-2 h-4 w-4" />
-          <span className="hidden lg:inline">{label}</span>
+          <span className="hidden sm:inline">{label}</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-72 rounded-[18px]">

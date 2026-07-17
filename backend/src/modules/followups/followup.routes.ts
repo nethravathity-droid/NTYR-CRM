@@ -6,6 +6,7 @@ import { FollowupsController } from "./followup.controller.js";
 import { followupsService } from "./followup.service.js";
 import {
   completeFollowupSchema,
+  calendarFollowupsSchema,
   createFollowupSchema,
   deleteFollowupSchema,
   getFollowupSchema,
@@ -20,6 +21,7 @@ const router = Router();
 router.use(authenticate);
 
 router.get("/", authorize("leads.view"), validate(listFollowupsSchema), followupsController.list);
+router.get("/calendar", authorize("leads.view"), validate(calendarFollowupsSchema), followupsController.calendar);
 router.get("/today", authorize("leads.view"), followupsController.getToday);
 router.get("/overdue", authorize("leads.view"), followupsController.getOverdue);
 router.get("/form-options", authorize("leads.view"), followupsController.getFormOptions);

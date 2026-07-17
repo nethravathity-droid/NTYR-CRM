@@ -36,6 +36,13 @@ export const visitsService = {
     return response.data.data;
   },
 
+  async getCalendar(fromDate: string, toDate: string): Promise<VisitListItem[]> {
+    const response = await apiClient.get<ApiResponse<VisitListItem[]>>("/visits/calendar", {
+      params: { fromDate, toDate },
+    });
+    return response.data.data;
+  },
+
   async getFormOptions(): Promise<VisitFormOptions> {
     const response = await apiClient.get<ApiResponse<VisitFormOptions>>("/visits/form-options");
     return response.data.data;

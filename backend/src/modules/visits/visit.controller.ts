@@ -6,6 +6,7 @@ import type { VisitsService } from "./visit.service.js";
 import type {
   cancelVisitSchema,
   completeVisitSchema,
+  calendarVisitsSchema,
   createVisitSchema,
   deleteVisitSchema,
   getVisitAuditSchema,
@@ -15,6 +16,7 @@ import type {
 } from "./visit.validation.js";
 
 type ListVisitsRequest = Request & { validated: z.infer<typeof listVisitsSchema> };
+type CalendarVisitsRequest = Request & { validated: z.infer<typeof calendarVisitsSchema> };
 type CreateVisitRequest = Request & { validated: z.infer<typeof createVisitSchema> };
 type GetVisitRequest = Request & { validated: z.infer<typeof getVisitSchema> };
 type UpdateVisitRequest = Request & { validated: z.infer<typeof updateVisitSchema> };
@@ -35,6 +37,18 @@ export class VisitsController {
       success: true,
       message: "Visits retrieved successfully",
       data: result,
+    });
+  });
+
+  calendar = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+    const { query } = (req as CalendarVisitsRequest).validated;
+    const scopedQuery = withAssignedUserScope(req.user!.roleCode, req.user!.id, query);
+    const visits = await this.visitsService.listVisitsForCalendar(req.user!.companyId, scopedQuery);
+
+    res.status(200).json({
+      success: true,
+      message: "Visit calendar retrieved successfully",
+      data: visits,
     });
   });
 

@@ -5,8 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MonthCalendarGrid, useCalendarMonthState } from "@/components/calendar/MonthCalendarGrid";
 import { CompanyPageHeader } from "@/features/companies/components/CompanyPageHeader";
-import { useFollowups } from "@/features/followups/hooks/useFollowups";
+import { useFollowupsCalendar } from "@/features/followups/hooks/useFollowups";
 import { FOLLOWUP_TYPE_LABELS } from "@/features/followups/types/followup.types";
+import { getApiErrorMessage } from "@/lib/api/client";
 import { formatLocalDateLabel, getMonthBounds } from "@/lib/date/local-date";
 import { paths } from "@/routes/paths";
 
@@ -15,26 +16,22 @@ export function FollowupCalendarPage() {
   const { currentMonth, setCurrentMonth, selectedDateKey, setSelectedDateKey } = useCalendarMonthState();
 
   const monthBounds = useMemo(() => getMonthBounds(currentMonth), [currentMonth]);
-  const { data, isLoading } = useFollowups({
-    page: 1,
-    limit: 500,
-    fromDate: monthBounds.fromDate,
-    toDate: monthBounds.toDate,
-    sortBy: "followup_date",
-    sortOrder: "asc",
-  });
+  const { data: followups = [], isLoading, isError, error } = useFollowupsCalendar(
+    monthBounds.fromDate,
+    monthBounds.toDate,
+  );
 
   const followupsByDate = useMemo(() => {
-    const grouped = new Map<string, NonNullable<typeof data>["followups"]>();
+    const grouped = new Map<string, typeof followups>();
 
-    for (const followup of data?.followups ?? []) {
+    for (const followup of followups) {
       const items = grouped.get(followup.followupDate) ?? [];
       items.push(followup);
       grouped.set(followup.followupDate, items);
     }
 
     return grouped;
-  }, [data?.followups]);
+  }, [followups]);
 
   const selectedFollowups = followupsByDate.get(selectedDateKey) ?? [];
 
@@ -51,6 +48,12 @@ export function FollowupCalendarPage() {
           </Button>
         }
       />
+
+      {isError ? (
+        <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">
+          {getApiErrorMessage(error)}
+        </div>
+      ) : null}
 
       <Card>
         <CardHeader>
@@ -93,7 +96,7 @@ export function FollowupCalendarPage() {
                 <div>
                   <p className="font-medium">{followup.customerName}</p>
                   <p className="text-sm text-muted-foreground">
-                    {followup.followupTime.slice(0, 5)} • {FOLLOWUP_TYPE_LABELS[followup.type]} •{" "}
+                    {(followup.followupTime ?? "").slice(0, 5)} • {FOLLOWUP_TYPE_LABELS[followup.type]} •{" "}
                     {followup.status}
                   </p>
                 </div>

@@ -27,6 +27,14 @@ const visitBaseSchema = z.object({
   notes: z.string().trim().max(4000).nullable().optional(),
 });
 
+export const calendarVisitsSchema = z.object({
+  query: z.object({
+    fromDate: z.string().min(1, "fromDate is required"),
+    toDate: z.string().min(1, "toDate is required"),
+    assignedUserId: z.coerce.number().int().positive().optional(),
+  }),
+});
+
 export const listVisitsSchema = z.object({
   query: z.object({
     page: z.coerce.number().int().positive().default(1),
@@ -66,6 +74,7 @@ export const cancelVisitSchema = uuidParamSchema.extend({
 });
 
 export type ListVisitsQuery = z.infer<typeof listVisitsSchema>["query"];
+export type CalendarVisitsQuery = z.infer<typeof calendarVisitsSchema>["query"];
 export type CreateVisitInput = z.infer<typeof createVisitSchema>["body"];
 export type UpdateVisitInput = z.infer<typeof updateVisitSchema>["body"];
 export type CompleteVisitInput = z.infer<typeof completeVisitSchema>["body"];

@@ -21,6 +21,13 @@ export class VisitsService {
     return this.visitsRepository.listVisits(companyId, query);
   }
 
+  async listVisitsForCalendar(
+    companyId: number,
+    query: Pick<ListVisitsQuery, "fromDate" | "toDate" | "assignedUserId">,
+  ) {
+    return this.visitsRepository.listVisitsForCalendar(companyId, query);
+  }
+
   async getVisitByUuid(companyId: number, uuid: string): Promise<VisitDetail> {
     const visit = await this.visitsRepository.findVisitByUuid(companyId, uuid);
     if (!visit) {

@@ -71,6 +71,14 @@ export const listLeadsSchema = z.object({
     propertyType: z.string().trim().max(100).optional(),
     city: z.string().trim().max(100).optional(),
     campaign: z.string().trim().max(150).optional(),
+    fromDate: z
+      .string()
+      .regex(/^\d{4}-\d{2}-\d{2}$/, "fromDate must be YYYY-MM-DD")
+      .optional(),
+    toDate: z
+      .string()
+      .regex(/^\d{4}-\d{2}-\d{2}$/, "toDate must be YYYY-MM-DD")
+      .optional(),
     sortBy: z
       .enum([
         "created_at",
