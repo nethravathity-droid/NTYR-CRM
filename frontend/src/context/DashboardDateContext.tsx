@@ -4,6 +4,7 @@ import {
   getTodayRange,
   getMonthRange,
   getWeekRange,
+  normalizeDateRange,
   type DashboardDatePreset,
   type DashboardDateRange,
 } from "@/lib/dashboard/date-range";
@@ -31,7 +32,7 @@ export function DashboardDateProvider({ children }: { children: ReactNode }) {
 
   const setCustomRange = (nextRange: DashboardDateRange) => {
     setPresetState("custom");
-    setRange(nextRange);
+    setRange(normalizeDateRange(nextRange.fromDate, nextRange.toDate));
   };
 
   const value = useMemo(

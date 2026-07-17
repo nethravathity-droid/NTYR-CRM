@@ -1,4 +1,5 @@
 import type { Knex } from "knex";
+import { formatLocalDateKey } from "../../common/utils/local-date.js";
 import type {
   CreateFollowupData,
   FollowupDetail,
@@ -212,7 +213,7 @@ export class FollowupsRepository {
       .select(FOLLOWUP_LIST_SELECT)
       .where("f.company_id", companyId)
       .whereNull("f.deleted_at")
-      .where("f.followup_date", new Date().toISOString().slice(0, 10))
+      .where("f.followup_date", formatLocalDateKey())
       .modify((qb) => {
         if (assignedUserId) qb.where("f.assigned_user_id", assignedUserId);
       })
@@ -228,7 +229,7 @@ export class FollowupsRepository {
       .select(FOLLOWUP_LIST_SELECT)
       .where("f.company_id", companyId)
       .whereNull("f.deleted_at")
-      .where("f.followup_date", "<", new Date().toISOString().slice(0, 10))
+      .where("f.followup_date", "<", formatLocalDateKey())
       .whereIn("f.status", ["PENDING", "RESCHEDULED"])
       .modify((qb) => {
         if (assignedUserId) qb.where("f.assigned_user_id", assignedUserId);
@@ -322,11 +323,11 @@ export class FollowupsRepository {
     }
 
     if (query.upcoming) {
-      baseQuery.where("f.followup_date", ">=", new Date().toISOString().slice(0, 10));
+      baseQuery.where("f.followup_date", ">=", formatLocalDateKey());
     }
 
     if (query.overdue) {
-      baseQuery.where("f.followup_date", "<", new Date().toISOString().slice(0, 10));
+      baseQuery.where("f.followup_date", "<", formatLocalDateKey());
     }
 
     return baseQuery;

@@ -1,3 +1,10 @@
+import {
+  formatLocalDateLabel,
+  formatLocalDateKey,
+  getLocalTodayKey,
+  normalizeDateRange,
+} from "@/lib/date/local-date";
+
 export interface DashboardDateRange {
   fromDate: string;
   toDate: string;
@@ -6,11 +13,11 @@ export interface DashboardDateRange {
 export type DashboardDatePreset = "today" | "week" | "month" | "custom";
 
 export function formatDateInput(date: Date): string {
-  return date.toISOString().slice(0, 10);
+  return formatLocalDateKey(date);
 }
 
 export function getTodayRange(): DashboardDateRange {
-  const today = formatDateInput(new Date());
+  const today = getLocalTodayKey();
   return { fromDate: today, toDate: today };
 }
 
@@ -20,13 +27,13 @@ export function getWeekRange(): DashboardDateRange {
   const day = start.getDay();
   const diff = start.getDate() - day + (day === 0 ? -6 : 1);
   start.setDate(diff);
-  return { fromDate: formatDateInput(start), toDate: formatDateInput(end) };
+  return normalizeDateRange(formatDateInput(start), formatDateInput(end));
 }
 
 export function getMonthRange(): DashboardDateRange {
   const end = new Date();
   const start = new Date(end.getFullYear(), end.getMonth(), 1);
-  return { fromDate: formatDateInput(start), toDate: formatDateInput(end) };
+  return normalizeDateRange(formatDateInput(start), formatDateInput(end));
 }
 
 export function getRangeForPreset(preset: DashboardDatePreset): DashboardDateRange {
@@ -44,21 +51,20 @@ export function getRangeForPreset(preset: DashboardDatePreset): DashboardDateRan
 
 export function formatDateRangeLabel(range: DashboardDateRange): string {
   if (range.fromDate === range.toDate) {
-    return new Date(`${range.fromDate}T00:00:00`).toLocaleDateString(undefined, {
+    return formatLocalDateLabel(range.fromDate, {
       month: "short",
       day: "numeric",
       year: "numeric",
     });
   }
 
-  const from = new Date(`${range.fromDate}T00:00:00`).toLocaleDateString(undefined, {
-    month: "short",
-    day: "numeric",
-  });
-  const to = new Date(`${range.toDate}T00:00:00`).toLocaleDateString(undefined, {
+  const from = formatLocalDateLabel(range.fromDate, { month: "short", day: "numeric" });
+  const to = formatLocalDateLabel(range.toDate, {
     month: "short",
     day: "numeric",
     year: "numeric",
   });
   return `${from} – ${to}`;
 }
+
+export { normalizeDateRange };

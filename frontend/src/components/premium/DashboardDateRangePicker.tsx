@@ -17,6 +17,7 @@ export function DashboardDateRangePicker({ variant = "default" }: { variant?: "d
   const { label, preset, setPreset, setCustomRange, range } = useDashboardDate();
 
   const applyCustom = (field: keyof DashboardDateRange, value: string) => {
+    if (!value) return;
     setCustomRange({ ...range, [field]: value });
   };
 
@@ -47,18 +48,34 @@ export function DashboardDateRangePicker({ variant = "default" }: { variant?: "d
           This Month
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <div className="space-y-2 px-2 py-1">
+        <div
+          className="space-y-2 px-2 py-1"
+          onPointerDown={(event) => event.preventDefault()}
+          onClick={(event) => event.stopPropagation()}
+        >
           <p className="text-xs font-medium text-muted-foreground">Custom range</p>
-          <Input
-            type="date"
-            value={range.fromDate}
-            onChange={(event) => applyCustom("fromDate", event.target.value)}
-          />
-          <Input
-            type="date"
-            value={range.toDate}
-            onChange={(event) => applyCustom("toDate", event.target.value)}
-          />
+          <div className="space-y-1">
+            <label className="text-xs text-muted-foreground" htmlFor="dashboard-from-date">
+              From
+            </label>
+            <Input
+              id="dashboard-from-date"
+              type="date"
+              value={range.fromDate}
+              onChange={(event) => applyCustom("fromDate", event.target.value)}
+            />
+          </div>
+          <div className="space-y-1">
+            <label className="text-xs text-muted-foreground" htmlFor="dashboard-to-date">
+              To
+            </label>
+            <Input
+              id="dashboard-to-date"
+              type="date"
+              value={range.toDate}
+              onChange={(event) => applyCustom("toDate", event.target.value)}
+            />
+          </div>
         </div>
       </DropdownMenuContent>
     </DropdownMenu>

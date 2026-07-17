@@ -11,7 +11,7 @@ import {
   Settings,
   UserRound,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -41,6 +41,7 @@ import { CommandPalette } from "@/components/premium/CommandPalette";
 import { DashboardDateRangePicker } from "@/components/premium/DashboardDateRangePicker";
 import { isWhatsAppConfigured, openWhatsAppConversation } from "@/lib/whatsapp";
 import { getQuickAddItemsForRole } from "@/lib/rbac/quick-add";
+import { ROLE_CODES } from "@/lib/rbac/roles";
 
 function formatHeaderDate() {
   return new Date().toLocaleDateString(undefined, {
@@ -98,6 +99,7 @@ function NotificationMenuItem({
 export function PremiumHeader() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const { setCommandOpen, setSearchOpen, searchQuery, setSearchQuery } = useShell();
   const { hasPermission } = usePermissions();
   const { notifications, unreadCount, markAsRead, markAllAsRead, isRead } = useNotifications();
@@ -134,6 +136,10 @@ export function PremiumHeader() {
     () => getQuickAddItemsForRole(user?.role.code, hasPermission),
     [hasPermission, user?.role.code],
   );
+
+  const showDashboardDatePicker =
+    user?.role.code !== ROLE_CODES.PLATFORM_SUPER_ADMIN &&
+    location.pathname.includes("/dashboard");
 
   const handleWhatsAppClick = () => {
     if (isWhatsAppConfigured() && user?.user.mobile) {
@@ -195,7 +201,7 @@ export function PremiumHeader() {
             </DropdownMenu>
           ) : null}
 
-          <DashboardDateRangePicker />
+          {showDashboardDatePicker ? <DashboardDateRangePicker /> : null}
 
           <Button
             variant="outline"
