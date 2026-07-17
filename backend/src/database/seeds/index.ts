@@ -288,9 +288,9 @@ async function seedDemoRbacRoles(
       username: roleSeed.user.username,
     });
 
-    if (!existingUserId) {
-      const passwordHash = await bcrypt.hash(roleSeed.user.password, BCRYPT_ROUNDS);
+    const passwordHash = await bcrypt.hash(roleSeed.user.password, BCRYPT_ROUNDS);
 
+    if (!existingUserId) {
       const [createdUser] = await trx("users")
         .insert({
           company_id: demoCompany.id,
@@ -321,6 +321,18 @@ async function seedDemoRbacRoles(
         state: SEED.demo.state,
         country: "India",
       });
+    } else {
+      await trx("users")
+        .where({ id: existingUserId })
+        .update({
+          role_id: roleId,
+          designation_id: designationId,
+          employee_code: roleSeed.user.employeeCode,
+          password_hash: passwordHash,
+          status: "ACTIVE",
+          failed_login_attempts: 0,
+          account_locked_until: null,
+        });
     }
   }
 }
@@ -412,7 +424,7 @@ async function runSeed(): Promise<void> {
     console.log(`${roleSeed.roleName.padEnd(16)}: ${roleSeed.user.username} / ${roleSeed.user.password}`);
   }
   console.log("");
-  console.log("Note: Re-running this seed is safe. Existing records are preserved.");
+  console.log("Note: Re-running this seed is safe. Demo RBAC passwords are reset to defaults.");
 }
 
 runSeed()
