@@ -9,7 +9,11 @@ import type {
   CompanyStatus,
   ListCompaniesParams,
 } from "@/features/companies/types/company.types";
-import type { CompanyFormSchema } from "@/features/companies/schemas/company.schema";
+import type {
+  CompanyCreateFormSchema,
+  CompanyFormSchema,
+} from "@/features/companies/schemas/company.schema";
+import type { ProvisionInitialAdminPayload } from "@/features/companies/types/company.types";
 
 export const companyKeys = {
   all: ["companies"] as const,
@@ -18,6 +22,7 @@ export const companyKeys = {
     [...companyKeys.lists(), params] as const,
   details: () => [...companyKeys.all, "detail"] as const,
   detail: (uuid: string) => [...companyKeys.details(), uuid] as const,
+  loginSetup: (uuid: string) => [...companyKeys.all, "login-setup", uuid] as const,
 };
 
 export function useCompanies(params: ListCompaniesParams) {
@@ -40,9 +45,29 @@ export function useCreateCompany() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (values: CompanyFormSchema) => companiesService.create(values),
+    mutationFn: (values: CompanyCreateFormSchema) => companiesService.create(values),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: companyKeys.all });
+    },
+  });
+}
+
+export function useCompanyLoginSetup(uuid: string | undefined) {
+  return useQuery({
+    queryKey: companyKeys.loginSetup(uuid ?? ""),
+    queryFn: () => companiesService.getLoginSetup(uuid!),
+    enabled: Boolean(uuid),
+  });
+}
+
+export function useProvisionInitialAdmin(uuid: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (payload: ProvisionInitialAdminPayload) =>
+      companiesService.provisionInitialAdmin(uuid, payload),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: companyKeys.loginSetup(uuid) });
     },
   });
 }

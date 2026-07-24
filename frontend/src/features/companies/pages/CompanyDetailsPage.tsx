@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import {
   ArrowLeft,
   Building2,
@@ -26,6 +26,7 @@ import { CompanyActiveSwitch } from "@/features/companies/components/CompanyActi
 import { CompanyStatusBadge } from "@/features/companies/components/CompanyStatusBadge";
 import { CompanyStatusSelect } from "@/features/companies/components/CompanyStatusSelect";
 import { DeleteCompanyDialog } from "@/features/companies/components/DeleteCompanyDialog";
+import { CompanyLoginSetupCard } from "@/features/companies/components/CompanyLoginSetupCard";
 import { IconBox } from "@/features/companies/components/IconBox";
 import {
   useCompany,
@@ -33,7 +34,7 @@ import {
   useUpdateCompanyActive,
   useUpdateCompanyStatus,
 } from "@/features/companies/hooks/useCompanies";
-import type { CompanyStatus } from "@/features/companies/types/company.types";
+import type { InitialAdminLogin } from "@/features/companies/types/company.types";
 import { usePermissions } from "@/hooks/usePermissions";
 import { getApiErrorMessage } from "@/lib/api/client";
 import { paths } from "@/routes/paths";
@@ -85,10 +86,15 @@ function ContactRow({
 
 export function CompanyDetailsPage() {
   const { uuid } = useParams<{ uuid: string }>();
+  const location = useLocation();
   const navigate = useNavigate();
   const { hasPermission } = usePermissions();
   const canUpdate = hasPermission("companies.update");
   const canDelete = hasPermission("companies.delete");
+
+  const flashLogin = location.state as
+    | (InitialAdminLogin & { password?: string })
+    | undefined;
 
   const { data: company, isLoading, error } = useCompany(uuid);
   const updateStatus = useUpdateCompanyStatus();
@@ -237,6 +243,15 @@ export function CompanyDetailsPage() {
         <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">
           {actionError}
         </div>
+      ) : null}
+
+      {!isPlatformCompany && uuid ? (
+        <CompanyLoginSetupCard
+          companyUuid={uuid}
+          companyCode={company.companyCode}
+          canManage={canUpdate}
+          flashLogin={flashLogin}
+        />
       ) : null}
 
       <div className="grid gap-4 lg:grid-cols-3">

@@ -5,8 +5,10 @@ import type { CompaniesService } from "./companies.service.js";
 import type {
   createCompanySchema,
   deleteCompanySchema,
+  getCompanyLoginSetupSchema,
   getCompanySchema,
   listCompaniesSchema,
+  provisionInitialAdminSchema,
   updateCompanyActiveSchema,
   updateCompanySchema,
   updateCompanyStatusSchema,
@@ -32,6 +34,9 @@ type UpdateCompanyActiveRequest = Request & {
 };
 type DeleteCompanyRequest = Request & {
   validated: z.infer<typeof deleteCompanySchema>;
+};
+type ProvisionInitialAdminRequest = Request & {
+  validated: z.infer<typeof provisionInitialAdminSchema>;
 };
 
 export class CompaniesController {
@@ -66,17 +71,46 @@ export class CompaniesController {
   create = asyncHandler(async (req: Request, res: Response): Promise<void> => {
     const { body } = (req as CreateCompanyRequest).validated;
 
-    const company = await this.companiesService.createCompany(
-      body,
-      req.user!.id,
-    );
+    const result = await this.companiesService.createCompany(body, req.user!.id);
 
     res.status(201).json({
       success: true,
       message: "Company created successfully",
-      data: { company },
+      data: result,
     });
   });
+
+  getLoginSetup = asyncHandler(
+    async (req: Request, res: Response): Promise<void> => {
+      const { params } = (req as GetCompanyRequest).validated;
+
+      const setup = await this.companiesService.getCompanyLoginSetup(params.uuid);
+
+      res.status(200).json({
+        success: true,
+        message: "Company login setup retrieved successfully",
+        data: setup,
+      });
+    },
+  );
+
+  provisionInitialAdmin = asyncHandler(
+    async (req: Request, res: Response): Promise<void> => {
+      const { params, body } = (req as ProvisionInitialAdminRequest).validated;
+
+      const initialAdmin = await this.companiesService.provisionInitialAdmin(
+        params.uuid,
+        body,
+        req.user!.id,
+      );
+
+      res.status(201).json({
+        success: true,
+        message: "Company admin login created successfully",
+        data: { initialAdmin },
+      });
+    },
+  );
 
   update = asyncHandler(async (req: Request, res: Response): Promise<void> => {
     const { params, body } = (req as UpdateCompanyRequest).validated;

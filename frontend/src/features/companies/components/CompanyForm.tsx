@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Building2,
+  KeyRound,
   Loader2,
   MapPin,
   Phone,
@@ -24,8 +25,11 @@ import {
 } from "@/components/ui/card";
 import { IconBox, type IconBoxTone } from "@/features/companies/components/IconBox";
 import {
+  companyCreateDefaultValues,
+  companyCreateFormSchema,
   companyDefaultValues,
   companyFormSchema,
+  type CompanyCreateFormSchema,
   type CompanyFormSchema,
 } from "@/features/companies/schemas/company.schema";
 import { companyStatusOptions } from "@/features/companies/components/CompanyStatusBadge";
@@ -36,7 +40,8 @@ interface CompanyFormProps {
   submitLabel: string;
   isSubmitting?: boolean;
   disableCode?: boolean;
-  onSubmit: (values: CompanyFormSchema) => Promise<void> | void;
+  includeInitialAdmin?: boolean;
+  onSubmit: (values: CompanyFormSchema | CompanyCreateFormSchema) => Promise<void> | void;
   onCancel?: () => void;
 }
 
@@ -45,6 +50,7 @@ export function CompanyForm({
   submitLabel,
   isSubmitting = false,
   disableCode = false,
+  includeInitialAdmin = false,
   onSubmit,
   onCancel,
 }: CompanyFormProps) {
@@ -52,9 +58,11 @@ export function CompanyForm({
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<CompanyFormSchema>({
-    resolver: zodResolver(companyFormSchema),
-    defaultValues,
+  } = useForm<CompanyCreateFormSchema>({
+    resolver: zodResolver(includeInitialAdmin ? companyCreateFormSchema : companyFormSchema),
+    defaultValues: includeInitialAdmin
+      ? { ...companyCreateDefaultValues, ...defaultValues }
+      : defaultValues,
   });
 
   return (
@@ -68,9 +76,14 @@ export function CompanyForm({
         <FormField label="Company Code" error={errors.companyCode?.message}>
           <Input
             {...register("companyCode")}
-            placeholder="DEMO"
+            placeholder="NAMMABLR"
             disabled={disableCode}
           />
+          {includeInitialAdmin ? (
+            <p className="mt-1 text-xs text-muted-foreground">
+              Used at login (e.g. NAMMABLR). Letters, numbers, hyphens only — no spaces.
+            </p>
+          ) : null}
         </FormField>
 
         <FormField label="Company Name" error={errors.companyName?.message}>
@@ -214,6 +227,31 @@ export function CompanyForm({
           />
         </FormField>
       </FormSection>
+
+      {includeInitialAdmin ? (
+        <FormSection
+          icon={KeyRound}
+          tone="violet"
+          title="First company admin login"
+          description="Tenant owner uses company code + username + password on the login page."
+          columns="grid-cols-1 md:grid-cols-3"
+        >
+          <FormField label="Username" error={errors.adminUsername?.message}>
+            <Input {...register("adminUsername")} placeholder="admin" autoComplete="off" />
+          </FormField>
+          <FormField label="Password" error={errors.adminPassword?.message}>
+            <Input
+              {...register("adminPassword")}
+              type="password"
+              autoComplete="new-password"
+              placeholder="Min. 8 characters"
+            />
+          </FormField>
+          <FormField label="Employee code" error={errors.adminEmployeeCode?.message}>
+            <Input {...register("adminEmployeeCode")} placeholder="ADM001" />
+          </FormField>
+        </FormSection>
+      ) : null}
 
       <div className="flex flex-col-reverse gap-3 rounded-xl border bg-muted/20 p-4 sm:flex-row sm:justify-end">
         {onCancel ? (

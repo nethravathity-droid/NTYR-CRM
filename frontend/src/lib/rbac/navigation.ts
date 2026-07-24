@@ -140,7 +140,8 @@ export function getNavigationSectionsForRole(roleCode: RoleCode): NavSection[] {
             dashboard(),
             { label: "My Leads", href: rolePath("/leads"), icon: UserSquare2, permission: "leads.view" },
             { label: "Calls", href: rolePath("/calls"), icon: PhoneCall, permission: "calls.view" },
-            { label: "Follow-ups", href: rolePath("/followups/today"), icon: CalendarClock, permission: "leads.view" },
+            { label: "Follow-ups", href: rolePath("/followups"), icon: CalendarClock, permission: "leads.view" },
+            { label: "Today", href: rolePath("/followups/today"), icon: CalendarDays, permission: "leads.view" },
           ],
         },
         {
@@ -160,6 +161,7 @@ export function getNavigationSectionsForRole(roleCode: RoleCode): NavSection[] {
             { label: "Leads", href: rolePath("/leads"), icon: UserSquare2, permission: "leads.view" },
             { label: "Calls", href: rolePath("/calls"), icon: PhoneCall, permission: "calls.view" },
             { label: "Follow-ups", href: rolePath("/followups"), icon: CalendarClock, permission: "leads.view" },
+            { label: "Calendar", href: rolePath("/followups/calendar"), icon: CalendarDays, permission: "leads.view" },
             { label: "Visits", href: rolePath("/visits"), icon: MapPinned, permission: "visits.view" },
             { label: "Bookings", href: rolePath("/bookings"), icon: CreditCard, permission: "bookings.view" },
             { label: "Payments", href: rolePath("/payments"), icon: Banknote, permission: "payments.view" },

@@ -278,9 +278,9 @@ export class CompaniesRepository {
     companyCode: string,
     excludeCompanyId?: number,
   ): Promise<boolean> {
-    const query = this.db("companies")
-      .whereRaw("LOWER(company_code) = LOWER(?)", [companyCode])
-      .whereNull("deleted_at");
+    const query = this.db("companies").whereRaw("LOWER(company_code) = LOWER(?)", [
+      companyCode,
+    ]);
 
     if (excludeCompanyId) {
       query.whereNot("id", excludeCompanyId);
@@ -290,9 +290,7 @@ export class CompaniesRepository {
   }
 
   async isEmailTaken(email: string, excludeCompanyId?: number): Promise<boolean> {
-    const query = this.db("companies")
-      .whereRaw("LOWER(email) = LOWER(?)", [email])
-      .whereNull("deleted_at");
+    const query = this.db("companies").whereRaw("LOWER(email) = LOWER(?)", [email]);
 
     if (excludeCompanyId) {
       query.whereNot("id", excludeCompanyId);

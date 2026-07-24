@@ -54,7 +54,31 @@ export const companyFormSchema = z.object({
   notes: optionalString,
 });
 
+export const companyInitialAdminSchema = z.object({
+  adminUsername: z
+    .string()
+    .trim()
+    .min(3, "Username must be at least 3 characters")
+    .max(50)
+    .regex(/^[a-zA-Z0-9._-]+$/, "Use letters, numbers, dots, underscores, or hyphens"),
+  adminPassword: z
+    .string()
+    .min(8, "Password must be at least 8 characters")
+    .max(128),
+  adminEmployeeCode: z
+    .string()
+    .trim()
+    .min(2)
+    .max(30)
+    .regex(/^[A-Za-z0-9_-]+$/, "Invalid employee code")
+    .optional()
+    .or(z.literal("")),
+});
+
+export const companyCreateFormSchema = companyFormSchema.merge(companyInitialAdminSchema);
+
 export type CompanyFormSchema = z.infer<typeof companyFormSchema>;
+export type CompanyCreateFormSchema = z.infer<typeof companyCreateFormSchema>;
 
 export const companyDefaultValues: CompanyFormSchema = {
   companyCode: "",
@@ -83,6 +107,26 @@ export const companyDefaultValues: CompanyFormSchema = {
   trialEndDate: "",
   notes: "",
 };
+
+export const companyCreateDefaultValues: CompanyCreateFormSchema = {
+  ...companyDefaultValues,
+  adminUsername: "admin",
+  adminPassword: "",
+  adminEmployeeCode: "ADM001",
+};
+
+export function normalizeCompanyCreatePayload(values: CompanyCreateFormSchema) {
+  const company = normalizeCompanyPayload(values);
+
+  return {
+    ...company,
+    initialAdmin: {
+      username: values.adminUsername.trim().toLowerCase(),
+      password: values.adminPassword,
+      employeeCode: values.adminEmployeeCode?.trim() || "ADM001",
+    },
+  };
+}
 
 export function mapCompanyToFormValues(
   company: import("../types/company.types").CompanyDetail,

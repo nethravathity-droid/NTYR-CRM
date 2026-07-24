@@ -18,13 +18,6 @@ import {
   type LoginFormValues,
 } from "@/features/auth/schemas/login.schema";
 
-const DEMO_LOGINS = [
-  { role: "Company Admin", companyCode: "DEMO", username: "admin", password: "Admin@123" },
-  { role: "Manager", companyCode: "DEMO", username: "manager", password: "Manager@123" },
-  { role: "Telecaller", companyCode: "DEMO", username: "telecaller", password: "Telecaller@123", employeeCode: "TC001" },
-  { role: "Sales Executive", companyCode: "DEMO", username: "sales", password: "Sales@123" },
-] as const;
-
 export function LoginForm() {
   const { login, isLoading } = useAuth();
   const [error, setError] = useState<string | null>(null);
@@ -68,15 +61,6 @@ export function LoginForm() {
       );
     }
   });
-
-  const applyDemoLogin = (demo: (typeof DEMO_LOGINS)[number]) => {
-    form.setValue("companyCode", demo.companyCode);
-    form.setValue("loginType", "username");
-    form.setValue("username", demo.username);
-    form.setValue("employeeCode", "");
-    form.setValue("password", demo.password);
-    setError(null);
-  };
 
   return (
     <Card className="w-full max-w-md border-border/60 shadow-xl">
@@ -183,17 +167,11 @@ export function LoginForm() {
             )}
           </div>
 
-          {error && (
+          {error ? (
             <div className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
               {error}
-              {error === "Invalid credentials" ? (
-                <p className="mt-2 text-xs text-destructive/90">
-                  Use Company Code DEMO, login type Username, username telecaller, password
-                  Telecaller@123 (case sensitive). Employee code login uses TC001, not telecaller.
-                </p>
-              ) : null}
             </div>
-          )}
+          ) : null}
 
           <Button type="submit" className="w-full" disabled={isLoading}>
             {isLoading ? (
@@ -205,25 +183,6 @@ export function LoginForm() {
               "Sign in"
             )}
           </Button>
-
-          <div className="rounded-lg border border-border/60 bg-muted/30 p-3">
-            <p className="text-xs font-medium text-foreground">Demo logins (company DEMO)</p>
-            <div className="mt-2 space-y-2">
-              {DEMO_LOGINS.map((demo) => (
-                <button
-                  key={demo.username}
-                  type="button"
-                  className="flex w-full items-center justify-between rounded-md border border-border/50 bg-background px-3 py-2 text-left text-xs transition-colors hover:bg-muted"
-                  onClick={() => applyDemoLogin(demo)}
-                >
-                  <span className="font-medium">{demo.role}</span>
-                  <span className="text-muted-foreground">
-                    {demo.username} / {demo.password}
-                  </span>
-                </button>
-              ))}
-            </div>
-          </div>
         </form>
       </CardContent>
     </Card>

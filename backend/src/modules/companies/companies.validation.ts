@@ -2,6 +2,29 @@ import { z } from "zod";
 
 const companyStatusSchema = z.enum(["TRIAL", "ACTIVE", "SUSPENDED", "EXPIRED"]);
 
+const initialAdminBodySchema = z.object({
+  username: z
+    .string()
+    .trim()
+    .min(3, "Username must be at least 3 characters")
+    .max(50)
+    .regex(/^[a-zA-Z0-9._-]+$/, "Invalid username format"),
+  password: z
+    .string()
+    .min(8, "Password must be at least 8 characters")
+    .max(128),
+  employeeCode: z
+    .string()
+    .trim()
+    .min(2)
+    .max(30)
+    .regex(/^[A-Za-z0-9_-]+$/)
+    .optional(),
+  firstName: z.string().trim().min(1).max(100).optional(),
+  lastName: z.string().trim().max(100).optional(),
+  displayName: z.string().trim().max(150).optional(),
+});
+
 const companyBodySchema = z.object({
   companyCode: z
     .string()
@@ -64,8 +87,16 @@ export const listCompaniesSchema = z.object({
 });
 
 export const createCompanySchema = z.object({
-  body: companyBodySchema,
+  body: companyBodySchema.extend({
+    initialAdmin: initialAdminBodySchema,
+  }),
 });
+
+export const provisionInitialAdminSchema = uuidParamSchema.extend({
+  body: initialAdminBodySchema,
+});
+
+export const getCompanyLoginSetupSchema = uuidParamSchema;
 
 export const updateCompanySchema = uuidParamSchema.extend({
   body: companyBodySchema.partial().refine((body) => Object.keys(body).length > 0, {
@@ -90,6 +121,9 @@ export const deleteCompanySchema = uuidParamSchema;
 
 export type ListCompaniesQuery = z.infer<typeof listCompaniesSchema>["query"];
 export type CreateCompanyInput = z.infer<typeof createCompanySchema>["body"];
+export type ProvisionInitialAdminInput = z.infer<
+  typeof provisionInitialAdminSchema
+>["body"];
 export type UpdateCompanyInput = z.infer<typeof updateCompanySchema>["body"];
 export type UpdateCompanyStatusInput = z.infer<
   typeof updateCompanyStatusSchema

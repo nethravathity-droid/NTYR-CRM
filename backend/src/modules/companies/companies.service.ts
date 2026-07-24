@@ -4,9 +4,15 @@ import { logger } from "../../config/logger.js";
 import { AppError } from "../../common/errors/AppError.js";
 import { CompaniesRepository } from "./companies.repository.js";
 import type { CompanyDetail, PaginatedCompaniesResult } from "./companies.types.js";
+import {
+  companyHasAdminUser,
+  provisionCompanyAdmin,
+  type ProvisionAdminResult,
+} from "./tenant-provisioning.service.js";
 import type {
   CreateCompanyInput,
   ListCompaniesQuery,
+  ProvisionInitialAdminInput,
   UpdateCompanyActiveInput,
   UpdateCompanyInput,
   UpdateCompanyStatusInput,
@@ -37,21 +43,75 @@ export class CompaniesService {
   async createCompany(
     input: CreateCompanyInput,
     createdBy: number,
-  ): Promise<CompanyDetail> {
+  ): Promise<{ company: CompanyDetail; initialAdmin: ProvisionAdminResult }> {
+    const { initialAdmin, ...companyInput } = input;
+
     await this.assertUniqueCompanyFields({
-      companyCode: input.companyCode,
-      email: input.email,
+      companyCode: companyInput.companyCode,
+      email: companyInput.email,
     });
 
-    const company = await this.companiesRepository.createCompany(input, createdBy);
+    const company = await this.companiesRepository.createCompany(companyInput, createdBy);
+
+    const adminLogin = await provisionCompanyAdmin(
+      db,
+      {
+        companyId: company.id,
+        companyCode: company.companyCode,
+        email: company.email,
+        phone: company.phone,
+        city: company.city,
+        state: company.state,
+        ownerName: company.ownerName,
+      },
+      initialAdmin,
+      createdBy,
+    );
 
     this.logger.info("Company created", {
       companyId: company.id,
       companyCode: company.companyCode,
       createdBy,
+      adminUsername: adminLogin.username,
     });
 
-    return company;
+    return { company, initialAdmin: adminLogin };
+  }
+
+  async getCompanyLoginSetup(uuid: string): Promise<{
+    companyCode: string;
+    hasAdminUser: boolean;
+  }> {
+    const company = await this.getCompanyByUuid(uuid);
+    const hasAdminUser = await companyHasAdminUser(db, company.id);
+
+    return {
+      companyCode: company.companyCode,
+      hasAdminUser,
+    };
+  }
+
+  async provisionInitialAdmin(
+    uuid: string,
+    input: ProvisionInitialAdminInput,
+    createdBy: number,
+  ): Promise<ProvisionAdminResult> {
+    const company = await this.getCompanyByUuid(uuid);
+
+    return provisionCompanyAdmin(
+      db,
+      {
+        companyId: company.id,
+        companyCode: company.companyCode,
+        email: company.email,
+        phone: company.phone,
+        city: company.city,
+        state: company.state,
+        ownerName: company.ownerName,
+      },
+      input,
+      createdBy,
+    );
   }
 
   async updateCompany(
@@ -204,7 +264,10 @@ export class CompaniesService {
         excludeCompanyId,
       );
       if (taken) {
-        throw new AppError(409, "Company code already exists");
+        throw new AppError(
+          409,
+          "Company code already exists. Open it from Companies or use a different code (even deleted tenants keep their code).",
+        );
       }
     }
 

@@ -68,6 +68,28 @@ export interface ListCompaniesParams {
   sortOrder?: "asc" | "desc";
 }
 
+export interface InitialAdminLogin {
+  companyCode: string;
+  username: string;
+  employeeCode: string;
+}
+
+export interface CreateCompanyResult {
+  company: CompanyDetail;
+  initialAdmin: InitialAdminLogin;
+}
+
+export interface CompanyLoginSetup {
+  companyCode: string;
+  hasAdminUser: boolean;
+}
+
+export interface ProvisionInitialAdminPayload {
+  username: string;
+  password: string;
+  employeeCode?: string;
+}
+
 export type CompanyFormValues = {
   companyCode: string;
   companyName: string;

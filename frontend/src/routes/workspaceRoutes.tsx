@@ -283,4 +283,5 @@ export const salesWorkspaceRoutes = createWorkspaceRoutes({
   includeVisits: true,
   includeBookings: true,
   includePayments: true,
+  includeProjects: true,
 });

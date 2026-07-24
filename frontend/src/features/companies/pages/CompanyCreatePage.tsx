@@ -4,7 +4,7 @@ import { Building2 } from "lucide-react";
 import { CompanyForm } from "@/features/companies/components/CompanyForm";
 import { CompanyPageHeader } from "@/features/companies/components/CompanyPageHeader";
 import { useCreateCompany } from "@/features/companies/hooks/useCompanies";
-import type { CompanyFormSchema } from "@/features/companies/schemas/company.schema";
+import type { CompanyCreateFormSchema } from "@/features/companies/schemas/company.schema";
 import { getApiErrorMessage } from "@/lib/api/client";
 import { paths } from "@/routes/paths";
 
@@ -13,12 +13,17 @@ export function CompanyCreatePage() {
   const createCompany = useCreateCompany();
   const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = async (values: CompanyFormSchema) => {
+  const handleSubmit = async (values: CompanyCreateFormSchema) => {
     setError(null);
 
     try {
-      const company = await createCompany.mutateAsync(values);
-      navigate(paths.companies.details(company.uuid));
+      const result = await createCompany.mutateAsync(values);
+      navigate(paths.companies.details(result.company.uuid), {
+        state: {
+          ...result.initialAdmin,
+          password: values.adminPassword,
+        },
+      });
     } catch (submitError) {
       setError(getApiErrorMessage(submitError));
     }
@@ -42,6 +47,7 @@ export function CompanyCreatePage() {
       <CompanyForm
         submitLabel="Create Company"
         isSubmitting={createCompany.isPending}
+        includeInitialAdmin
         onSubmit={handleSubmit}
         onCancel={() => navigate(paths.companies.list)}
       />

@@ -1,4 +1,4 @@
-import { ROLE_CODES, type RoleCode } from "@/lib/rbac/roles";
+import { ROLE_CODES } from "@/lib/rbac/roles";
 import { paths } from "@/routes/paths";
 
 export type QuickAddItem = {

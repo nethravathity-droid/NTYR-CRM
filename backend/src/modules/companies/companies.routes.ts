@@ -7,8 +7,10 @@ import { companiesService } from "./companies.service.js";
 import {
   createCompanySchema,
   deleteCompanySchema,
+  getCompanyLoginSetupSchema,
   getCompanySchema,
   listCompaniesSchema,
+  provisionInitialAdminSchema,
   updateCompanyActiveSchema,
   updateCompanySchema,
   updateCompanyStatusSchema,
@@ -33,6 +35,20 @@ router.post(
   authorize("companies.create"),
   validate(createCompanySchema),
   companiesController.create,
+);
+
+router.get(
+  "/:uuid/login-setup",
+  authorize("companies.view"),
+  validate(getCompanyLoginSetupSchema),
+  companiesController.getLoginSetup,
+);
+
+router.post(
+  "/:uuid/provision-admin",
+  authorize("companies.update"),
+  validate(provisionInitialAdminSchema),
+  companiesController.provisionInitialAdmin,
 );
 
 router.get(

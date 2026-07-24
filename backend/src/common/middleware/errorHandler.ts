@@ -4,9 +4,23 @@ import { env } from "../../config/env.js";
 import { AppError } from "../errors/AppError.js";
 
 const getDatabaseErrorMessage = (err: Error): string | null => {
-  const pgError = err as Error & { code?: string };
+  const pgError = err as Error & { code?: string; constraint?: string };
 
   switch (pgError.code) {
+    case "23505":
+      if (
+        pgError.constraint === "uq_company_code" ||
+        err.message.includes("uq_company_code")
+      ) {
+        return "Company code already exists. Open that company from the list or choose a different code.";
+      }
+      if (
+        pgError.constraint === "uq_company_email" ||
+        err.message.includes("uq_company_email")
+      ) {
+        return "Company email already exists. Use a different email or open the existing company.";
+      }
+      return "A record with this value already exists.";
     case "28P01":
       return "Database authentication failed. Check DB_USER and DB_PASSWORD in backend/.env";
     case "3D000":
