@@ -1,5 +1,6 @@
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { AdminChartsSection } from "@/features/dashboards/components/AdminChartsSection";
+import { AdminEmployeesSection } from "@/features/dashboards/components/AdminEmployeesSection";
 import { AdminKpiSection } from "@/features/dashboards/components/AdminKpiSection";
 import { AdminQuickActions, buildAdminQuickActions } from "@/features/dashboards/components/AdminQuickActions";
 import { AdminTablesSection } from "@/features/dashboards/components/AdminTablesSection";
@@ -54,6 +55,16 @@ export function CompanyAdminDashboardPage() {
       </GlassCard>
 
       <AdminQuickActions actions={quickActions} />
+
+      {data.canEmployees ? (
+        <AdminEmployeesSection
+          employees={data.teamEmployees}
+          total={data.teamEmployeeTotal}
+          loading={data.isLoading}
+          canCreate={data.canCreateEmployees}
+          companyCode={user?.company.code}
+        />
+      ) : null}
 
       <AdminKpiSection kpis={data.kpis} dateRange={range} loading={data.isLoading} />
 

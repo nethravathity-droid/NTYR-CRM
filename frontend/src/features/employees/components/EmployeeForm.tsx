@@ -64,6 +64,9 @@ export function EmployeeForm({
 
   const branchId = watch("branchId");
   const departmentId = watch("departmentId");
+  const roleId = watch("roleId");
+  const designationId = watch("designationId");
+  const hasValidationErrors = Object.keys(errors).length > 0;
 
   const { data: options, isLoading: isLoadingOptions } = useEmployeeFormOptions({
     branchId: branchId || undefined,
@@ -90,8 +93,80 @@ export function EmployeeForm({
       (department) => !branchId || department.branchId === branchId,
     ) ?? [];
 
+  const selectedRole = options?.roles.find((role) => role.id === roleId);
+
+  useEffect(() => {
+    if (!options || mode !== "create") {
+      return;
+    }
+
+    if (options.branches.length === 1 && !branchId) {
+      setValue("branchId", options.branches[0]!.id);
+    }
+  }, [options, branchId, mode, setValue]);
+
+  useEffect(() => {
+    if (!options || !selectedRole || mode !== "create") {
+      return;
+    }
+
+    const roleCode = selectedRole.code;
+    const departmentByCode: Record<string, string[]> = {
+      TELECALLER: ["telecalling", "tel"],
+      SALES_EXECUTIVE: ["sales"],
+      MANAGER: ["sales", "administration", "admin"],
+      COMPANY_ADMIN: ["administration", "admin"],
+    };
+
+    const designationByCode: Record<string, string[]> = {
+      TELECALLER: ["telecaller", "tc"],
+      SALES_EXECUTIVE: ["sales executive", "se"],
+      MANAGER: ["sales manager", "mgr"],
+      COMPANY_ADMIN: ["company administrator", "ca"],
+    };
+
+    const departmentHints = departmentByCode[roleCode] ?? [];
+    const matchedDepartment = departments.find((department) =>
+      departmentHints.some((hint) => department.name.toLowerCase().includes(hint)),
+    );
+
+    if (matchedDepartment && departmentId !== matchedDepartment.id) {
+      setValue("departmentId", matchedDepartment.id);
+    } else if (departments.length === 1 && !departmentId) {
+      setValue("departmentId", departments[0]!.id);
+    }
+
+    const designationHints = designationByCode[roleCode] ?? [];
+    const matchedDesignation = options.designations.find((designation) =>
+      designationHints.some((hint) => designation.name.toLowerCase().includes(hint)),
+    );
+
+    if (matchedDesignation && designationId !== matchedDesignation.id) {
+      setValue("designationId", matchedDesignation.id);
+    }
+  }, [
+    options,
+    selectedRole,
+    departments,
+    departmentId,
+    designationId,
+    mode,
+    setValue,
+  ]);
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+    <form
+      onSubmit={handleSubmit(onSubmit, () => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      })}
+      className="space-y-6"
+    >
+      {hasValidationErrors ? (
+        <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">
+          Please fix the highlighted fields below before saving.
+        </div>
+      ) : null}
+
       {isLoadingOptions ? (
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <Loader2 className="h-4 w-4 animate-spin" />
@@ -103,8 +178,22 @@ export function EmployeeForm({
         icon={Building2}
         tone="indigo"
         title="Organization"
-        description="Assign branch, department, role, designation, and manager."
+        description="Pick the employee role first. Branch and department are filled automatically for most companies."
       >
+        <FormField label="Role" error={errors.roleId?.message} className="md:col-span-2">
+          <Select {...register("roleId", { valueAsNumber: true })}>
+            <option value={0}>Select role</option>
+            {options?.roles.map((role) => (
+              <option key={role.id} value={role.id}>
+                {role.name}
+              </option>
+            ))}
+          </Select>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Telecaller, Sales Executive, and Manager each get their own dashboard login.
+          </p>
+        </FormField>
+
         <FormField label="Branch" error={errors.branchId?.message}>
           <Select {...register("branchId", { valueAsNumber: true })}>
             <option value={0}>Select branch</option>
@@ -114,6 +203,9 @@ export function EmployeeForm({
               </option>
             ))}
           </Select>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Office location. Use Main Branch if you have only one office.
+          </p>
         </FormField>
 
         <FormField label="Department" error={errors.departmentId?.message}>
@@ -125,6 +217,9 @@ export function EmployeeForm({
               </option>
             ))}
           </Select>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Team name, e.g. Sales or Telecalling. Auto-selected from role when possible.
+          </p>
         </FormField>
 
         <FormField label="Designation" error={errors.designationId?.message}>
@@ -133,17 +228,6 @@ export function EmployeeForm({
             {options?.designations.map((designation) => (
               <option key={designation.id} value={designation.id}>
                 {designation.name}
-              </option>
-            ))}
-          </Select>
-        </FormField>
-
-        <FormField label="Role" error={errors.roleId?.message}>
-          <Select {...register("roleId", { valueAsNumber: true })}>
-            <option value={0}>Select role</option>
-            {options?.roles.map((role) => (
-              <option key={role.id} value={role.id}>
-                {role.name}
               </option>
             ))}
           </Select>
@@ -165,27 +249,42 @@ export function EmployeeForm({
             ))}
           </Select>
         </FormField>
+
+        {!isLoadingOptions && options?.branches.length === 0 ? (
+          <div className="md:col-span-2 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-200">
+            No branch is set up for this company yet. Complete company login setup first, then
+            return here to add employees.
+          </div>
+        ) : null}
       </FormSection>
 
       <FormSection
         icon={UserRound}
         tone="emerald"
-        title="Employee Profile"
-        description="Personal details and login credentials."
+        title="Login credentials"
+        description="Each employee gets a unique username and password for sign-in."
       >
-        <FormField label="Employee Code" error={errors.employeeCode?.message}>
+        <FormField label="Employee Code (login ID option)" error={errors.employeeCode?.message}>
           <Input {...register("employeeCode")} placeholder="EMP001" />
         </FormField>
 
-        <FormField label="Username" error={errors.username?.message}>
-          <Input {...register("username")} placeholder="john.doe" />
+        <FormField label="Username (login ID)" error={errors.username?.message}>
+          <Input {...register("username")} placeholder="john.doe" autoComplete="off" />
         </FormField>
 
         {mode === "create" ? (
           <FormField label="Password" error={errors.password?.message}>
-            <Input {...register("password")} type="password" />
+            <Input {...register("password")} type="password" autoComplete="new-password" />
           </FormField>
         ) : null}
+      </FormSection>
+
+      <FormSection
+        icon={UserRound}
+        tone="indigo"
+        title="Employee profile"
+        description="Personal and contact details."
+      >
 
         <FormField label="First Name" error={errors.firstName?.message}>
           <Input {...register("firstName")} placeholder="John" />

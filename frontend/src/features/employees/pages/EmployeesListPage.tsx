@@ -138,7 +138,7 @@ export function EmployeesListPage() {
         icon={Users}
         tone="violet"
         title="Employees"
-        description="Manage employees, roles, and access within your company."
+        description="Each employee gets their own username and password. Share company code + credentials at login."
         action={
           canCreate ? (
             <Button asChild className="bg-violet-600 hover:bg-violet-700">

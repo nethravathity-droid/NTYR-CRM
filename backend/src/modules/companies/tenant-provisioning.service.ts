@@ -2,6 +2,7 @@ import bcrypt from "bcrypt";
 import type { Knex } from "knex";
 import { env } from "../../config/env.js";
 import { AppError } from "../../common/errors/AppError.js";
+import { ensureTenantEmployeeDefaults } from "./tenant-employee-defaults.service.js";
 
 const FULL_ACCESS = {
   can_view: true,
@@ -163,7 +164,7 @@ export async function provisionCompanyAdmin(
     admin.lastName?.trim() || (ownerParts.length > 1 ? ownerParts.slice(1).join(" ") : "Admin");
   const displayName = admin.displayName?.trim() || `${firstName} ${lastName}`.trim();
 
-  return db.transaction(async (trx) => {
+  const result = await db.transaction(async (trx) => {
     const duplicateUsername = await trx("users")
       .where({ company_id: context.companyId, username })
       .whereNull("deleted_at")
@@ -285,4 +286,7 @@ export async function provisionCompanyAdmin(
       employeeCode,
     };
   });
+
+  await ensureTenantEmployeeDefaults(db, context.companyId);
+  return result;
 }

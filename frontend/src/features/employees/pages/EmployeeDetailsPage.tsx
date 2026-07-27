@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import {
   ArrowLeft,
   Briefcase,
@@ -25,6 +26,10 @@ import { IconBox } from "@/features/companies/components/IconBox";
 import { DeleteEmployeeDialog } from "@/features/employees/components/DeleteEmployeeDialog";
 import { EmployeeStatusBadge } from "@/features/employees/components/EmployeeStatusBadge";
 import { ResetPasswordDialog } from "@/features/employees/components/ResetPasswordDialog";
+import {
+  EmployeeLoginCredentialsCard,
+  type EmployeeLoginCredentials,
+} from "@/features/employees/components/EmployeeLoginCredentialsCard";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
@@ -40,6 +45,7 @@ import { getEmployeeDisplayName } from "@/features/employees/schemas/employee.sc
 import { usePermissions } from "@/hooks/usePermissions";
 import { getApiErrorMessage } from "@/lib/api/client";
 import { paths } from "@/routes/paths";
+import { useAuth } from "@/features/auth/hooks/useAuth";
 
 function DetailItem({ label, value }: { label: string; value: string | null | undefined }) {
   return (
@@ -54,7 +60,10 @@ function DetailItem({ label, value }: { label: string; value: string | null | un
 
 export function EmployeeDetailsPage() {
   const { uuid } = useParams<{ uuid: string }>();
+  const location = useLocation();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const flashCredentials = location.state as EmployeeLoginCredentials | undefined;
   const { hasPermission } = usePermissions();
   const canUpdate = hasPermission("users.update");
   const canDelete = hasPermission("users.delete");
@@ -189,6 +198,22 @@ export function EmployeeDetailsPage() {
           {actionError}
         </div>
       ) : null}
+
+      {flashCredentials?.password ? (
+        <EmployeeLoginCredentialsCard credentials={flashCredentials} />
+      ) : (
+        <EmployeeLoginCredentialsCard
+          credentials={{
+            companyCode: user?.company.code ?? "",
+            username: employee.username,
+            employeeCode: employee.employeeCode,
+            displayName,
+            roleName: employee.role.name,
+          }}
+          description="This employee signs in with their own username and password on the main login page."
+          showPasswordWarning={false}
+        />
+      )}
 
       <div className="grid gap-4 lg:grid-cols-3">
         <Card className="border-0 shadow-sm ring-1 ring-border/60 lg:col-span-2">

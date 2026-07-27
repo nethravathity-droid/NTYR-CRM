@@ -188,34 +188,90 @@ export class UsersRepository {
     passwordHash: string,
     createdBy: number,
   ): Promise<UserDetail> {
-    const [inserted] = await this.db("users")
-      .insert({
+    return this.db.transaction(async (trx) => {
+      const [inserted] = await trx("users")
+        .insert({
+          company_id: companyId,
+          branch_id: data.branchId,
+          department_id: data.departmentId,
+          designation_id: data.designationId,
+          role_id: data.roleId,
+          manager_user_id: data.managerUserId ?? null,
+          employee_code: data.employeeCode,
+          username: data.username,
+          password_hash: passwordHash,
+          first_name: data.firstName,
+          last_name: data.lastName ?? null,
+          display_name: data.displayName ?? null,
+          official_email: data.officialEmail ?? null,
+          mobile: data.mobile,
+          profile_photo_url: data.profilePhotoUrl ?? null,
+          created_by: createdBy,
+          updated_by: createdBy,
+        })
+        .returning(["id", "uuid"]);
+
+      await trx("employee_profiles").insert({
         company_id: companyId,
-        branch_id: data.branchId,
-        department_id: data.departmentId,
-        designation_id: data.designationId,
-        role_id: data.roleId,
-        manager_user_id: data.managerUserId ?? null,
-        employee_code: data.employeeCode,
-        username: data.username,
-        password_hash: passwordHash,
-        first_name: data.firstName,
-        last_name: data.lastName ?? null,
-        display_name: data.displayName ?? null,
-        official_email: data.officialEmail ?? null,
-        mobile: data.mobile,
-        profile_photo_url: data.profilePhotoUrl ?? null,
-        created_by: createdBy,
-        updated_by: createdBy,
-      })
-      .returning("uuid");
+        user_id: inserted.id,
+        joining_date: new Date().toISOString().slice(0, 10),
+      });
 
-    const user = await this.findUserByUuid(companyId, inserted.uuid);
-    if (!user) {
-      throw new Error("Failed to retrieve created user");
-    }
+      const user = await trx("users as u")
+        .select(
+          "u.id",
+          "u.uuid",
+          "u.employee_code",
+          "u.username",
+          "u.first_name",
+          "u.last_name",
+          "u.display_name",
+          "u.official_email",
+          "u.mobile",
+          "u.profile_photo_url",
+          "u.status",
+          "u.email_verified",
+          "u.mobile_verified",
+          "u.last_login_at",
+          "u.password_changed_at",
+          "u.created_at",
+          "u.updated_at",
+          "u.manager_user_id",
+          "r.id as role_id",
+          "r.uuid as role_uuid",
+          "r.role_code",
+          "r.role_name",
+          "b.id as branch_id",
+          "b.uuid as branch_uuid",
+          "b.branch_name",
+          "d.id as department_id",
+          "d.uuid as department_uuid",
+          "d.department_name",
+          "des.id as designation_id",
+          "des.uuid as designation_uuid",
+          "des.designation_name",
+          "mgr.id as manager_id",
+          "mgr.uuid as manager_uuid",
+          "mgr.employee_code as manager_employee_code",
+          "mgr.display_name as manager_display_name",
+        )
+        .join("roles as r", "r.id", "u.role_id")
+        .join("branches as b", "b.id", "u.branch_id")
+        .join("departments as d", "d.id", "u.department_id")
+        .join("designations as des", "des.id", "u.designation_id")
+        .leftJoin("users as mgr", "mgr.id", "u.manager_user_id")
+        .where("u.company_id", companyId)
+        .where("u.uuid", inserted.uuid)
+        .whereNull("u.deleted_at")
+        .whereNull("r.deleted_at")
+        .first();
 
-    return user;
+      if (!user) {
+        throw new Error("Failed to retrieve created user");
+      }
+
+      return this.mapToDetail(user);
+    });
   }
 
   async updateUser(

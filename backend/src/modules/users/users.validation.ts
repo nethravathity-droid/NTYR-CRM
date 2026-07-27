@@ -62,18 +62,22 @@ export const createUserSchema = z.object({
     lastName: z.string().trim().max(100).nullable().optional(),
     displayName: z.string().trim().max(200).nullable().optional(),
     officialEmail: z
-      .string()
-      .trim()
-      .email("Invalid email address")
-      .max(255)
-      .nullable()
-      .optional(),
+      .union([
+        z.string().trim().email("Invalid email address").max(255),
+        z.literal(""),
+        z.null(),
+      ])
+      .optional()
+      .transform((value) => (value && value.trim() ? value.trim() : null)),
     mobile: z
       .string()
       .trim()
       .min(10, "Mobile number must be at least 10 digits")
       .max(20, "Mobile number is too long"),
-    profilePhotoUrl: z.string().url("Invalid profile photo URL").nullable().optional(),
+    profilePhotoUrl: z
+      .union([z.string().url("Invalid profile photo URL"), z.literal(""), z.null()])
+      .optional()
+      .transform((value) => (value && value.trim() ? value.trim() : null)),
   }),
 });
 
@@ -91,14 +95,18 @@ export const updateUserSchema = uuidParamSchema.extend({
       lastName: z.string().trim().max(100).nullable().optional(),
       displayName: z.string().trim().max(200).nullable().optional(),
       officialEmail: z
-        .string()
-        .trim()
-        .email("Invalid email address")
-        .max(255)
-        .nullable()
-        .optional(),
+        .union([
+          z.string().trim().email("Invalid email address").max(255),
+          z.literal(""),
+          z.null(),
+        ])
+        .optional()
+        .transform((value) => (value && value.trim() ? value.trim() : null)),
       mobile: z.string().trim().min(10).max(20).optional(),
-      profilePhotoUrl: z.string().url("Invalid profile photo URL").nullable().optional(),
+      profilePhotoUrl: z
+        .union([z.string().url("Invalid profile photo URL"), z.literal(""), z.null()])
+        .optional()
+        .transform((value) => (value && value.trim() ? value.trim() : null)),
     })
     .refine((body) => Object.keys(body).length > 0, {
       message: "At least one field must be provided for update",

@@ -23,11 +23,15 @@ export const employeeKeys = {
     [...employeeKeys.all, "form-options", params] as const,
 };
 
-export function useEmployees(params: ListEmployeesParams) {
+export function useEmployees(
+  params: ListEmployeesParams,
+  options?: { enabled?: boolean },
+) {
   return useQuery({
     queryKey: employeeKeys.list(params),
     queryFn: () => employeesService.list(params),
     placeholderData: keepPreviousData,
+    enabled: options?.enabled ?? true,
   });
 }
 

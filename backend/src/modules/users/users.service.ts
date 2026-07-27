@@ -4,6 +4,7 @@ import { db } from "../../database/knex.js";
 import { logger } from "../../config/logger.js";
 import { env } from "../../config/env.js";
 import { AppError } from "../../common/errors/AppError.js";
+import { ensureTenantEmployeeDefaults } from "../companies/tenant-employee-defaults.service.js";
 import { UsersRepository } from "./users.repository.js";
 import type {
   PaginatedUsersResult,
@@ -60,39 +61,47 @@ export class UsersService {
     input: CreateUserInput,
     createdBy: number,
   ): Promise<UserDetail> {
+    await ensureTenantEmployeeDefaults(db, companyId);
+
+    const normalizedInput = {
+      ...input,
+      employeeCode: input.employeeCode.trim().toUpperCase(),
+      username: input.username.trim().toLowerCase(),
+    };
+
     await this.validateOrganizationReferences(companyId, {
-      branchId: input.branchId,
-      departmentId: input.departmentId,
-      designationId: input.designationId,
-      roleId: input.roleId,
-      managerUserId: input.managerUserId,
+      branchId: normalizedInput.branchId,
+      departmentId: normalizedInput.departmentId,
+      designationId: normalizedInput.designationId,
+      roleId: normalizedInput.roleId,
+      managerUserId: normalizedInput.managerUserId,
     });
 
     await this.assertUniqueUserFields(companyId, {
-      employeeCode: input.employeeCode,
-      username: input.username,
-      officialEmail: input.officialEmail,
+      employeeCode: normalizedInput.employeeCode,
+      username: normalizedInput.username,
+      officialEmail: normalizedInput.officialEmail,
     });
 
-    const passwordHash = await bcrypt.hash(input.password, env.BCRYPT_ROUNDS);
+    const passwordHash = await bcrypt.hash(normalizedInput.password, env.BCRYPT_ROUNDS);
 
     const user = await this.usersRepository.createUser(
       companyId,
       {
-        branchId: input.branchId,
-        departmentId: input.departmentId,
-        designationId: input.designationId,
-        roleId: input.roleId,
-        managerUserId: input.managerUserId,
-        employeeCode: input.employeeCode,
-        username: input.username,
-        password: input.password,
-        firstName: input.firstName,
-        lastName: input.lastName,
-        displayName: input.displayName,
-        officialEmail: input.officialEmail,
-        mobile: input.mobile,
-        profilePhotoUrl: input.profilePhotoUrl,
+        branchId: normalizedInput.branchId,
+        departmentId: normalizedInput.departmentId,
+        designationId: normalizedInput.designationId,
+        roleId: normalizedInput.roleId,
+        managerUserId: normalizedInput.managerUserId,
+        employeeCode: normalizedInput.employeeCode,
+        username: normalizedInput.username,
+        password: normalizedInput.password,
+        firstName: normalizedInput.firstName,
+        lastName: normalizedInput.lastName,
+        displayName: normalizedInput.displayName,
+        officialEmail: normalizedInput.officialEmail,
+        mobile: normalizedInput.mobile,
+        profilePhotoUrl: normalizedInput.profilePhotoUrl,
       },
       passwordHash,
       createdBy,
@@ -300,6 +309,8 @@ export class UsersService {
     companyId: number,
     query: UserFormOptionsQuery,
   ): Promise<UserFormOptions> {
+    await ensureTenantEmployeeDefaults(db, companyId);
+
     if (query.branchId) {
       await this.assertBranchBelongsToCompany(companyId, query.branchId);
     }

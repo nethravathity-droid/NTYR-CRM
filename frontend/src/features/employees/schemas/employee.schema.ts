@@ -33,7 +33,15 @@ export const employeeFormSchema = z.object({
       "Invalid email",
     ),
   mobile: z.string().trim().min(10, "Mobile is required").max(20),
-  profilePhotoUrl: optionalString,
+  profilePhotoUrl: z
+    .string()
+    .trim()
+    .optional()
+    .or(z.literal(""))
+    .refine(
+      (value) => !value || /^https?:\/\/.+/.test(value),
+      "Enter a valid profile photo URL",
+    ),
 });
 
 export const employeeCreateSchema = employeeFormSchema.extend({

@@ -14,6 +14,7 @@ import {
   usePaymentReport,
 } from "@/features/reports/hooks/useReports";
 import { useVisits } from "@/features/visits/hooks/useVisits";
+import { useEmployees } from "@/features/employees/hooks/useEmployees";
 import { usePermissions } from "@/hooks/usePermissions";
 import type { BreakdownItem } from "@/features/reports/types/report.types";
 import { getTodayRange, type DashboardDateRange } from "@/lib/dashboard/date-range";
@@ -40,11 +41,23 @@ export function useAdminDashboard(dateRange: DashboardDateRange = getTodayRange(
   const canLeads = hasPermission("leads.view");
   const canProjects = hasPermission("projects.view");
   const canUpdateLeads = hasPermission("leads.update");
+  const canEmployees = hasPermission("users.view");
+  const canCreateEmployees = hasPermission("users.create");
 
   const { fromDate, toDate } = dateRange;
   const today = getTodayRange().fromDate;
   const isTodayOnly = fromDate === toDate && fromDate === today;
   const reportPeriod = fromDate === toDate ? "daily" : "custom";
+
+  const { data: employeeDirectory, isLoading: employeesLoading } = useEmployees(
+    {
+      page: 1,
+      limit: 8,
+      sortBy: "created_at",
+      sortOrder: "desc",
+    },
+    { enabled: canEmployees },
+  );
 
   const { data: rangeReport, isLoading: rangeReportLoading } = useDashboardReport(
     { period: reportPeriod, fromDate, toDate, page: 1, limit: 5 },
@@ -195,12 +208,15 @@ export function useAdminDashboard(dateRange: DashboardDateRange = getTodayRange(
     (canCalls && callsLoading) ||
     (canLeads && (followupsLoading || rangeFollowupsLoading)) ||
     paymentsLoading ||
-    (canProjects && inventoryLoading);
+    (canProjects && inventoryLoading) ||
+    (canEmployees && employeesLoading);
 
   return {
     hasPermission,
     canReports,
     canUpdateLeads,
+    canEmployees,
+    canCreateEmployees,
     isLoading,
     dateRange,
     kpis,
@@ -210,6 +226,8 @@ export function useAdminDashboard(dateRange: DashboardDateRange = getTodayRange(
     employeeReport,
     topEmployees,
     bestPerformer,
+    teamEmployees: employeeDirectory?.users ?? [],
+    teamEmployeeTotal: employeeDirectory?.pagination.total ?? 0,
     callSummary,
     todayFollowups: followupsForRange,
     overdueFollowups,
