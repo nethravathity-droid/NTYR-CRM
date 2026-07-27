@@ -11,6 +11,34 @@ import type {
 import type { EmployeeFormSchema } from "@/features/employees/schemas/employee.schema";
 import { normalizeEmployeePayload } from "@/features/employees/schemas/employee.schema";
 
+function normalizeEmployeeFormOptions(
+  options: EmployeeFormOptions,
+): EmployeeFormOptions {
+  return {
+    branches: options.branches.map((branch) => ({
+      ...branch,
+      id: Number(branch.id),
+    })),
+    departments: options.departments.map((department) => ({
+      ...department,
+      id: Number(department.id),
+      branchId: Number(department.branchId),
+    })),
+    designations: options.designations.map((designation) => ({
+      ...designation,
+      id: Number(designation.id),
+    })),
+    roles: options.roles.map((role) => ({
+      ...role,
+      id: Number(role.id),
+    })),
+    managers: options.managers.map((manager) => ({
+      ...manager,
+      id: Number(manager.id),
+    })),
+  };
+}
+
 export const employeesService = {
   async list(params: ListEmployeesParams = {}): Promise<PaginatedEmployees> {
     const response = await apiClient.get<ApiResponse<PaginatedEmployees>>(
@@ -27,7 +55,7 @@ export const employeesService = {
       "/users/form-options",
       { params },
     );
-    return response.data.data;
+    return normalizeEmployeeFormOptions(response.data.data);
   },
 
   async getByUuid(uuid: string): Promise<EmployeeDetail> {

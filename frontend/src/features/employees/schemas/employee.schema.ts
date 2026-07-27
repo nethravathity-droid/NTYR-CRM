@@ -44,9 +44,88 @@ export const employeeFormSchema = z.object({
     ),
 });
 
-export const employeeCreateSchema = employeeFormSchema.extend({
-  password: passwordSchema,
-});
+export const employeeCreateSchema = employeeFormSchema
+  .omit({ branchId: true, departmentId: true, designationId: true })
+  .extend({
+    password: passwordSchema,
+    roleId: z.coerce.number().int().positive("Select a role for this employee."),
+    branchId: z.coerce.number().int().nonnegative().default(0),
+    departmentId: z.coerce.number().int().nonnegative().default(0),
+    designationId: z.coerce.number().int().nonnegative().default(0),
+  });
+
+const DEPARTMENT_HINTS_BY_ROLE: Record<string, string[]> = {
+  TELECALLER: ["telecalling", "tel"],
+  SALES_EXECUTIVE: ["sales"],
+  MANAGER: ["sales", "administration", "admin"],
+  COMPANY_ADMIN: ["administration", "admin"],
+};
+
+const DESIGNATION_HINTS_BY_ROLE: Record<string, string[]> = {
+  TELECALLER: ["telecaller", "tc"],
+  SALES_EXECUTIVE: ["sales executive", "se"],
+  MANAGER: ["sales manager", "mgr"],
+  COMPANY_ADMIN: ["company administrator", "ca"],
+};
+
+export const ASSIGNABLE_EMPLOYEE_ROLE_CODES = new Set([
+  "MANAGER",
+  "TELECALLER",
+  "SALES_EXECUTIVE",
+]);
+
+export function resolveDefaultDesignationId(
+  designations: Array<{ id: number; name: string }>,
+  roleCode?: string,
+): number | null {
+  if (!designations.length) {
+    return null;
+  }
+
+  if (roleCode) {
+    const hints = DESIGNATION_HINTS_BY_ROLE[roleCode] ?? [];
+    const matched = designations.find((designation) =>
+      hints.some((hint) => designation.name.toLowerCase().includes(hint)),
+    );
+    if (matched) {
+      return matched.id;
+    }
+  }
+
+  return designations[0]!.id;
+}
+
+export function resolveDefaultBranchId(
+  branches: Array<{ id: number }>,
+): number | null {
+  return branches[0]?.id ?? null;
+}
+
+export function resolveDefaultDepartmentId(
+  departments: Array<{ id: number; name: string; branchId: number }>,
+  branchId: number,
+  roleCode?: string,
+): number | null {
+  const branchDepartments = departments.filter(
+    (department) => !branchId || department.branchId === branchId,
+  );
+
+  if (!branchDepartments.length) {
+    return null;
+  }
+
+  if (roleCode) {
+    const hints = DEPARTMENT_HINTS_BY_ROLE[roleCode] ?? [];
+    const matched = branchDepartments.find((department) =>
+      hints.some((hint) => department.name.toLowerCase().includes(hint)),
+    );
+    if (matched) {
+      return matched.id;
+    }
+  }
+
+  return branchDepartments[0]!.id;
+}
 
 export const resetPasswordSchema = z.object({
   password: passwordSchema,

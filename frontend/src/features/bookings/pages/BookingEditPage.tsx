@@ -62,6 +62,7 @@ export function BookingEditPage() {
       {defaultValues ? (
         <BookingForm
           defaultValues={defaultValues}
+          selectedUnitId={defaultValues.unitId}
           submitLabel="Save Changes"
           isSubmitting={updateBooking.isPending}
           onSubmit={handleSubmit}

@@ -416,11 +416,30 @@ export class BookingsRepository {
     ]);
 
     return {
-      leads,
-      projects,
-      units,
-      users,
-      branches,
+      leads: leads.map((row) => ({
+        ...row,
+        id: Number(row.id),
+      })),
+      projects: projects.map((row) => ({
+        ...row,
+        id: Number(row.id),
+      })),
+      units: units.map((row) => ({
+        id: Number(row.id),
+        uuid: row.uuid,
+        projectId: Number(row.projectId),
+        unitNumber: row.unitNumber,
+        price: row.price != null ? Number(row.price) : null,
+        availability: row.availability,
+      })),
+      users: users.map((row) => ({
+        ...row,
+        id: Number(row.id),
+      })),
+      branches: branches.map((row) => ({
+        ...row,
+        id: Number(row.id),
+      })),
       statuses: ["DRAFT", "PENDING_APPROVAL", "APPROVED", "REJECTED", "CANCELLED", "COMPLETED"],
       documentTypes: ["AADHAAR", "PAN", "PASSPORT", "ADDRESS_PROOF", "PHOTOGRAPH", "BOOKING_FORM", "AGREEMENT_COPY"],
     };

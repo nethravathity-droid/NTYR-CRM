@@ -5,9 +5,15 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loading } from "@/components/shared/Loading";
 import { CompanyPageHeader } from "@/features/companies/components/CompanyPageHeader";
+import { GeneratePaymentReceiptButton } from "@/features/payments/components/GeneratePaymentReceiptButton";
 import { PaymentStatusBadge } from "@/features/payments/components/PaymentStatusBadge";
 import { usePayment, useUploadPaymentReceipt } from "@/features/payments/hooks/usePayments";
-import { formatCurrency, resolveFileUrl } from "@/features/payments/types/payment.types";
+import {
+  formatCurrency,
+  PAYMENT_MODE_LABELS,
+  PAYMENT_TYPE_LABELS,
+  resolveFileUrl,
+} from "@/features/payments/types/payment.types";
 import { env } from "@/config/env";
 import { getApiErrorMessage } from "@/lib/api/client";
 import { usePermissions } from "@/hooks/usePermissions";
@@ -60,7 +66,10 @@ export function PaymentReceiptPage() {
         title="Receipt Viewer"
         description={`${payment.paymentNumber} — ${payment.customerName}`}
         action={
-          <Button variant="outline" asChild><Link to={paths.payments.details(payment.uuid)}>Payment Details</Link></Button>
+          <div className="flex flex-wrap gap-2">
+            <GeneratePaymentReceiptButton payment={payment} />
+            <Button variant="outline" asChild><Link to={paths.payments.details(payment.uuid)}>Payment Details</Link></Button>
+          </div>
         }
       />
 
@@ -70,9 +79,23 @@ export function PaymentReceiptPage() {
           <PaymentStatusBadge status={payment.status} />
         </CardHeader>
         <CardContent className="space-y-3 text-sm">
-          <div className="flex justify-between gap-4"><span className="text-muted-foreground">Receipt Number</span><span>{payment.receiptNumber ?? "—"}</span></div>
+          <div className="flex justify-between gap-4"><span className="text-muted-foreground">Receipt Number</span><span>{payment.receiptNumber ?? payment.paymentNumber}</span></div>
+          <div className="flex justify-between gap-4"><span className="text-muted-foreground">Payment Number</span><span>{payment.paymentNumber}</span></div>
+          <div className="flex justify-between gap-4"><span className="text-muted-foreground">Customer</span><span>{payment.customerName}</span></div>
+          <div className="flex justify-between gap-4"><span className="text-muted-foreground">Booking</span><span>{payment.booking.bookingNumber}</span></div>
+          <div className="flex justify-between gap-4"><span className="text-muted-foreground">Project / Unit</span><span>{payment.project.projectName} — {payment.unit.unitNumber}</span></div>
+          <div className="flex justify-between gap-4"><span className="text-muted-foreground">Payment Type</span><span>{PAYMENT_TYPE_LABELS[payment.paymentType]}</span></div>
           <div className="flex justify-between gap-4"><span className="text-muted-foreground">Amount</span><span className="font-semibold">{formatCurrency(payment.amount)}</span></div>
-          <div className="flex justify-between gap-4"><span className="text-muted-foreground">File</span><span>{payment.receiptOriginalFileName ?? "No receipt attached"}</span></div>
+          <div className="flex justify-between gap-4"><span className="text-muted-foreground">Due Amount</span><span>{formatCurrency(payment.dueAmount)}</span></div>
+          <div className="flex justify-between gap-4"><span className="text-muted-foreground">Payment Mode</span><span>{payment.paymentMode ? PAYMENT_MODE_LABELS[payment.paymentMode] : "—"}</span></div>
+          <div className="flex justify-between gap-4"><span className="text-muted-foreground">Transaction Ref</span><span>{payment.transactionReference ?? "—"}</span></div>
+          <div className="flex justify-between gap-4"><span className="text-muted-foreground">Uploaded File</span><span>{payment.receiptOriginalFileName ?? "No file uploaded"}</span></div>
+          <div className="pt-2">
+            <p className="mb-3 text-muted-foreground">
+              Generate a PDF receipt from the payment details above — no upload required.
+            </p>
+            <GeneratePaymentReceiptButton payment={payment} variant="outline" />
+          </div>
         </CardContent>
       </Card>
 

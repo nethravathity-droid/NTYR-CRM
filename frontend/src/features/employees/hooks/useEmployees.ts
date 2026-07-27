@@ -47,6 +47,7 @@ export function useEmployeeFormOptions(params: EmployeeFormOptionsParams = {}) {
   return useQuery({
     queryKey: employeeKeys.formOptions(params),
     queryFn: () => employeesService.getFormOptions(params),
+    placeholderData: keepPreviousData,
   });
 }
 

@@ -81,7 +81,7 @@ export function EmployeeCreatePage() {
         icon={UserPlus}
         tone="emerald"
         title="Add Employee"
-        description="Create a separate login for this employee — unique username and password for their workspace."
+        description={`Create a staff login for company code ${user?.company.code ?? "—"}. Each employee gets their own username and password.`}
       />
 
       {error ? (

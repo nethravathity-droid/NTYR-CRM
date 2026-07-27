@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loading } from "@/components/shared/Loading";
 import { CompanyPageHeader } from "@/features/companies/components/CompanyPageHeader";
 import { DeletePaymentDialog } from "@/features/payments/components/DeletePaymentDialog";
+import { GeneratePaymentReceiptButton } from "@/features/payments/components/GeneratePaymentReceiptButton";
 import { PaymentStatusBadge } from "@/features/payments/components/PaymentStatusBadge";
 import { useDeletePayment, usePayment, usePaymentAuditTrail } from "@/features/payments/hooks/usePayments";
 import {
@@ -60,10 +61,9 @@ export function PaymentDetailsPage() {
         description={`${payment.paymentNumber} — ${PAYMENT_TYPE_LABELS[payment.paymentType]}`}
         action={
           <div className="flex flex-wrap gap-2">
+            <GeneratePaymentReceiptButton payment={payment} variant="outline" />
             {canUpdate ? <Button variant="outline" onClick={() => navigate(paths.payments.edit(payment.uuid))}><Pencil className="mr-2 h-4 w-4" />Edit</Button> : null}
-            {payment.hasReceipt || payment.receiptFileUrl ? (
-              <Button variant="outline" onClick={() => navigate(paths.payments.receipt(payment.uuid))}><FileText className="mr-2 h-4 w-4" />Receipt</Button>
-            ) : null}
+            <Button variant="outline" onClick={() => navigate(paths.payments.receipt(payment.uuid))}><FileText className="mr-2 h-4 w-4" />Receipt</Button>
             {canDelete ? <Button variant="destructive" onClick={() => setShowDeleteDialog(true)}><Trash2 className="mr-2 h-4 w-4" />Delete</Button> : null}
           </div>
         }
