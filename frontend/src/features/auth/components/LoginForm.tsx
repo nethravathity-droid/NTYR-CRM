@@ -26,33 +26,22 @@ export function LoginForm() {
     resolver: zodResolver(loginFormSchema),
     defaultValues: {
       companyCode: "",
-      loginType: "username",
-      username: "",
-      employeeCode: "",
+      loginId: "",
       password: "",
     },
   });
-
-  const loginType = form.watch("loginType");
 
   const onSubmit = form.handleSubmit(async (values) => {
     setError(null);
 
     try {
-      const payload =
-        values.loginType === "username"
-          ? {
-              companyCode: values.companyCode.trim().toUpperCase(),
-              password: values.password,
-              username: values.username?.trim(),
-            }
-          : {
-              companyCode: values.companyCode.trim().toUpperCase(),
-              password: values.password,
-              employeeCode: values.employeeCode?.trim().toUpperCase(),
-            };
+      const loginId = values.loginId.trim();
 
-      await login(payload);
+      await login({
+        companyCode: values.companyCode.trim().toUpperCase(),
+        password: values.password.trim(),
+        username: loginId.toLowerCase(),
+      });
     } catch (submitError) {
       setError(
         submitError instanceof Error
@@ -67,7 +56,7 @@ export function LoginForm() {
       <CardHeader className="space-y-2 text-center">
         <CardTitle className="text-2xl">Welcome back</CardTitle>
         <CardDescription>
-          Sign in to your company workspace to continue
+          Sign in with your company code, username or employee code, and password
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -78,75 +67,43 @@ export function LoginForm() {
               <Building2 className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 id="companyCode"
-                placeholder="e.g. ACME"
-                className="pl-10"
+                placeholder="e.g. URC"
+                className="pl-10 uppercase"
+                autoCapitalize="characters"
                 {...form.register("companyCode")}
               />
             </div>
-            {form.formState.errors.companyCode && (
+            <p className="text-xs text-muted-foreground">
+              Use your company code from the admin dashboard — not PLATFORM.
+            </p>
+            {form.formState.errors.companyCode ? (
               <p className="text-sm text-destructive">
                 {form.formState.errors.companyCode.message}
               </p>
-            )}
+            ) : null}
           </div>
 
           <div className="space-y-2">
-            <Label>Login with</Label>
-            <div className="grid grid-cols-2 gap-2">
-              <Button
-                type="button"
-                variant={loginType === "username" ? "default" : "outline"}
-                onClick={() => form.setValue("loginType", "username")}
-              >
-                Username
-              </Button>
-              <Button
-                type="button"
-                variant={loginType === "employeeCode" ? "default" : "outline"}
-                onClick={() => form.setValue("loginType", "employeeCode")}
-              >
-                Employee Code
-              </Button>
+            <Label htmlFor="loginId">Username or Employee Code</Label>
+            <div className="relative">
+              <UserRound className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                id="loginId"
+                placeholder="e.g. john.doe or EMP001"
+                className="pl-10"
+                autoComplete="username"
+                {...form.register("loginId")}
+              />
             </div>
+            <p className="text-xs text-muted-foreground">
+              Enter the username or employee code shown when the account was created.
+            </p>
+            {form.formState.errors.loginId ? (
+              <p className="text-sm text-destructive">
+                {form.formState.errors.loginId.message}
+              </p>
+            ) : null}
           </div>
-
-          {loginType === "username" ? (
-            <div className="space-y-2">
-              <Label htmlFor="username">Username</Label>
-              <div className="relative">
-                <UserRound className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  id="username"
-                  placeholder="Enter your username"
-                  className="pl-10"
-                  {...form.register("username")}
-                />
-              </div>
-              {form.formState.errors.username && (
-                <p className="text-sm text-destructive">
-                  {form.formState.errors.username.message}
-                </p>
-              )}
-            </div>
-          ) : (
-            <div className="space-y-2">
-              <Label htmlFor="employeeCode">Employee Code</Label>
-              <div className="relative">
-                <UserRound className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  id="employeeCode"
-                  placeholder="e.g. EMP001"
-                  className="pl-10"
-                  {...form.register("employeeCode")}
-                />
-              </div>
-              {form.formState.errors.employeeCode && (
-                <p className="text-sm text-destructive">
-                  {form.formState.errors.employeeCode.message}
-                </p>
-              )}
-            </div>
-          )}
 
           <div className="space-y-2">
             <Label htmlFor="password">Password</Label>
@@ -157,14 +114,15 @@ export function LoginForm() {
                 type="password"
                 placeholder="Enter your password"
                 className="pl-10"
+                autoComplete="current-password"
                 {...form.register("password")}
               />
             </div>
-            {form.formState.errors.password && (
+            {form.formState.errors.password ? (
               <p className="text-sm text-destructive">
                 {form.formState.errors.password.message}
               </p>
-            )}
+            ) : null}
           </div>
 
           {error ? (

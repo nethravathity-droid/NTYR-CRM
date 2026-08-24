@@ -13,7 +13,6 @@ import type {
   AuthTokens,
   CompanyRecord,
   CurrentUserResponse,
-  LoginLookup,
   LoginResult,
   RefreshTokenPayload,
   RequestMetadata,
@@ -36,26 +35,30 @@ export class AuthService {
     input: LoginInput,
     metadata: RequestMetadata,
   ): Promise<LoginResult> {
+    const normalizedInput = this.normalizeLoginInput(input);
     const company = await this.authRepository.findCompanyByCode(
-      input.companyCode,
+      normalizedInput.companyCode,
     );
 
     if (!company) {
       this.logger.warn("Login failed: company not found", {
-        companyCode: input.companyCode,
+        companyCode: normalizedInput.companyCode,
       });
       throw new AppError(401, "Invalid credentials");
     }
 
     this.assertCompanyIsActive(company.status);
 
-    const lookup = this.resolveLoginLookup(input);
-    const user = await this.authRepository.findUserForLogin(company.id, lookup);
+    const user = await this.findUserForAuthentication(
+      company.id,
+      normalizedInput,
+    );
 
     if (!user) {
       this.logger.warn("Login failed: user not found", {
         companyId: company.id,
-        identifierType: lookup.identifierType,
+        hasUsername: Boolean(normalizedInput.username),
+        hasEmployeeCode: Boolean(normalizedInput.employeeCode),
       });
       throw new AppError(401, "Invalid credentials");
     }
@@ -63,7 +66,7 @@ export class AuthService {
     await this.assertUserCanAuthenticate(user);
 
     const isPasswordValid = await bcrypt.compare(
-      input.password,
+      normalizedInput.password,
       user.password_hash,
     );
 
@@ -94,7 +97,6 @@ export class AuthService {
       userId: user.id,
       companyId: user.company_id,
       roleCode: user.role_code,
-      loginType: lookup.identifierType,
     });
 
     return { user: profile, tokens };
@@ -265,18 +267,43 @@ export class AuthService {
     };
   }
 
-  private resolveLoginLookup(input: LoginInput): LoginLookup {
+  private normalizeLoginInput(input: LoginInput): LoginInput {
+    return {
+      companyCode: input.companyCode.trim(),
+      password: input.password.trim(),
+      username: input.username?.trim().toLowerCase() || undefined,
+      employeeCode: input.employeeCode?.trim().toUpperCase() || undefined,
+    };
+  }
+
+  private async findUserForAuthentication(
+    companyId: number,
+    input: LoginInput,
+  ): Promise<UserAuthRecord | null> {
     if (input.employeeCode) {
-      return {
+      return this.authRepository.findUserForLogin(companyId, {
         identifierType: "employee_code",
         identifier: input.employeeCode,
-      };
+      });
     }
 
-    return {
+    if (!input.username) {
+      return null;
+    }
+
+    const byUsername = await this.authRepository.findUserForLogin(companyId, {
       identifierType: "username",
-      identifier: input.username!,
-    };
+      identifier: input.username,
+    });
+
+    if (byUsername) {
+      return byUsername;
+    }
+
+    return this.authRepository.findUserForLogin(companyId, {
+      identifierType: "employee_code",
+      identifier: input.username.toUpperCase(),
+    });
   }
 
   private async issueTokenPair(

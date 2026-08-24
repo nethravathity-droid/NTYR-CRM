@@ -67,6 +67,7 @@ export class UsersService {
       ...input,
       employeeCode: input.employeeCode.trim().toUpperCase(),
       username: input.username.trim().toLowerCase(),
+      password: input.password.trim(),
     };
 
     await this.validateOrganizationReferences(companyId, {
