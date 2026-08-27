@@ -34,7 +34,7 @@ import {
   useUpdateCompanyActive,
   useUpdateCompanyStatus,
 } from "@/features/companies/hooks/useCompanies";
-import type { InitialAdminLogin } from "@/features/companies/types/company.types";
+import type { CompanyStatus, InitialAdminLogin } from "@/features/companies/types/company.types";
 import { usePermissions } from "@/hooks/usePermissions";
 import { getApiErrorMessage } from "@/lib/api/client";
 import { paths } from "@/routes/paths";

@@ -41,7 +41,7 @@ interface CompanyFormProps {
   isSubmitting?: boolean;
   disableCode?: boolean;
   includeInitialAdmin?: boolean;
-  onSubmit: (values: CompanyFormSchema | CompanyCreateFormSchema) => Promise<void> | void;
+  onSubmit: (values: CompanyCreateFormSchema) => Promise<void> | void;
   onCancel?: () => void;
 }
 
@@ -59,7 +59,9 @@ export function CompanyForm({
     handleSubmit,
     formState: { errors },
   } = useForm<CompanyCreateFormSchema>({
-    resolver: zodResolver(includeInitialAdmin ? companyCreateFormSchema : companyFormSchema),
+    resolver: zodResolver(
+      includeInitialAdmin ? companyCreateFormSchema : companyFormSchema,
+    ) as never,
     defaultValues: includeInitialAdmin
       ? { ...companyCreateDefaultValues, ...defaultValues }
       : defaultValues,

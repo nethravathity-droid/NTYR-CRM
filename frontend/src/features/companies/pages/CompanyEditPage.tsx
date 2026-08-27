@@ -9,7 +9,7 @@ import {
   useUpdateCompany,
 } from "@/features/companies/hooks/useCompanies";
 import { mapCompanyToFormValues } from "@/features/companies/schemas/company.schema";
-import type { CompanyFormSchema } from "@/features/companies/schemas/company.schema";
+import type { CompanyCreateFormSchema } from "@/features/companies/schemas/company.schema";
 import { getApiErrorMessage } from "@/lib/api/client";
 import { paths } from "@/routes/paths";
 
@@ -20,7 +20,7 @@ export function CompanyEditPage() {
   const updateCompany = useUpdateCompany(uuid ?? "");
   const [submitError, setSubmitError] = useState<string | null>(null);
 
-  const handleSubmit = async (values: CompanyFormSchema) => {
+  const handleSubmit = async (values: CompanyCreateFormSchema) => {
     if (!uuid) {
       return;
     }
@@ -28,7 +28,13 @@ export function CompanyEditPage() {
     setSubmitError(null);
 
     try {
-      await updateCompany.mutateAsync(values);
+      const {
+        adminUsername: _adminUsername,
+        adminPassword: _adminPassword,
+        adminEmployeeCode: _adminEmployeeCode,
+        ...companyValues
+      } = values;
+      await updateCompany.mutateAsync(companyValues);
       navigate(paths.companies.details(uuid));
     } catch (err) {
       setSubmitError(getApiErrorMessage(err));

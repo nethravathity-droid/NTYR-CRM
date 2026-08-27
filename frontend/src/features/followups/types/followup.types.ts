@@ -33,6 +33,7 @@ export interface FollowupListItem {
   notes: string | null;
   reminderBefore: ReminderBefore;
   nextFollowupDate: string | null;
+  projectInterested: string | null;
   createdAt: string;
   updatedAt: string;
 }
