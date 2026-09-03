@@ -4,6 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { APP_NAME, APP_DESCRIPTION } from "@/config/branding";
 import { AutomationSection } from "@/public/components/AutomationSection";
+import { PipelineSection } from "@/public/components/PipelineSection";
+import { CommunicationSection } from "@/public/components/CommunicationSection";
+import { AnalyticsSection } from "@/public/components/AnalyticsSection";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 
 const FEATURES = [
@@ -243,7 +246,28 @@ export function LandingPage() {
         </div>
       </section>
 
+      <PipelineSection />
+
+      <CommunicationSection />
+
+      <AnalyticsSection />
+
       <AutomationSection />
+
+      <section className="border-t bg-muted/20">
+        <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+          <Reveal>
+            <div className="text-center">
+              <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
+                Secure multi-tenant architecture.
+              </h2>
+              <p className="mt-4 text-lg text-muted-foreground">
+                Role-based access, permission management, workspace isolation, and audit logs.
+              </p>
+            </div>
+          </Reveal>
+        </div>
+      </section>
 
       <section className="border-t">
         <div className="mx-auto max-w-4xl px-4 py-16 text-center sm:px-6 lg:px-8">
