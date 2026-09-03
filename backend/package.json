@@ -9,6 +9,7 @@
     "start": "node dist/server.js",
     "typecheck": "tsc --noEmit",
     "seed": "tsx src/database/seeds/index.ts",
+    "seed:dev-employees": "tsx src/database/seeds/dev-employees.ts",
     "db:schema": "tsx src/database/apply-schema.ts",
     "db:followups": "tsx src/database/apply-followups-schema.ts",
     "db:properties": "tsx src/database/apply-properties-schema.ts",
