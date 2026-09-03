@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { APP_NAME, APP_DESCRIPTION } from "@/config/branding";
 import { AutomationSection } from "@/public/components/AutomationSection";
+import { useScrollReveal } from "@/hooks/useScrollReveal";
 
 const FEATURES = [
   {
@@ -37,6 +38,11 @@ const FEATURES = [
     description: "Revenue, conversion, and team performance at a glance.",
   },
 ];
+
+function Reveal({ children, className }: { children: React.ReactNode; className?: string }) {
+  const ref = useScrollReveal();
+  return <div ref={ref} className={className}>{children}</div>;
+}
 
 export function LandingPage() {
   return (
@@ -99,18 +105,22 @@ export function LandingPage() {
 
       <section className="border-t bg-muted/20">
         <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-          <p className="text-center text-lg font-medium">
-            Everything you need to turn leads into customers.
-          </p>
+          <Reveal>
+            <p className="text-center text-lg font-medium">
+              Everything you need to turn leads into customers.
+            </p>
+          </Reveal>
           <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {FEATURES.map((feature) => (
-              <Card key={feature.title} className="p-6">
-                <feature.icon className="h-8 w-8 text-primary" />
-                <h3 className="mt-4 text-lg font-semibold">{feature.title}</h3>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  {feature.description}
-                </p>
-              </Card>
+              <Reveal key={feature.title}>
+                <Card className="h-full p-6">
+                  <feature.icon className="h-8 w-8 text-primary" />
+                  <h3 className="mt-4 text-lg font-semibold">{feature.title}</h3>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    {feature.description}
+                  </p>
+                </Card>
+              </Reveal>
             ))}
           </div>
         </div>
@@ -118,14 +128,16 @@ export function LandingPage() {
 
       <section className="border-t">
         <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-              One platform. Every customer interaction.
-            </h2>
-            <p className="mt-4 text-lg text-muted-foreground">
-              From first contact to closed deal — and everything after.
-            </p>
-          </div>
+          <Reveal>
+            <div className="text-center">
+              <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
+                One platform. Every customer interaction.
+              </h2>
+              <p className="mt-4 text-lg text-muted-foreground">
+                From first contact to closed deal — and everything after.
+              </p>
+            </div>
+          </Reveal>
           <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {[
               "CRM & Contacts",
@@ -137,9 +149,11 @@ export function LandingPage() {
               "Marketing",
               "Analytics",
             ].map((feature) => (
-              <Card key={feature} className="p-6 text-center">
-                <h3 className="font-semibold">{feature}</h3>
-              </Card>
+              <Reveal key={feature}>
+                <Card className="p-6 text-center">
+                  <h3 className="font-semibold">{feature}</h3>
+                </Card>
+              </Reveal>
             ))}
           </div>
         </div>
@@ -147,14 +161,16 @@ export function LandingPage() {
 
       <section className="border-t bg-muted/20">
         <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-              Built for the way YOUR business works.
-            </h2>
-            <p className="mt-4 text-lg text-muted-foreground">
-              Real Estate, Agencies, Education, Healthcare, Finance, and more.
-            </p>
-          </div>
+          <Reveal>
+            <div className="text-center">
+              <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
+                Built for the way YOUR business works.
+              </h2>
+              <p className="mt-4 text-lg text-muted-foreground">
+                Real Estate, Agencies, Education, Healthcare, Finance, and more.
+              </p>
+            </div>
+          </Reveal>
           <div className="mt-10 flex flex-wrap justify-center gap-3">
             {[
               "Real Estate",
@@ -169,12 +185,11 @@ export function LandingPage() {
               "Consulting",
               "More",
             ].map((industry) => (
-              <span
-                key={industry}
-                className="rounded-full border bg-background px-4 py-2 text-sm font-medium"
-              >
-                {industry}
-              </span>
+              <Reveal key={industry}>
+                <span className="rounded-full border bg-background px-4 py-2 text-sm font-medium">
+                  {industry}
+                </span>
+              </Reveal>
             ))}
           </div>
         </div>
@@ -182,14 +197,16 @@ export function LandingPage() {
 
       <section className="border-t">
         <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-              Make the CRM fit your business.
-            </h2>
-            <p className="mt-4 text-lg text-muted-foreground">
-              Custom fields, pipelines, stages, roles, workflows, and reports.
-            </p>
-          </div>
+          <Reveal>
+            <div className="text-center">
+              <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
+                Make the CRM fit your business.
+              </h2>
+              <p className="mt-4 text-lg text-muted-foreground">
+                Custom fields, pipelines, stages, roles, workflows, and reports.
+              </p>
+            </div>
+          </Reveal>
           <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {[
               "Custom Fields",
@@ -201,9 +218,11 @@ export function LandingPage() {
               "Custom Workflows",
               "Custom Reports",
             ].map((item) => (
-              <Card key={item} className="p-4 text-center text-sm font-medium">
-                {item}
-              </Card>
+              <Reveal key={item}>
+                <Card className="p-4 text-center text-sm font-medium">
+                  {item}
+                </Card>
+              </Reveal>
             ))}
           </div>
         </div>
@@ -211,22 +230,24 @@ export function LandingPage() {
 
       <section className="border-t bg-muted/20">
         <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-              Secure multi-tenant architecture.
-            </h2>
-            <p className="mt-4 text-lg text-muted-foreground">
-              Role-based access, permission management, workspace isolation, and audit logs.
-            </p>
-          </div>
+          <Reveal>
+            <div className="text-center">
+              <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
+                Secure multi-tenant architecture.
+              </h2>
+              <p className="mt-4 text-lg text-muted-foreground">
+                Role-based access, permission management, workspace isolation, and audit logs.
+              </p>
+            </div>
+          </Reveal>
         </div>
       </section>
 
       <AutomationSection />
 
       <section className="border-t">
-        <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-          <div className="text-center">
+        <div className="mx-auto max-w-4xl px-4 py-16 text-center sm:px-6 lg:px-8">
+          <Reveal>
             <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
               Ready to grow your business?
             </h2>
@@ -244,7 +265,7 @@ export function LandingPage() {
                 <Link to="/contact">Book a Demo</Link>
               </Button>
             </div>
-          </div>
+          </Reveal>
         </div>
       </section>
     </div>

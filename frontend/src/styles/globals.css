@@ -169,4 +169,9 @@
   .enterprise-chart [data-slot="card"] {
     @apply rounded-[18px] border-[#E2E8F0] bg-white shadow-sm dark:border-border dark:bg-card;
   }
+
+  .animate-in {
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+  }
 }
