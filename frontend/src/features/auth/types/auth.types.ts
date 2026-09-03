@@ -13,6 +13,7 @@ export interface AuthUser {
   mobile: string;
   profilePhotoUrl: string | null;
   status: UserStatus;
+  mustChangePassword: boolean;
   lastLoginAt: string | null;
   emailVerified: boolean;
   mobileVerified: boolean;

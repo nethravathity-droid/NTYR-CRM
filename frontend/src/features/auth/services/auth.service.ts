@@ -15,6 +15,42 @@ export const authService = {
     return response.data.data;
   },
 
+  async register(payload: {
+    companyCode: string;
+    companyName: string;
+    ownerName: string;
+    email: string;
+    phone: string;
+    city: string;
+    state: string;
+    country?: string;
+    postalCode: string;
+    addressLine1: string;
+    addressLine2?: string;
+    legalName?: string;
+    gstNumber?: string;
+    panNumber?: string;
+    reraNumber?: string;
+    website?: string;
+    timezone?: string;
+    currency?: string;
+    trialStartDate?: string;
+    trialEndDate?: string;
+    notes?: string;
+    username: string;
+    password: string;
+    employeeCode?: string;
+    firstName?: string;
+    lastName?: string;
+    displayName?: string;
+  }): Promise<LoginResponse> {
+    const response = await apiClient.post<ApiResponse<LoginResponse>>(
+      "/auth/register",
+      payload,
+    );
+    return response.data.data;
+  },
+
   async logout(refreshToken: string): Promise<void> {
     await apiClient.post("/auth/logout", { refreshToken });
   },
@@ -30,5 +66,13 @@ export const authService = {
     confirmPassword: string;
   }): Promise<void> {
     await apiClient.post("/auth/change-password", payload);
+  },
+
+  async forgotPassword(payload: { companyCode: string; email: string }): Promise<void> {
+    await apiClient.post("/auth/forgot-password", payload);
+  },
+
+  async resetPassword(payload: { token: string; password: string }): Promise<void> {
+    await apiClient.post("/auth/reset-password", payload);
   },
 };

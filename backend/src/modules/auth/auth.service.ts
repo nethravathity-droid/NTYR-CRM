@@ -7,21 +7,29 @@ import { logger } from "../../config/logger.js";
 import { env } from "../../config/env.js";
 import { AppError } from "../../common/errors/AppError.js";
 import { AuthRepository } from "./auth.repository.js";
+import {
+  companyHasAdminUser,
+  provisionCompanyAdmin,
+} from "../companies/tenant-provisioning.service.js";
+import { companiesService } from "../companies/companies.service.js";
 import type {
   AccessTokenPayload,
   AccessTokenResult,
   AuthTokens,
   CompanyRecord,
   CurrentUserResponse,
+  ForgotPasswordInput,
   LoginResult,
   RefreshTokenPayload,
+  RegisterInput,
   RequestMetadata,
+  ResetPasswordInput,
   UserAuthRecord,
 } from "./auth.types.js";
 import type {
   ChangePasswordInput,
   LoginInput,
-  LogoutInput,
+  LogoutTokenInput,
   RefreshTokenInput,
 } from "./auth.validation.js";
 
@@ -152,7 +160,7 @@ export class AuthService {
     };
   }
 
-  async logout(input: LogoutInput): Promise<void> {
+  async logout(input: LogoutTokenInput): Promise<void> {
     try {
       const payload = this.verifyRefreshToken(input.refreshToken);
       await this.authRepository.revokeRefreshToken(payload.jti);
@@ -232,6 +240,182 @@ export class AuthService {
     }
 
     return profile;
+  }
+
+  async register(input: RegisterInput): Promise<LoginResult> {
+    const normalizedInput = {
+      ...input,
+      companyCode: input.companyCode.trim().toUpperCase(),
+      username: input.username.trim().toLowerCase(),
+      employeeCode: input.employeeCode?.trim().toUpperCase() || undefined,
+    };
+
+    const company = await this.authRepository.findCompanyByCode(
+      normalizedInput.companyCode,
+    );
+
+    if (company) {
+      throw new AppError(409, "Company code already exists");
+    }
+
+    const existingEmail = await db("companies")
+      .whereRaw("LOWER(email) = LOWER(?)", [normalizedInput.email])
+      .first("id");
+
+    if (existingEmail) {
+      throw new AppError(409, "Company email already exists");
+    }
+
+    const newCompany = await companiesService.createCompany(
+      {
+        companyCode: normalizedInput.companyCode,
+        companyName: normalizedInput.companyName,
+        legalName: normalizedInput.legalName || null,
+        ownerName: normalizedInput.ownerName,
+        gstNumber: normalizedInput.gstNumber || null,
+        panNumber: normalizedInput.panNumber || null,
+        reraNumber: normalizedInput.reraNumber || null,
+        email: normalizedInput.email,
+        phone: normalizedInput.phone,
+        alternatePhone: null,
+        website: normalizedInput.website || null,
+        addressLine1: normalizedInput.addressLine1,
+        addressLine2: normalizedInput.addressLine2 || null,
+        city: normalizedInput.city,
+        state: normalizedInput.state,
+        country: normalizedInput.country || "India",
+        postalCode: normalizedInput.postalCode,
+        logoUrl: null,
+        faviconUrl: null,
+        timezone: normalizedInput.timezone || "Asia/Kolkata",
+        currency: normalizedInput.currency || "INR",
+        status: "TRIAL",
+        trialStartDate: normalizedInput.trialStartDate || null,
+        trialEndDate: normalizedInput.trialEndDate || null,
+        notes: normalizedInput.notes || null,
+        initialAdmin: {
+          username: normalizedInput.username,
+          password: normalizedInput.password,
+          employeeCode: normalizedInput.employeeCode,
+          firstName: normalizedInput.firstName,
+          lastName: normalizedInput.lastName,
+          displayName: normalizedInput.displayName,
+        },
+      },
+      0,
+    );
+
+    const user = await this.authRepository.findUserForLogin(
+      newCompany.company.id,
+      {
+        identifierType: "username",
+        identifier: normalizedInput.username,
+      },
+    );
+
+    if (!user) {
+      throw new AppError(500, "Failed to create user account");
+    }
+
+    const permissions = await this.authRepository.getPermissionsByRoleId(
+      user.role_id,
+    );
+
+    const tokens = await this.issueTokenPair(user, permissions, {
+      ipAddress: undefined,
+      userAgent: undefined,
+    });
+
+    await this.authRepository.recordSuccessfulLogin(
+      user.id,
+      user.company_id,
+      undefined,
+      undefined,
+    );
+
+    const profile = this.authRepository.mapToCurrentUserResponse(
+      user,
+      permissions,
+    );
+
+    this.logger.info("User registered successfully", {
+      userId: user.id,
+      companyId: user.company_id,
+      companyCode: newCompany.company.companyCode,
+    });
+
+    return { user: profile, tokens };
+  }
+
+  async forgotPassword(input: ForgotPasswordInput): Promise<void> {
+    const company = await this.authRepository.findCompanyByCode(
+      input.companyCode.trim().toUpperCase(),
+    );
+
+    if (!company) {
+      return;
+    }
+
+    const user = await this.authRepository.findUserByEmail(
+      company.id,
+      input.email,
+    );
+
+    if (!user) {
+      return;
+    }
+
+    const token = randomUUID();
+    const tokenHash = createHash("sha256").update(token).digest("hex");
+    const expiresAt = new Date(Date.now() + 60 * 60 * 1000);
+
+    await this.authRepository.createPasswordResetToken({
+      userId: user.id,
+      companyId: company.id,
+      tokenHash,
+      expiresAt,
+      ipAddress: undefined,
+      userAgent: undefined,
+    });
+
+    this.logger.info("Password reset token generated", {
+      userId: user.id,
+      companyId: company.id,
+    });
+  }
+
+  async resetPassword(input: ResetPasswordInput): Promise<void> {
+    const tokenHash = createHash("sha256")
+      .update(input.token)
+      .digest("hex");
+
+    const tokenRecord = await this.authRepository.findValidPasswordResetToken(
+      tokenHash,
+    );
+
+    if (!tokenRecord) {
+      throw new AppError(400, "Invalid or expired reset token");
+    }
+
+    const passwordHash = await bcrypt.hash(input.password, env.BCRYPT_ROUNDS);
+
+    await this.authRepository.updatePassword(
+      tokenRecord.user_id,
+      tokenRecord.company_id,
+      passwordHash,
+    );
+
+    await this.authRepository.revokeAllUserRefreshTokens(
+      tokenRecord.user_id,
+      tokenRecord.company_id,
+    );
+
+    await this.authRepository.markPasswordResetTokenUsed(tokenRecord.id);
+
+    this.logger.info("Password reset successful", {
+      userId: tokenRecord.user_id,
+      companyId: tokenRecord.company_id,
+    });
   }
 
   verifyAccessToken(token: string): AccessTokenPayload {

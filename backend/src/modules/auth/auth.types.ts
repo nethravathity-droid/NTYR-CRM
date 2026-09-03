@@ -77,6 +77,7 @@ export interface UserAuthRecord {
   failed_login_attempts: number;
   account_locked_until: Date | null;
   password_changed_at: Date | null;
+  must_change_password: boolean;
   last_login_at: Date | null;
   email_verified: boolean;
   mobile_verified: boolean;
@@ -120,6 +121,7 @@ export interface CurrentUserResponse {
     mobile: string;
     profilePhotoUrl: string | null;
     status: UserStatus;
+    mustChangePassword: boolean;
     lastLoginAt: Date | null;
     emailVerified: boolean;
     mobileVerified: boolean;
@@ -162,4 +164,56 @@ export interface RequestMetadata {
 export interface LoginLookup {
   identifierType: LoginIdentifierType;
   identifier: string;
+}
+
+export interface RegisterInput {
+  companyCode: string;
+  companyName: string;
+  ownerName: string;
+  email: string;
+  phone: string;
+  city: string;
+  state: string;
+  country?: string;
+  postalCode: string;
+  addressLine1: string;
+  addressLine2?: string;
+  legalName?: string;
+  gstNumber?: string;
+  panNumber?: string;
+  reraNumber?: string;
+  website?: string;
+  timezone?: string;
+  currency?: string;
+  trialStartDate?: string;
+  trialEndDate?: string;
+  notes?: string;
+  username: string;
+  password: string;
+  employeeCode?: string;
+  firstName?: string;
+  lastName?: string;
+  displayName?: string;
+}
+
+export interface ForgotPasswordInput {
+  companyCode: string;
+  email: string;
+}
+
+export interface ResetPasswordInput {
+  token: string;
+  password: string;
+}
+
+export interface PasswordResetTokenRecord {
+  id: number;
+  user_id: number;
+  company_id: number;
+  token_hash: string;
+  expires_at: Date;
+  used_at: Date | null;
+  ip_address: string | null;
+  user_agent: string | null;
+  created_at: Date;
 }

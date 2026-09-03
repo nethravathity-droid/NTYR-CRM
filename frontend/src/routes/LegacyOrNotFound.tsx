@@ -9,7 +9,18 @@ import {
 } from "@/lib/rbac/roles";
 import { paths } from "@/routes/paths";
 
-const PUBLIC_PATHS = [paths.login, paths.forbidden] as string[];
+const PUBLIC_PATHS = [
+  paths.login,
+  paths.register,
+  paths.forgotPassword,
+  paths.resetPassword,
+  paths.terms,
+  paths.privacy,
+  paths.features,
+  paths.pricing,
+  paths.contact,
+  paths.forbidden,
+] as string[];
 
 function hasRolePrefix(pathname: string): boolean {
   return Object.values(ROLE_ROUTE_PREFIX).some(

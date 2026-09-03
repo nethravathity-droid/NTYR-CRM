@@ -68,6 +68,7 @@ export function EmployeeTable({
             <TableHead>Branch / Dept</TableHead>
             <TableHead>Contact</TableHead>
             <TableHead>Status</TableHead>
+            <TableHead>Last Login</TableHead>
             <TableHead>Active</TableHead>
             <TableHead className="text-right">Actions</TableHead>
           </TableRow>
@@ -126,6 +127,11 @@ export function EmployeeTable({
                 </TableCell>
                 <TableCell>
                   <EmployeeStatusBadge status={employee.status} />
+                </TableCell>
+                <TableCell className="text-sm text-muted-foreground">
+                  {employee.lastLoginAt
+                    ? new Date(employee.lastLoginAt).toLocaleString()
+                    : "Never"}
                 </TableCell>
                 <TableCell>
                   {canUpdate ? (

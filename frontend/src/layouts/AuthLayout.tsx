@@ -29,17 +29,18 @@ export function AuthLayout() {
       <div className="mx-auto flex min-h-screen w-full max-w-6xl flex-col items-center justify-center gap-8 px-4 py-10 lg:flex-row lg:justify-between">
         <div className="max-w-xl space-y-4 text-center lg:text-left">
           <p className="text-sm font-medium uppercase tracking-[0.2em] text-primary">
-            Multi-Tenant CRM
+            All-in-One CRM
           </p>
           <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
             {env.VITE_APP_NAME}
           </h1>
           <p className="text-lg text-muted-foreground">
-            Manage leads, teams, visits, bookings, and payments from one secure
-            SaaS platform built for real estate companies.
+            Manage leads, customers, sales, conversations, tasks and automation from one intelligent workspace.
           </p>
         </div>
-        <Outlet />
+        <div className="w-full max-w-md">
+          <Outlet />
+        </div>
       </div>
     </div>
   );

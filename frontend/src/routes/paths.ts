@@ -4,6 +4,14 @@ export { getRoleDashboardPath };
 
 export const paths = {
   login: "/login",
+  register: "/register",
+  forgotPassword: "/forgot-password",
+  resetPassword: "/reset-password",
+  terms: "/terms",
+  privacy: "/privacy",
+  features: "/features",
+  pricing: "/pricing",
+  contact: "/contact",
   forbidden: "/forbidden",
   get dashboard() {
     return rolePath("/dashboard");

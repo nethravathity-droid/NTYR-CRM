@@ -2,6 +2,7 @@ import { createBrowserRouter, Navigate, type RouteObject } from "react-router-do
 import type { ReactElement } from "react";
 import { AuthLayout } from "@/layouts/AuthLayout";
 import { ForbiddenLayout } from "@/layouts/ForbiddenLayout";
+import { PublicLayout } from "@/public/components/PublicLayout";
 import {
   AdminLayout,
   ManagerLayout,
@@ -10,13 +11,26 @@ import {
   TelecallerLayout,
 } from "@/layouts/role-layouts";
 import { LoginPage } from "@/features/auth/pages/LoginPage";
+import { ForceChangePasswordPage } from "@/features/auth/pages/ForceChangePasswordPage";
 import { ForbiddenPage } from "@/pages/ForbiddenPage";
 import { ProtectedRoute } from "@/routes/ProtectedRoute";
+import { MustChangePasswordGate } from "@/routes/MustChangePasswordGate";
 import { RoleRootRedirect } from "@/routes/RoleRootRedirect";
 import { RoleRoute } from "@/routes/RoleRoute";
 import { LegacyOrNotFound, RoleWorkspaceFallback } from "@/routes/LegacyOrNotFound";
 import { paths } from "@/routes/paths";
 import { ROLE_CODES, type RoleCode } from "@/lib/rbac/roles";
+import {
+  LandingPage,
+} from "@/public/pages/LandingPage";
+import { FeaturesPage } from "@/public/pages/FeaturesPage";
+import { PricingPage } from "@/public/pages/PricingPage";
+import { ContactPage } from "@/public/pages/ContactPage";
+import { TermsPage } from "@/public/pages/TermsPage";
+import { PrivacyPage } from "@/public/pages/PrivacyPage";
+import { RegisterPage } from "@/public/pages/RegisterPage";
+import { ForgotPasswordPage } from "@/public/pages/ForgotPasswordPage";
+import { ResetPasswordPage } from "@/public/pages/ResetPasswordPage";
 import {
   adminWorkspaceRoutes,
   managerWorkspaceRoutes,
@@ -35,7 +49,9 @@ function createRoleWorkspace(
     path,
     element: (
       <ProtectedRoute>
-        <RoleRoute allowedRoles={allowedRoles}>{layout}</RoleRoute>
+        <MustChangePasswordGate>
+          <RoleRoute allowedRoles={allowedRoles}>{layout}</RoleRoute>
+        </MustChangePasswordGate>
       </ProtectedRoute>
     ),
     children: [
@@ -48,12 +64,54 @@ function createRoleWorkspace(
 
 export const router = createBrowserRouter([
   {
+    path: "/",
+    element: <PublicLayout />,
+    children: [
+      { index: true, element: <LandingPage /> },
+      { path: "features", element: <FeaturesPage /> },
+      { path: "pricing", element: <PricingPage /> },
+      { path: "contact", element: <ContactPage /> },
+      { path: "terms", element: <TermsPage /> },
+      { path: "privacy", element: <PrivacyPage /> },
+    ],
+  },
+  {
     path: paths.login,
     element: <AuthLayout />,
     children: [
       {
         index: true,
         element: <LoginPage />,
+      },
+    ],
+  },
+  {
+    path: "/register",
+    element: <AuthLayout />,
+    children: [
+      {
+        index: true,
+        element: <RegisterPage />,
+      },
+    ],
+  },
+  {
+    path: "/forgot-password",
+    element: <AuthLayout />,
+    children: [
+      {
+        index: true,
+        element: <ForgotPasswordPage />,
+      },
+    ],
+  },
+  {
+    path: "/reset-password",
+    element: <AuthLayout />,
+    children: [
+      {
+        index: true,
+        element: <ResetPasswordPage />,
       },
     ],
   },
@@ -95,6 +153,14 @@ export const router = createBrowserRouter([
     <SalesLayout />,
     salesWorkspaceRoutes,
   ),
+  {
+    path: "/force-change-password",
+    element: (
+      <ProtectedRoute>
+        <ForceChangePasswordPage />
+      </ProtectedRoute>
+    ),
+  },
   {
     path: paths.forbidden,
     element: (

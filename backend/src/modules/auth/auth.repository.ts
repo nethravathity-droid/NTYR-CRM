@@ -3,6 +3,7 @@ import type {
   CompanyRecord,
   CurrentUserResponse,
   LoginLookup,
+  PasswordResetTokenRecord,
   RefreshTokenRecord,
   UserAuthRecord,
 } from "./auth.types.js";
@@ -27,6 +28,7 @@ const USER_AUTH_SELECT = [
   "u.failed_login_attempts",
   "u.account_locked_until",
   "u.password_changed_at",
+  "u.must_change_password",
   "u.last_login_at",
   "u.email_verified",
   "u.mobile_verified",
@@ -232,6 +234,7 @@ export class AuthRepository {
       .update({
         password_hash: passwordHash,
         password_changed_at: this.db.fn.now(),
+        must_change_password: false,
         failed_login_attempts: 0,
         account_locked_until: null,
         updated_at: this.db.fn.now(),
@@ -282,6 +285,7 @@ export class AuthRepository {
         mobile: user.mobile,
         profilePhotoUrl: user.profile_photo_url,
         status: user.status,
+        mustChangePassword: user.must_change_password ?? false,
         lastLoginAt: user.last_login_at,
         emailVerified: user.email_verified,
         mobileVerified: user.mobile_verified,
@@ -310,5 +314,61 @@ export class AuthRepository {
       },
       permissions,
     };
+  }
+
+  async createPasswordResetToken(data: {
+    userId: number;
+    companyId: number;
+    tokenHash: string;
+    expiresAt: Date;
+    ipAddress: string | undefined;
+    userAgent: string | undefined;
+  }): Promise<void> {
+    await this.db("password_reset_tokens").insert({
+      user_id: data.userId,
+      company_id: data.companyId,
+      token_hash: data.tokenHash,
+      expires_at: data.expiresAt,
+      ip_address: data.ipAddress ?? null,
+      user_agent: data.userAgent ?? null,
+    });
+  }
+
+  async findValidPasswordResetToken(
+    tokenHash: string,
+  ): Promise<PasswordResetTokenRecord | null> {
+    const token = await this.db<PasswordResetTokenRecord>("password_reset_tokens")
+      .where("token_hash", tokenHash)
+      .where("expires_at", ">", this.db.fn.now())
+      .whereNull("used_at")
+      .first();
+
+    return token ?? null;
+  }
+
+  async markPasswordResetTokenUsed(tokenId: number): Promise<void> {
+    await this.db("password_reset_tokens")
+      .where({ id: tokenId })
+      .update({ used_at: this.db.fn.now() });
+  }
+
+  async findUserByEmail(
+    companyId: number,
+    email: string,
+  ): Promise<UserAuthRecord | null> {
+    const user = await this.db("users as u")
+      .select(USER_AUTH_SELECT)
+      .join("roles as r", "r.id", "u.role_id")
+      .join("companies as c", "c.id", "u.company_id")
+      .join("branches as b", "b.id", "u.branch_id")
+      .join("departments as d", "d.id", "u.department_id")
+      .join("designations as des", "des.id", "u.designation_id")
+      .where("u.company_id", companyId)
+      .whereRaw("LOWER(u.official_email) = LOWER(?)", [email])
+      .whereNull("u.deleted_at")
+      .whereNull("r.deleted_at")
+      .first<UserAuthRecord>();
+
+    return user ?? null;
   }
 }

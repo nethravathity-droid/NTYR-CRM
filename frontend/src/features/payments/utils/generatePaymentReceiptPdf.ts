@@ -52,7 +52,7 @@ export function generatePaymentReceiptPdf(
 
   doc.setFont("helvetica", "normal");
   doc.setFontSize(10);
-  const companyMeta = company.code ? `Company Code: ${company.code}` : "Real Estate CRM";
+  const companyMeta = company.code ? `Company Code: ${company.code}` : "CRM";
   doc.text(companyMeta, margin, 24);
 
   doc.setFont("helvetica", "bold");

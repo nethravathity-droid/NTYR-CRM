@@ -4,7 +4,7 @@ export const SEED = {
     companyName: "CRM Platform Operations",
     ownerName: "Platform Owner",
     email: "platform@crm-saas.local",
-    phone: "9000000001",
+    phone: "9380164997",
     addressLine1: "Platform HQ, Tech Park",
     city: "Bengaluru",
     state: "Karnataka",
@@ -25,7 +25,7 @@ export const SEED = {
       lastName: "Super Admin",
       displayName: "Platform Super Admin",
       officialEmail: "superadmin@crm-saas.local",
-      mobile: "9000000001",
+      mobile: "9380164997",
     },
   },
 } as const;

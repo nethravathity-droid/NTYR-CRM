@@ -3,9 +3,12 @@ import { asyncHandler } from "../../common/utils/asyncHandler.js";
 import type { AuthService } from "./auth.service.js";
 import type {
   changePasswordSchema,
+  forgotPasswordSchema,
   loginSchema,
   logoutSchema,
   refreshTokenSchema,
+  registerSchema,
+  resetPasswordSchema,
 } from "./auth.validation.js";
 import type { z } from "zod";
 
@@ -16,6 +19,13 @@ type RefreshRequest = Request & {
 type LogoutRequest = Request & { validated: z.infer<typeof logoutSchema> };
 type ChangePasswordRequest = Request & {
   validated: z.infer<typeof changePasswordSchema>;
+};
+type RegisterRequest = Request & { validated: z.infer<typeof registerSchema> };
+type ForgotPasswordRequest = Request & {
+  validated: z.infer<typeof forgotPasswordSchema>;
+};
+type ResetPasswordRequest = Request & {
+  validated: z.infer<typeof resetPasswordSchema>;
 };
 
 export class AuthController {
@@ -35,6 +45,46 @@ export class AuthController {
       data: result,
     });
   });
+
+  register = asyncHandler(
+    async (req: Request, res: Response): Promise<void> => {
+      const { body } = (req as RegisterRequest).validated;
+
+      const result = await this.authService.register(body);
+
+      res.status(201).json({
+        success: true,
+        message: "Account created successfully",
+        data: result,
+      });
+    },
+  );
+
+  forgotPassword = asyncHandler(
+    async (req: Request, res: Response): Promise<void> => {
+      const { body } = (req as ForgotPasswordRequest).validated;
+
+      await this.authService.forgotPassword(body);
+
+      res.status(200).json({
+        success: true,
+        message: "If an account exists, a reset link has been sent.",
+      });
+    },
+  );
+
+  resetPassword = asyncHandler(
+    async (req: Request, res: Response): Promise<void> => {
+      const { body } = (req as ResetPasswordRequest).validated;
+
+      await this.authService.resetPassword(body);
+
+      res.status(200).json({
+        success: true,
+        message: "Password reset successful. Please sign in.",
+      });
+    },
+  );
 
   refresh = asyncHandler(async (req: Request, res: Response): Promise<void> => {
     const { body } = (req as RefreshRequest).validated;
