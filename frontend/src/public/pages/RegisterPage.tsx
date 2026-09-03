@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
+import { PasswordField } from "@/components/shared/PasswordField";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { authService } from "@/features/auth/services/auth.service";
 import { paths } from "@/routes/paths";
@@ -234,7 +235,13 @@ export function RegisterPage() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="password">Password</Label>
-                <Input id="password" type="password" {...form.register("password")} />
+                <PasswordField
+                  id="password"
+                  label=""
+                  value={form.getValues("password")}
+                  onChange={(value) => form.setValue("password", value)}
+                  placeholder="Create a strong password"
+                />
                 {form.formState.errors.password && (
                   <p className="text-sm text-destructive">
                     {form.formState.errors.password.message}
@@ -243,10 +250,12 @@ export function RegisterPage() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="confirmPassword">Confirm Password</Label>
-                <Input
+                <PasswordField
                   id="confirmPassword"
-                  type="password"
-                  {...form.register("confirmPassword")}
+                  label=""
+                  value={form.getValues("confirmPassword")}
+                  onChange={(value) => form.setValue("confirmPassword", value)}
+                  placeholder="Repeat your password"
                 />
                 {form.formState.errors.confirmPassword && (
                   <p className="text-sm text-destructive">

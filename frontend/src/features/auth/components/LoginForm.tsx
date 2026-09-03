@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Building2, KeyRound, Loader2, UserRound } from "lucide-react";
+import { Building2, UserRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -17,6 +17,7 @@ import {
   loginFormSchema,
   type LoginFormValues,
 } from "@/features/auth/schemas/login.schema";
+import { PasswordField } from "@/components/shared/PasswordField";
 
 export function LoginForm() {
   const { login, isLoading } = useAuth();
@@ -107,17 +108,13 @@ export function LoginForm() {
 
           <div className="space-y-2">
             <Label htmlFor="password">Password</Label>
-            <div className="relative">
-              <KeyRound className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                id="password"
-                type="password"
-                placeholder="Enter your password"
-                className="pl-10"
-                autoComplete="current-password"
-                {...form.register("password")}
-              />
-            </div>
+            <PasswordField
+              id="password"
+              label=""
+              value={form.getValues("password")}
+              onChange={(value) => form.setValue("password", value)}
+              placeholder="Enter your password"
+            />
             {form.formState.errors.password ? (
               <p className="text-sm text-destructive">
                 {form.formState.errors.password.message}
@@ -132,14 +129,7 @@ export function LoginForm() {
           ) : null}
 
           <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? (
-              <>
-                <Loader2 className="animate-spin" />
-                Signing in...
-              </>
-            ) : (
-              "Sign in"
-            )}
+            {isLoading ? "Signing in..." : "Sign in"}
           </Button>
         </form>
       </CardContent>

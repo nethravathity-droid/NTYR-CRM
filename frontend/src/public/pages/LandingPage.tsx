@@ -3,6 +3,7 @@ import { ArrowRight, BarChart3, CalendarDays, Mail, Phone, Settings2, Users } fr
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { APP_NAME, APP_DESCRIPTION } from "@/config/branding";
+import { AutomationSection } from "@/public/components/AutomationSection";
 
 const FEATURES = [
   {
@@ -221,24 +222,28 @@ export function LandingPage() {
         </div>
       </section>
 
+      <AutomationSection />
+
       <section className="border-t">
-        <div className="mx-auto max-w-4xl px-4 py-16 text-center sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-            Ready to grow your business?
-          </h2>
-          <p className="mt-4 text-lg text-muted-foreground">
-            Set up your workspace and start managing your business from one place.
-          </p>
-          <div className="mt-8 flex flex-wrap justify-center gap-4">
-            <Button size="lg" asChild>
-              <Link to="/register">
-                Start Free Trial
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
-            <Button size="lg" variant="outline" asChild>
-              <Link to="/contact">Book a Demo</Link>
-            </Button>
+        <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
+              Ready to grow your business?
+            </h2>
+            <p className="mt-4 text-lg text-muted-foreground">
+              Set up your workspace and start managing your business from one place.
+            </p>
+            <div className="mt-8 flex flex-wrap justify-center gap-4">
+              <Button size="lg" asChild>
+                <Link to="/register">
+                  Start Free Trial
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+              <Button size="lg" variant="outline" asChild>
+                <Link to="/contact">Book a Demo</Link>
+              </Button>
+            </div>
           </div>
         </div>
       </section>
