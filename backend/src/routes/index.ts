@@ -14,6 +14,7 @@ import callsRoutes from "../modules/calls/call.routes.js";
 import supportRoutes from "../modules/support/support.routes.js";
 import whatsappRoutes from "../modules/whatsapp/whatsapp.routes.js";
 import aiRoutes from "../modules/ai/ai.routes.js";
+import attendanceRoutes from "../modules/attendance/attendance.routes.js";
 
 const router = Router();
 
@@ -33,6 +34,7 @@ router.use("/calls", callsRoutes);
 router.use("/support", supportRoutes);
 router.use("/whatsapp", whatsappRoutes);
 router.use("/ai", aiRoutes);
+router.use("/attendance", attendanceRoutes);
 
 router.get("/health", (_req, res) => {
   res.status(200).json({

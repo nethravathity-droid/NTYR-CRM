@@ -8,6 +8,9 @@ import { useBookings } from "@/features/bookings/hooks/useBookings";
 import { useCollectionSummary } from "@/features/payments/hooks/usePayments";
 import { formatCurrency } from "@/features/payments/types/payment.types";
 import { Loading } from "@/components/shared/Loading";
+import { AttendanceStatsCard } from "@/features/attendance/components/AttendanceStatsCard";
+import { LeaveRequestForm } from "@/features/attendance/components/LeaveRequestForm";
+import { PerformanceEmailButton } from "@/features/attendance/components/PerformanceEmailButton";
 import { paths } from "@/routes/paths";
 
 const today = new Date().toISOString().slice(0, 10);
@@ -72,6 +75,15 @@ export function SalesExecutiveDashboardPage() {
         <KpiCard label="Outstanding" value={formatCurrency(payments?.totalOutstanding ?? 0)} icon={Banknote} tone="rose" />
         <KpiCard label="Approved Deals" value={approvedBookings} icon={Target} tone="violet" />
         <KpiCard label="Performance" value={bookings?.pagination.total ?? 0} icon={TrendingUp} tone="indigo" />
+      </div>
+
+      <div className="grid gap-6 lg:grid-cols-2">
+        <AttendanceStatsCard />
+        <LeaveRequestForm />
+      </div>
+
+      <div className="flex justify-end">
+        <PerformanceEmailButton />
       </div>
 
       <div className="grid gap-6 xl:grid-cols-2">

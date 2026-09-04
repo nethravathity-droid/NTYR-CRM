@@ -9,6 +9,9 @@ import { useLeads } from "@/features/leads/hooks/useLeads";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { formatCallDuration } from "@/features/calls/types/call.types";
 import { Loading } from "@/components/shared/Loading";
+import { AttendanceStatsCard } from "@/features/attendance/components/AttendanceStatsCard";
+import { LeaveRequestForm } from "@/features/attendance/components/LeaveRequestForm";
+import { PerformanceEmailButton } from "@/features/attendance/components/PerformanceEmailButton";
 import { paths } from "@/routes/paths";
 
 export function TelecallerDashboardPage() {
@@ -54,6 +57,15 @@ export function TelecallerDashboardPage() {
         <KpiCard label="Avg Call Duration" value={formatCallDuration(callSummary?.averageDurationSeconds ?? 0)} icon={PhoneCall} tone="cyan" />
         <KpiCard label="Conversion Rate" value={`${conversionRate}%`} icon={Target} tone="emerald" />
         <KpiCard label="Answered Calls" value={callSummary?.answeredCalls ?? 0} icon={PhoneCall} tone="blue" />
+      </div>
+
+      <div className="grid gap-6 lg:grid-cols-2">
+        <AttendanceStatsCard />
+        <LeaveRequestForm />
+      </div>
+
+      <div className="flex justify-end">
+        <PerformanceEmailButton />
       </div>
 
       <div className="grid gap-6 xl:grid-cols-2">
