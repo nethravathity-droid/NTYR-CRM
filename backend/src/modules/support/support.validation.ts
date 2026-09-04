@@ -24,7 +24,7 @@ export const sendThreadMessageSchema = uuidParamSchema.extend({
 export const broadcastMessageSchema = z.object({
   body: z.object({
     body: z.string().trim().min(1, "Message cannot be empty").max(4000),
-    companyIds: z.array(z.number().int().positive()).optional(),
+    statuses: z.array(z.enum(["TRIAL", "ACTIVE", "SUSPENDED", "EXPIRED"])).default(["ACTIVE", "TRIAL"]),
   }),
 });
 

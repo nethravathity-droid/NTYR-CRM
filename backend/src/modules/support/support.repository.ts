@@ -187,10 +187,11 @@ export class SupportRepository {
     return Number((rows[0] as { total: string }).total ?? 0);
   }
 
-  async listAllCompanies(): Promise<Array<{ id: number; uuid: string }>> {
+  async listAllCompanies(statuses: string[] = ["ACTIVE", "TRIAL"]): Promise<Array<{ id: number; uuid: string }>> {
     const rows = await this.db("companies")
       .whereNull("deleted_at")
       .where("company_code", "!=", "PLATFORM")
+      .whereIn("status", statuses)
       .select("id", "uuid");
     return rows as Array<{ id: number; uuid: string }>;
   }

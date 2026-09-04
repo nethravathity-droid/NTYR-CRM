@@ -73,6 +73,7 @@ import { MessagesPage } from "@/features/messages/pages/MessagesPage";
 import { NotificationsPage } from "@/features/notifications/pages/NotificationsPage";
 import { PermissionRoute } from "@/routes/PermissionRoute";
 import { SuperAdminRoute } from "@/routes/SuperAdminRoute";
+import { SuperAdminBroadcastPage } from "@/features/dashboards/pages/SuperAdminBroadcastPage";
 
 export type WorkspaceRouteOptions = {
   dashboardElement?: ReactElement;
@@ -257,6 +258,10 @@ export const superAdminWorkspaceRoutes = createWorkspaceRoutes({
   includePayments: false,
   includeCalls: false,
 });
+
+superAdminWorkspaceRoutes.push(
+  { path: "support/broadcast", element: withSuperAdminPermission("companies.view", <SuperAdminBroadcastPage />) },
+);
 
 export const adminWorkspaceRoutes = createWorkspaceRoutes({
   dashboardElement: <CompanyAdminDashboardPage />,

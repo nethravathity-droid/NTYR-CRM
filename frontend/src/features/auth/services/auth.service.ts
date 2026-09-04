@@ -75,4 +75,15 @@ export const authService = {
   async resetPassword(payload: { token: string; password: string }): Promise<void> {
     await apiClient.post("/auth/reset-password", payload);
   },
+
+  async broadcastSupportMessage(payload: {
+    body: string;
+    statuses: string[];
+  }): Promise<{ count: number }> {
+    const response = await apiClient.post<ApiResponse<{ count: number }>>(
+      "/support/broadcast",
+      payload,
+    );
+    return response.data.data;
+  },
 };

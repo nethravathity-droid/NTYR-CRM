@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { PremiumHeader } from "@/components/premium/PremiumHeader";
 import { PremiumSidebar } from "@/components/premium/PremiumSidebar";
 import { Loading } from "@/components/shared/Loading";
+import { Toaster } from "@/components/shared/Toaster";
 import { ShellProvider, useShell } from "@/context/ShellContext";
 import { DashboardDateProvider } from "@/context/DashboardDateContext";
 import { useAuth } from "@/features/auth/hooks/useAuth";
@@ -50,6 +51,7 @@ function AppShellInner({ roleCode }: AppShellProps) {
           </div>
         </main>
       </div>
+      <Toaster />
     </div>
   );
 }

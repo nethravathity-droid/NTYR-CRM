@@ -68,8 +68,8 @@ export class SupportService {
     await this.supportRepository.markThreadRead(company.id, role);
   }
 
-  async broadcastMessage(body: string, sender: { id: number }): Promise<number> {
-    const companies = await this.supportRepository.listAllCompanies();
+  async broadcastMessage(body: string, sender: { id: number }, statuses: string[] = ["ACTIVE", "TRIAL"]): Promise<number> {
+    const companies = await this.supportRepository.listAllCompanies(statuses);
     const companyIds = companies.map((company) => company.id);
     const count = await this.supportRepository.broadcastMessage({
       companyIds,
@@ -80,6 +80,7 @@ export class SupportService {
     this.logger.info("Broadcast support message sent", {
       senderUserId: sender.id,
       companyCount: count,
+      statuses,
     });
 
     return count;
