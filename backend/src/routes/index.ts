@@ -11,6 +11,8 @@ import bookingsRoutes from "../modules/bookings/booking.routes.js";
 import paymentsRoutes from "../modules/payments/payment.routes.js";
 import reportsRoutes from "../modules/reports/reports.routes.js";
 import callsRoutes from "../modules/calls/call.routes.js";
+import supportRoutes from "../modules/support/support.routes.js";
+import whatsappRoutes from "../modules/whatsapp/whatsapp.routes.js";
 
 const router = Router();
 
@@ -27,6 +29,8 @@ router.use("/bookings", bookingsRoutes);
 router.use("/payments", paymentsRoutes);
 router.use("/reports", reportsRoutes);
 router.use("/calls", callsRoutes);
+router.use("/support", supportRoutes);
+router.use("/whatsapp", whatsappRoutes);
 
 router.get("/health", (_req, res) => {
   res.status(200).json({

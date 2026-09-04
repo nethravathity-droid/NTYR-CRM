@@ -74,6 +74,8 @@ import { NotificationsPage } from "@/features/notifications/pages/NotificationsP
 import { PermissionRoute } from "@/routes/PermissionRoute";
 import { SuperAdminRoute } from "@/routes/SuperAdminRoute";
 import { SuperAdminBroadcastPage } from "@/features/dashboards/pages/SuperAdminBroadcastPage";
+import { WhatsAppInboxPage } from "@/features/whatsapp/pages/WhatsAppInboxPage";
+import { WhatsAppSettingsPage } from "@/features/whatsapp/pages/WhatsAppSettingsPage";
 
 export type WorkspaceRouteOptions = {
   dashboardElement?: ReactElement;
@@ -130,6 +132,8 @@ export function createWorkspaceRoutes(options: WorkspaceRouteOptions = {}): Rout
       { path: "settings", element: <SettingsPage /> },
       { path: "messages", element: <MessagesPage /> },
       { path: "notifications", element: <NotificationsPage /> },
+      { path: "whatsapp/inbox", element: <WhatsAppInboxPage /> },
+      { path: "whatsapp/settings", element: <WhatsAppSettingsPage /> },
     );
   }
 
