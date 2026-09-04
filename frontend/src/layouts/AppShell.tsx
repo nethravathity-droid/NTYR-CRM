@@ -4,11 +4,13 @@ import { PremiumHeader } from "@/components/premium/PremiumHeader";
 import { PremiumSidebar } from "@/components/premium/PremiumSidebar";
 import { Loading } from "@/components/shared/Loading";
 import { Toaster } from "@/components/shared/Toaster";
+import { AiAssistant } from "@/components/ai/AiAssistant";
 import { ShellProvider, useShell } from "@/context/ShellContext";
 import { DashboardDateProvider } from "@/context/DashboardDateContext";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { getNavigationSectionsForRole, getWorkspaceLabel } from "@/lib/rbac/navigation";
 import { getRoleDashboardPath, isRoleCode, setActiveRoleCode, type RoleCode } from "@/lib/rbac/roles";
+import { ROLE_CODES } from "@/lib/rbac/roles";
 import { cn } from "@/lib/utils";
 
 interface AppShellProps {
@@ -21,6 +23,7 @@ function AppShellInner({ roleCode }: AppShellProps) {
   const sections = getNavigationSectionsForRole(roleCode);
   const dashboardPath = getRoleDashboardPath(roleCode);
   const workspaceLabel = user?.company.name ?? getWorkspaceLabel(roleCode);
+  const showAiAssistant = user?.role.code !== ROLE_CODES.PLATFORM_SUPER_ADMIN;
 
   useEffect(() => {
     if (user?.role.code && isRoleCode(user.role.code)) {
@@ -51,6 +54,7 @@ function AppShellInner({ roleCode }: AppShellProps) {
           </div>
         </main>
       </div>
+      {showAiAssistant ? <AiAssistant /> : null}
       <Toaster />
     </div>
   );
