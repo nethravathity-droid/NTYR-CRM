@@ -7,6 +7,7 @@ import type {
   listThreadMessagesSchema,
   markThreadReadSchema,
   sendThreadMessageSchema,
+  broadcastMessageSchema,
 } from "./support.validation.js";
 
 type ListThreadsRequest = Request & { validated: z.infer<typeof listCompanyThreadsSchema> };
@@ -14,6 +15,7 @@ type ThreadParamsRequest = Request & {
   validated: z.infer<typeof listThreadMessagesSchema> | z.infer<typeof markThreadReadSchema>;
 };
 type SendMessageRequest = Request & { validated: z.infer<typeof sendThreadMessageSchema> };
+type BroadcastRequest = Request & { validated: z.infer<typeof broadcastMessageSchema> };
 
 export class SupportController {
   constructor(private readonly supportService: SupportService) { }
@@ -62,6 +64,19 @@ export class SupportController {
     res.status(200).json({
       success: true,
       message: "Thread marked as read",
+    });
+  });
+
+  broadcast = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+    const { body } = (req as BroadcastRequest).validated;
+    const count = await this.supportService.broadcastMessage(body.body, {
+      id: req.user!.id,
+    });
+
+    res.status(200).json({
+      success: true,
+      message: `Message broadcasted to ${count} companies`,
+      data: { count },
     });
   });
 }

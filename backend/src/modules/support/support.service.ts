@@ -67,6 +67,23 @@ export class SupportService {
 
     await this.supportRepository.markThreadRead(company.id, role);
   }
+
+  async broadcastMessage(body: string, sender: { id: number }): Promise<number> {
+    const companies = await this.supportRepository.listAllCompanies();
+    const companyIds = companies.map((company) => company.id);
+    const count = await this.supportRepository.broadcastMessage({
+      companyIds,
+      senderUserId: sender.id,
+      body,
+    });
+
+    this.logger.info("Broadcast support message sent", {
+      senderUserId: sender.id,
+      companyCount: count,
+    });
+
+    return count;
+  }
 }
 
 export const supportService = new SupportService(new SupportRepository(db), logger);
