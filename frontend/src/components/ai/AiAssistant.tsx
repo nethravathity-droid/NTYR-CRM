@@ -7,6 +7,15 @@ import { useToast } from "@/hooks/useToast";
 import { aiService } from "@/features/ai/services/ai.service";
 import type { AiChatMessage } from "@/features/ai/types/ai.types";
 
+const SUGGESTED_QUESTIONS = [
+  "Show my leads",
+  "Today's follow-ups",
+  "Revenue this month",
+  "Team performance",
+  "Pending approvals",
+  "Overdue payments",
+];
+
 export function AiAssistant() {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<AiChatMessage[]>([]);
@@ -15,6 +24,10 @@ export function AiAssistant() {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const bottomRef = useRef<HTMLDivElement>(null);
+
+  const handleSuggested = (question: string) => {
+    setInput(question);
+  };
 
   useEffect(() => {
     if (open) {
@@ -112,10 +125,21 @@ export function AiAssistant() {
 
           <div className="flex-1 space-y-3 overflow-y-auto p-4">
             {messages.length === 0 ? (
-              <div className="flex h-full flex-col items-center justify-center gap-2 text-center text-sm text-muted-foreground">
+              <div className="flex h-full flex-col items-center justify-center gap-3 text-center text-sm text-muted-foreground">
                 <Bot className="h-8 w-8" />
                 <p>Hi! I can help you with leads, follow-ups, reports, payments, and more.</p>
-                <p>Try asking: "Show my leads" or "Today's follow-ups"</p>
+                <div className="flex flex-wrap justify-center gap-2">
+                  {SUGGESTED_QUESTIONS.map((question) => (
+                    <button
+                      key={question}
+                      type="button"
+                      onClick={() => handleSuggested(question)}
+                      className="rounded-full border px-3 py-1.5 text-xs transition hover:border-primary hover:text-primary"
+                    >
+                      {question}
+                    </button>
+                  ))}
+                </div>
               </div>
             ) : (
               messages.map((message) => (
