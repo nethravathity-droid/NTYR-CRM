@@ -32,6 +32,8 @@ export function LoginForm() {
     },
   });
 
+  const passwordValue = form.watch("password");
+
   const onSubmit = form.handleSubmit(async (values) => {
     setError(null);
 
@@ -111,7 +113,7 @@ export function LoginForm() {
             <PasswordField
               id="password"
               label=""
-              value={form.getValues("password")}
+              value={passwordValue}
               onChange={(value) => form.setValue("password", value)}
               placeholder="Enter your password"
             />

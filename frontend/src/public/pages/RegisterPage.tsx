@@ -72,13 +72,16 @@ export function RegisterPage() {
     },
   });
 
+  const passwordValue = form.watch("password");
+  const confirmPasswordValue = form.watch("confirmPassword");
+
   const onSubmit = form.handleSubmit(async (values) => {
     setError(null);
     setSuccess(false);
 
     try {
       const { confirmPassword: _confirmPassword, agreeTerms: _agreeTerms, agreePrivacy: _agreePrivacy, ...payload } = values;
-      
+
       const result = await authService.register({
         companyCode: payload.companyCode,
         companyName: payload.companyName,
@@ -119,43 +122,26 @@ export function RegisterPage() {
 
   if (success && result) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-background">
-        <div className="mx-auto flex min-h-screen w-full max-w-6xl flex-col items-center justify-center gap-8 px-4 py-10">
-          <Card className="w-full max-w-md p-8 text-center">
-            <h2 className="text-2xl font-bold">Your workspace is ready</h2>
-            <p className="mt-2 text-muted-foreground">
-              You can now sign in to your CRM dashboard.
-            </p>
-            <div className="mt-6 space-y-2 text-left">
-              <p className="text-sm"><span className="font-medium">Workspace:</span> {result.companyName}</p>
-              <p className="text-sm"><span className="font-medium">Code:</span> {result.companyCode}</p>
-              <p className="text-sm"><span className="font-medium">Email:</span> {result.email}</p>
-            </div>
-            <Button className="mt-6 w-full" asChild>
-              <a href={paths.dashboard}>Continue to CRM</a>
-            </Button>
-          </Card>
+      <div className="space-y-4 text-center">
+        <h2 className="text-2xl font-bold">Your workspace is ready</h2>
+        <p className="text-muted-foreground">
+          You can now sign in to your CRM dashboard.
+        </p>
+        <div className="space-y-2 text-left">
+          <p className="text-sm"><span className="font-medium">Workspace:</span> {result.companyName}</p>
+          <p className="text-sm"><span className="font-medium">Code:</span> {result.companyCode}</p>
+          <p className="text-sm"><span className="font-medium">Email:</span> {result.email}</p>
         </div>
+        <Button className="w-full" asChild>
+          <a href={paths.dashboard}>Continue to CRM</a>
+        </Button>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-background">
-      <div className="mx-auto flex min-h-screen w-full max-w-6xl flex-col items-center justify-center gap-8 px-4 py-10 lg:flex-row lg:justify-between">
-        <div className="max-w-xl space-y-4 text-center lg:text-left">
-          <p className="text-sm font-medium uppercase tracking-[0.2em] text-primary">
-            All-in-One CRM
-          </p>
-          <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
-            Start your free trial
-          </h1>
-          <p className="text-lg text-muted-foreground">
-            Create your workspace in just a few minutes.
-          </p>
-        </div>
-        <Card className="w-full max-w-md border-border/60 shadow-xl">
-          <CardContent className="p-6">
+    <Card className="w-full border-border/60 shadow-xl">
+      <CardContent className="p-6">
             <form onSubmit={onSubmit} className="space-y-4">
               <p className="text-sm font-medium text-muted-foreground">
                 PERSONAL INFORMATION
@@ -238,7 +224,7 @@ export function RegisterPage() {
                 <PasswordField
                   id="password"
                   label=""
-                  value={form.getValues("password")}
+                  value={passwordValue}
                   onChange={(value) => form.setValue("password", value)}
                   placeholder="Create a strong password"
                 />
@@ -253,7 +239,7 @@ export function RegisterPage() {
                 <PasswordField
                   id="confirmPassword"
                   label=""
-                  value={form.getValues("confirmPassword")}
+                  value={confirmPasswordValue}
                   onChange={(value) => form.setValue("confirmPassword", value)}
                   placeholder="Repeat your password"
                 />
@@ -323,8 +309,6 @@ export function RegisterPage() {
               </a>
             </p>
           </CardContent>
-        </Card>
-      </div>
-    </div>
+    </Card>
   );
 }
