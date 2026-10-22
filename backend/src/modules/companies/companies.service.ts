@@ -49,6 +49,7 @@ export class CompaniesService {
     await this.assertUniqueCompanyFields({
       companyCode: companyInput.companyCode,
       email: companyInput.email,
+      phone: companyInput.phone,
     });
 
     const company = await this.companiesRepository.createCompany(companyInput, createdBy);
@@ -135,6 +136,7 @@ export class CompaniesService {
       {
         companyCode: input.companyCode,
         email: input.email,
+        phone: input.phone,
       },
       existing.id,
     );
@@ -255,6 +257,7 @@ export class CompaniesService {
     fields: {
       companyCode?: string;
       email?: string;
+      phone?: string;
     },
     excludeCompanyId?: number,
   ): Promise<void> {
@@ -278,6 +281,16 @@ export class CompaniesService {
       );
       if (taken) {
         throw new AppError(409, "Company email already exists");
+      }
+    }
+
+    if (fields.phone) {
+      const taken = await this.companiesRepository.isPhoneTaken(
+        fields.phone,
+        excludeCompanyId,
+      );
+      if (taken) {
+        throw new AppError(409, "Company phone already exists");
       }
     }
   }

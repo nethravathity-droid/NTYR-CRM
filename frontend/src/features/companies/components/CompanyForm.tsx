@@ -33,6 +33,7 @@ import {
   type CompanyFormSchema,
 } from "@/features/companies/schemas/company.schema";
 import { companyStatusOptions } from "@/features/companies/components/CompanyStatusBadge";
+import { COUNTRIES, STATES_BY_COUNTRY } from "@/features/companies/constants/countries";
 import { cn } from "@/lib/utils";
 
 interface CompanyFormProps {
@@ -57,6 +58,8 @@ export function CompanyForm({
   const {
     register,
     handleSubmit,
+    watch,
+    setValue,
     formState: { errors },
   } = useForm<CompanyCreateFormSchema>({
     resolver: zodResolver(
@@ -66,6 +69,9 @@ export function CompanyForm({
       ? { ...companyCreateDefaultValues, ...defaultValues }
       : defaultValues,
   });
+
+  const selectedCountry = watch("country") || (defaultValues.country || "India");
+  const availableStates = STATES_BY_COUNTRY[selectedCountry as keyof typeof STATES_BY_COUNTRY] ?? [];
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
@@ -171,11 +177,38 @@ export function CompanyForm({
         </FormField>
 
         <FormField label="State" error={errors.state?.message}>
-          <Input {...register("state")} placeholder="Maharashtra" />
+          <Select
+            value={watch("state") || ""}
+            onChange={(event) => setValue("state", event.target.value, { shouldValidate: true })}
+          >
+            <option value="">Select state</option>
+            {availableStates.map((state) => (
+              <option key={state.value} value={state.value}>
+                {state.label}
+              </option>
+            ))}
+          </Select>
         </FormField>
 
         <FormField label="Country" error={errors.country?.message}>
-          <Input {...register("country")} placeholder="India" />
+          <Select
+            value={watch("country")}
+            onChange={(event) => {
+              const country = event.target.value;
+              setValue("country", country, { shouldValidate: true });
+              const states = STATES_BY_COUNTRY[country as keyof typeof STATES_BY_COUNTRY] ?? [];
+              const currentState = watch("state");
+              if (!states.some((state) => state.value === currentState)) {
+                setValue("state", "");
+              }
+            }}
+          >
+            {COUNTRIES.map((country) => (
+              <option key={country.value} value={country.value}>
+                {country.label}
+              </option>
+            ))}
+          </Select>
         </FormField>
 
         <FormField label="Postal Code" error={errors.postalCode?.message}>
@@ -209,11 +242,11 @@ export function CompanyForm({
 
         <div />
 
-        <FormField label="Trial Start Date" error={errors.trialStartDate?.message}>
+        <FormField label="Start Date" error={errors.trialStartDate?.message}>
           <Input {...register("trialStartDate")} type="date" />
         </FormField>
 
-        <FormField label="Trial End Date" error={errors.trialEndDate?.message}>
+        <FormField label="End Date" error={errors.trialEndDate?.message}>
           <Input {...register("trialEndDate")} type="date" />
         </FormField>
 

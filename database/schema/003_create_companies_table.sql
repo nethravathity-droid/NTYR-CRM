@@ -65,10 +65,23 @@ CREATE TABLE companies (
     deleted_by BIGINT,
 
     -- Constraints
-    CONSTRAINT uq_company_uuid UNIQUE (uuid),
-    CONSTRAINT uq_company_code UNIQUE (company_code),
-    CONSTRAINT uq_company_email UNIQUE (email)
+    CONSTRAINT uq_company_uuid UNIQUE (uuid)
 );
+
+-- Partial unique indexes so soft-deleted tenants do not block reuse
+-- of company_code, email, or phone.
+
+CREATE UNIQUE INDEX uq_company_code_active
+  ON companies (company_code)
+  WHERE deleted_at IS NULL;
+
+CREATE UNIQUE INDEX uq_company_email_active
+  ON companies (email)
+  WHERE deleted_at IS NULL;
+
+CREATE UNIQUE INDEX uq_company_phone_active
+  ON companies (phone)
+  WHERE deleted_at IS NULL;
 
 
 -- ==========================================

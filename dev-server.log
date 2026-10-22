@@ -1,0 +1,250 @@
+
+> real-estate-crm-backend@1.0.0 dev
+> tsx watch src/server.ts
+
+Database connection established
+Server listening on port 3000 [development]
+2026-09-02 12:23:35 [[32minfo[39m]: User logged in successfully
+[0mPOST /api/v1/auth/login [32m200[0m 484.779 ms - 2657[0m
+2026-09-02 12:23:56 [[32minfo[39m]: User logged in successfully
+[0mPOST /api/v1/auth/login [32m200[0m 347.531 ms - 1846[0m
+2026-09-02 12:23:57 [[32minfo[39m]: User logged in successfully
+[0mPOST /api/v1/auth/login [32m200[0m 349.230 ms - 2212[0m
+2026-09-02 12:25:14 [[32minfo[39m]: User logged in successfully
+[0mPOST /api/v1/auth/login [32m200[0m 417.685 ms - 2234[0m
+2026-09-02 12:25:15 [[32minfo[39m]: Password changed successfully
+[0mPOST /api/v1/auth/change-password [32m200[0m 704.438 ms - 79[0m
+2026-09-02 12:25:15 [[32minfo[39m]: User logged in successfully
+[0mPOST /api/v1/auth/login [32m200[0m 337.624 ms - 2235[0m
+2026-09-02 12:25:33 [[32minfo[39m]: User logged in successfully
+[0mPOST /api/v1/auth/login [32m200[0m 370.525 ms - 1846[0m
+2026-09-02 12:25:33 [[33mwarn[39m]: Insufficient permissions
+[0mGET /api/v1/users [33m403[0m 4.215 ms - 54[0m
+2026-09-02 12:25:33 [[33mwarn[39m]: Insufficient role privileges
+[0mGET /api/v1/companies [33m403[0m 2.746 ms - 58[0m
+2026-09-02 12:25:48 [[32minfo[39m]: User logged in successfully
+[0mPOST /api/v1/auth/login [32m200[0m 371.546 ms - 2657[0m
+[0mGET /api/v1/leads?page=1&limit=3 [32m200[0m 16.588 ms - 1524[0m
+2026-09-02 12:25:48 [[33mwarn[39m]: Login failed: user not found
+2026-09-02 12:25:48 [[33mwarn[39m]: Invalid credentials
+[0mPOST /api/v1/auth/login [33m401[0m 10.667 ms - 49[0m
+2026-09-02 12:25:48 [[33mwarn[39m]: Access token required
+[0mGET /api/v1/users [33m401[0m 1.300 ms - 51[0m
+2026-09-02 12:26:11 [[32minfo[39m]: User logged in successfully
+[0mPOST /api/v1/auth/login [32m200[0m 491.863 ms - 3488[0m
+[0mGET /api/v1/users/form-options [32m200[0m 32.827 ms - 713[0m
+2026-09-02 12:26:28 [[32minfo[39m]: User logged in successfully
+[0mPOST /api/v1/auth/login [32m200[0m 414.233 ms - 3488[0m
+2026-09-02 12:26:28 [[33mwarn[39m]: body.initialAdmin: Invalid input: expected object, received undefined
+[0mPOST /api/v1/companies [33m400[0m 6.442 ms - 99[0m
+2026-09-02 12:26:29 [[33mwarn[39m]: Login failed: company not found
+2026-09-02 12:26:29 [[33mwarn[39m]: Invalid credentials
+[0mPOST /api/v1/auth/login [33m401[0m 2.537 ms - 49[0m
+2026-09-02 12:26:41 [[32minfo[39m]: User logged in successfully
+[0mPOST /api/v1/auth/login [32m200[0m 402.041 ms - 3488[0m
+2026-09-02 12:26:42 [[32minfo[39m]: Company created
+[0mPOST /api/v1/companies [32m201[0m 590.337 ms - 826[0m
+2026-09-02 12:26:42 [[32minfo[39m]: User logged in successfully
+[0mPOST /api/v1/auth/login [32m200[0m 341.264 ms - 2841[0m
+[0mGET /api/v1/users/form-options [32m200[0m 68.034 ms - 1382[0m
+2026-09-02 12:40:14 [[32minfo[39m]: User logged in successfully
+[0mPOST /api/v1/auth/login [32m200[0m 526.206 ms - 2863[0m
+[0mGET /api/v1/users/form-options [32m200[0m 209.145 ms - 1382[0m
+[0mGET /api/v1/users/form-options [32m200[0m 138.659 ms - 1382[0m
+2026-09-02 12:40:15 [[33mwarn[39m]: body.branchId: Invalid input: expected number, received string; body.departmentId: Invalid input: expected number, received string; body.designationId: Invalid input: expected number, received string; body.roleId: Invalid input: expected number, received string
+[0mPOST /api/v1/users [33m400[0m 3.042 ms - 291[0m
+2026-09-02 12:40:15 [[33mwarn[39m]: Login failed: user not found
+2026-09-02 12:40:15 [[33mwarn[39m]: Invalid credentials
+[0mPOST /api/v1/auth/login [33m401[0m 42.036 ms - 49[0m
+2026-09-02 12:40:54 [[32minfo[39m]: User logged in successfully
+[0mPOST /api/v1/auth/login [32m200[0m 13483.889 ms - 2863[0m
+[0mGET /api/v1/users/form-options [32m200[0m 748.936 ms - 1382[0m
+2026-09-02 12:41:03 [[32minfo[39m]: User created
+[0mPOST /api/v1/users [32m201[0m 4056.706 ms - 922[0m
+2026-09-02 12:41:08 [[32minfo[39m]: User logged in successfully
+[0mPOST /api/v1/auth/login [32m200[0m 5635.307 ms - 2175[0m
+2026-09-02 12:44:51 [[32minfo[39m]: User logged in successfully
+[0mPOST /api/v1/auth/login [32m200[0m 358.173 ms - 2197[0m
+2026-09-02 12:44:51 [[33mwarn[39m]: Insufficient permissions
+[0mGET /api/v1/users [33m403[0m 2.645 ms - 54[0m
+2026-09-02 12:44:51 [[33mwarn[39m]: Insufficient role privileges
+[0mGET /api/v1/companies [33m403[0m 1.353 ms - 58[0m
+[0mGET /api/v1/leads?page=1&limit=5 [32m200[0m 20.271 ms - 136[0m
+2026-09-02 12:44:52 [[32minfo[39m]: User logged in successfully
+[0mPOST /api/v1/auth/login [32m200[0m 424.105 ms - 2876[0m
+[0mGET /api/v1/users [32m200[0m 13.697 ms - 2340[0m
+2026-09-02 12:45:08 [[32minfo[39m]: User logged in successfully
+[0mPOST /api/v1/auth/login [32m200[0m 355.691 ms - 2863[0m
+[0mGET /api/v1/users [32m200[0m 10.431 ms - 1245[0m
+2026-09-02 12:45:27 [[32minfo[39m]: User logged in successfully
+[0mPOST /api/v1/auth/login [32m200[0m 323.076 ms - 2863[0m
+[0mGET /api/v1/users [32m200[0m 7.054 ms - 1245[0m
+2026-09-02 12:45:27 [[32minfo[39m]: User status updated
+[0mPATCH /api/v1/users/fab524cd-88e3-4654-ba5b-969f83070f4e/status [32m200[0m 10.058 ms - 953[0m
+2026-09-02 12:45:27 [[33mwarn[39m]: User account is inactive
+[0mPOST /api/v1/auth/login [33m403[0m 4.000 ms - 54[0m
+2026-09-02 12:45:27 [[32minfo[39m]: User status updated
+[0mPATCH /api/v1/users/fab524cd-88e3-4654-ba5b-969f83070f4e/status [32m200[0m 8.828 ms - 951[0m
+2026-09-02 12:45:36 [[32minfo[39m]: User logged in successfully
+[0mPOST /api/v1/auth/login [32m200[0m 459.592 ms - 2863[0m
+2026-09-02 12:45:36 [[33mwarn[39m]: body.customerName: Invalid input: expected string, received undefined; body.mobile: Invalid input: expected string, received undefined
+[0mPOST /api/v1/leads [33m400[0m 1.972 ms - 164[0m
+2026-09-02 12:45:43 [[32minfo[39m]: User logged in successfully
+[0mPOST /api/v1/auth/login [32m200[0m 398.836 ms - 2863[0m
+2026-09-02 12:45:43 [[32minfo[39m]: Lead created
+[0mPOST /api/v1/leads [32m201[0m 26.631 ms - 538[0m
+[0mGET /api/v1/leads [32m200[0m 4.124 ms - 559[0m
+2026-09-02 12:45:51 [[32minfo[39m]: User logged in successfully
+[0mPOST /api/v1/auth/login [32m200[0m 413.280 ms - 2197[0m
+[0mGET /api/v1/leads [32m200[0m 3.852 ms - 137[0m
+2026-09-02 12:45:52 [[32minfo[39m]: User logged in successfully
+[0mPOST /api/v1/auth/login [32m200[0m 342.108 ms - 2876[0m
+[0mGET /api/v1/leads [32m200[0m 5.801 ms - 6783[0m
+2026-09-02 13:05:35 [[32minfo[39m]: User logged in successfully
+[0mPOST /api/v1/auth/login [32m200[0m 728.483 ms - -[0m
+[0mGET /api/v1/followups/today [36m304[0m 19.787 ms - -[0m
+[0mGET /api/v1/followups/overdue [36m304[0m 18.259 ms - -[0m
+[0mGET /api/v1/leads?page=1&limit=8&status=ASSIGNED&sortBy=updated_at&sortOrder=desc [36m304[0m 36.088 ms - -[0m
+[0mGET /api/v1/visits?page=1&limit=8&fromDate=2026-09-02&sortBy=visit_date&sortOrder=asc [32m200[0m 44.453 ms - 138[0m
+[0mGET /api/v1/bookings?page=1&limit=8&sortBy=created_at&sortOrder=desc [36m304[0m 74.095 ms - -[0m
+[0mGET /api/v1/reports/dashboard?period=daily&fromDate=2026-09-02&toDate=2026-09-02&page=1&limit=5 [32m200[0m 80.934 ms - 616[0m
+[0mGET /api/v1/users?page=1&limit=8&sortBy=created_at&sortOrder=desc [32m200[0m 97.622 ms - -[0m
+[0mGET /api/v1/payments?page=1&limit=8&status=PAID&sortBy=payment_date&sortOrder=desc [36m304[0m 118.572 ms - -[0m
+[0mGET /api/v1/reports/dashboard?period=monthly&fromDate=2026-08-31&toDate=2026-09-02&page=1&limit=5 [32m200[0m 77.175 ms - -[0m
+[0mGET /api/v1/reports/employees?period=daily&fromDate=2026-09-02&toDate=2026-09-02&page=1&limit=10 [32m200[0m 128.638 ms - 954[0m
+[0mGET /api/v1/payments/collection-summary [36m304[0m 49.494 ms - -[0m
+[0mGET /api/v1/calls/summary?fromDate=2026-09-02&toDate=2026-09-02 [32m200[0m 90.144 ms - 227[0m
+[0mGET /api/v1/projects/inventory/dashboard [36m304[0m 26.141 ms - -[0m
+[0mGET /api/v1/leads?page=1&limit=100&sortBy=updated_at&sortOrder=desc [36m304[0m 21.067 ms - -[0m
+[0mGET /api/v1/dashboard/recent-activities?limit=30 [32m200[0m 35.004 ms - -[0m
+[0mGET /api/v1/leads?page=1&limit=8&sortBy=created_at&sortOrder=desc [36m304[0m 19.281 ms - -[0m
+[0mGET /api/v1/reports/payments?period=daily&fromDate=2026-09-02&toDate=2026-09-02&page=1&limit=5 [32m200[0m 165.412 ms - 345[0m
+[0mGET /api/v1/visits?page=1&limit=8&fromDate=2026-09-02&toDate=2026-09-02&sortBy=visit_date&sortOrder=asc [32m200[0m 25.945 ms - 138[0m
+[0mGET /api/v1/bookings?page=1&limit=8&fromDate=2026-09-02&toDate=2026-09-02&sortBy=booking_date&sortOrder=desc [32m200[0m 27.338 ms - 142[0m
+[0mGET /api/v1/payments?page=1&limit=8&status=PENDING&sortBy=due_date&sortOrder=asc [36m304[0m 13.253 ms - -[0m
+[0mGET /api/v1/bookings?page=1&limit=5&status=PENDING_APPROVAL&sortBy=booking_date&sortOrder=desc [36m304[0m 22.088 ms - -[0m
+[0mGET /api/v1/auth/me [32m200[0m 48.620 ms - -[0m
+[0mGET /api/v1/auth/me [36m304[0m 16.769 ms - -[0m
+[0mGET /api/v1/leads?page=1&limit=8&status=ASSIGNED&sortBy=updated_at&sortOrder=desc [36m304[0m 22.058 ms - -[0m
+[0mGET /api/v1/followups/today [36m304[0m 19.897 ms - -[0m
+[0mGET /api/v1/followups/overdue [36m304[0m 19.762 ms - -[0m
+[0mGET /api/v1/visits?page=1&limit=8&fromDate=2026-09-02&sortBy=visit_date&sortOrder=asc [36m304[0m 52.230 ms - -[0m
+[0mGET /api/v1/bookings?page=1&limit=8&sortBy=created_at&sortOrder=desc [36m304[0m 65.336 ms - -[0m
+[0mGET /api/v1/reports/dashboard?period=daily&fromDate=2026-09-02&toDate=2026-09-02&page=1&limit=5 [36m304[0m 61.562 ms - -[0m
+[0mGET /api/v1/payments?page=1&limit=8&status=PAID&sortBy=payment_date&sortOrder=desc [36m304[0m 98.890 ms - -[0m
+[0mGET /api/v1/reports/dashboard?period=monthly&fromDate=2026-08-31&toDate=2026-09-02&page=1&limit=5 [36m304[0m 42.158 ms - -[0m
+[0mGET /api/v1/users?page=1&limit=8&sortBy=created_at&sortOrder=desc [36m304[0m 124.147 ms - -[0m
+[0mGET /api/v1/reports/employees?period=daily&fromDate=2026-09-02&toDate=2026-09-02&page=1&limit=10 [36m304[0m 81.608 ms - -[0m
+[0mGET /api/v1/payments/collection-summary [36m304[0m 17.044 ms - -[0m
+[0mGET /api/v1/calls/summary?fromDate=2026-09-02&toDate=2026-09-02 [36m304[0m 51.026 ms - -[0m
+[0mGET /api/v1/reports/payments?period=daily&fromDate=2026-09-02&toDate=2026-09-02&page=1&limit=5 [36m304[0m 86.061 ms - -[0m
+[0mGET /api/v1/projects/inventory/dashboard [36m304[0m 12.852 ms - -[0m
+[0mGET /api/v1/dashboard/recent-activities?limit=30 [36m304[0m 22.320 ms - -[0m
+[0mGET /api/v1/leads?page=1&limit=100&sortBy=updated_at&sortOrder=desc [36m304[0m 18.770 ms - -[0m
+[0mGET /api/v1/leads?page=1&limit=8&sortBy=created_at&sortOrder=desc [36m304[0m 28.688 ms - -[0m
+[0mGET /api/v1/visits?page=1&limit=8&fromDate=2026-09-02&toDate=2026-09-02&sortBy=visit_date&sortOrder=asc [36m304[0m 27.889 ms - -[0m
+[0mGET /api/v1/bookings?page=1&limit=8&fromDate=2026-09-02&toDate=2026-09-02&sortBy=booking_date&sortOrder=desc [36m304[0m 20.743 ms - -[0m
+[0mGET /api/v1/payments?page=1&limit=8&status=PENDING&sortBy=due_date&sortOrder=asc [36m304[0m 20.675 ms - -[0m
+[0mGET /api/v1/bookings?page=1&limit=5&status=PENDING_APPROVAL&sortBy=booking_date&sortOrder=desc [36m304[0m 36.520 ms - -[0m
+2026-09-02 13:40:31 [[33mwarn[39m]: Invalid or expired access token
+[0mGET /api/v1/auth/me [33m401[0m 8.956 ms - 61[0m
+2026-09-02 13:40:31 [[33mwarn[39m]: Invalid or expired access token
+[0mGET /api/v1/auth/me [33m401[0m 3.702 ms - 61[0m
+2026-09-02 13:40:31 [[32minfo[39m]: Access token refreshed
+[0mPOST /api/v1/auth/refresh [32m200[0m 55.418 ms - -[0m
+[0mGET /api/v1/auth/me [36m304[0m 15.732 ms - -[0m
+[0mGET /api/v1/auth/me [36m304[0m 16.090 ms - -[0m
+[0mGET /api/v1/followups/today [36m304[0m 19.664 ms - -[0m
+[0mGET /api/v1/followups/overdue [36m304[0m 32.366 ms - -[0m
+[0mGET /api/v1/leads?page=1&limit=8&status=ASSIGNED&sortBy=updated_at&sortOrder=desc [36m304[0m 51.024 ms - -[0m
+[0mGET /api/v1/visits?page=1&limit=8&fromDate=2026-09-02&sortBy=visit_date&sortOrder=asc [36m304[0m 63.878 ms - -[0m
+[0mGET /api/v1/bookings?page=1&limit=8&sortBy=created_at&sortOrder=desc [36m304[0m 65.146 ms - -[0m
+[0mGET /api/v1/payments?page=1&limit=8&status=PAID&sortBy=payment_date&sortOrder=desc [36m304[0m 66.140 ms - -[0m
+[0mGET /api/v1/reports/dashboard?period=daily&fromDate=2026-09-02&toDate=2026-09-02&page=1&limit=5 [36m304[0m 63.802 ms - -[0m
+[0mGET /api/v1/reports/dashboard?period=monthly&fromDate=2026-08-31&toDate=2026-09-02&page=1&limit=5 [36m304[0m 73.032 ms - -[0m
+[0mGET /api/v1/users?page=1&limit=8&sortBy=created_at&sortOrder=desc [36m304[0m 118.558 ms - -[0m
+[0mGET /api/v1/payments/collection-summary [36m304[0m 37.202 ms - -[0m
+[0mGET /api/v1/reports/employees?period=daily&fromDate=2026-09-02&toDate=2026-09-02&page=1&limit=10 [36m304[0m 116.210 ms - -[0m
+[0mGET /api/v1/dashboard/recent-activities?limit=30 [36m304[0m 45.843 ms - -[0m
+[0mGET /api/v1/calls/summary?fromDate=2026-09-02&toDate=2026-09-02 [36m304[0m 117.168 ms - -[0m
+[0mGET /api/v1/projects/inventory/dashboard [36m304[0m 37.893 ms - -[0m
+[0mGET /api/v1/leads?page=1&limit=100&sortBy=updated_at&sortOrder=desc [36m304[0m 48.542 ms - -[0m
+[0mGET /api/v1/leads?page=1&limit=8&sortBy=created_at&sortOrder=desc [36m304[0m 22.952 ms - -[0m
+[0mGET /api/v1/reports/payments?period=daily&fromDate=2026-09-02&toDate=2026-09-02&page=1&limit=5 [36m304[0m 148.360 ms - -[0m
+[0mGET /api/v1/visits?page=1&limit=8&fromDate=2026-09-02&toDate=2026-09-02&sortBy=visit_date&sortOrder=asc [36m304[0m 18.695 ms - -[0m
+[0mGET /api/v1/bookings?page=1&limit=5&status=PENDING_APPROVAL&sortBy=booking_date&sortOrder=desc [36m304[0m 30.616 ms - -[0m
+[0mGET /api/v1/bookings?page=1&limit=8&fromDate=2026-09-02&toDate=2026-09-02&sortBy=booking_date&sortOrder=desc [36m304[0m 24.619 ms - -[0m
+[0mGET /api/v1/payments?page=1&limit=8&status=PENDING&sortBy=due_date&sortOrder=asc [36m304[0m 16.734 ms - -[0m
+2026-09-02 13:40:37 [[32minfo[39m]: User logged out
+[0mPOST /api/v1/auth/logout [32m200[0m 13.784 ms - 46[0m
+2026-09-02 14:00:33 [[33mwarn[39m]: Login failed: company not found
+2026-09-02 14:00:33 [[33mwarn[39m]: Invalid credentials
+[0mPOST /api/v1/auth/login [33m401[0m 14.379 ms - 49[0m
+2026-09-02 14:02:45 [[32minfo[39m]: User logged in successfully
+[0mPOST /api/v1/auth/login [32m200[0m 686.246 ms - -[0m
+[0mGET /api/v1/followups/today [36m304[0m 20.279 ms - -[0m
+[0mGET /api/v1/followups/overdue [32m200[0m 23.026 ms - 689[0m
+[0mGET /api/v1/leads?page=1&limit=8&status=ASSIGNED&sortBy=updated_at&sortOrder=desc [36m304[0m 41.894 ms - -[0m
+[0mGET /api/v1/leads?page=1&limit=6&assignedUserId=4&sortBy=created_at&sortOrder=desc [32m200[0m 35.312 ms - 663[0m
+[0mGET /api/v1/calls/summary [36m304[0m 36.261 ms - -[0m
+[0mGET /api/v1/calls/form-options [32m200[0m 8.773 ms - -[0m
+[0mGET /api/v1/followups/today [36m304[0m 15.442 ms - -[0m
+[0mGET /api/v1/followups/overdue [36m304[0m 14.409 ms - -[0m
+[0mGET /api/v1/calls/summary [36m304[0m 26.287 ms - -[0m
+[0mGET /api/v1/leads?page=1&limit=6&assignedUserId=4&sortBy=created_at&sortOrder=desc [36m304[0m 15.119 ms - -[0m
+[0mGET /api/v1/leads/form-options [36m304[0m 18.665 ms - -[0m
+[0mGET /api/v1/leads?page=1&limit=100&sortBy=created_at&sortOrder=desc [32m200[0m 35.868 ms - 665[0m
+[0mGET /api/v1/leads?page=1&limit=10&sortBy=created_at&sortOrder=desc [32m200[0m 33.439 ms - 664[0m
+[0mGET /api/v1/followups?page=1&limit=10&sortBy=followup_date&sortOrder=asc [32m200[0m 30.608 ms - -[0m
+[0mGET /api/v1/followups/today [36m304[0m 6.552 ms - -[0m
+[0mGET /api/v1/followups/overdue [36m304[0m 6.278 ms - -[0m
+[0mGET /api/v1/followups/today [36m304[0m 12.920 ms - -[0m
+[0mGET /api/v1/followups/overdue [36m304[0m 14.819 ms - -[0m
+[0mGET /api/v1/followups?page=1&limit=10&sortBy=followup_date&sortOrder=asc [36m304[0m 27.122 ms - -[0m
+[0mGET /api/v1/calls/summary [36m304[0m 32.846 ms - -[0m
+[0mGET /api/v1/leads/form-options [36m304[0m 15.815 ms - -[0m
+[0mGET /api/v1/leads?page=1&limit=10&sortBy=created_at&sortOrder=desc [36m304[0m 31.861 ms - -[0m
+[0mGET /api/v1/leads?page=1&limit=100&sortBy=created_at&sortOrder=desc [36m304[0m 30.247 ms - -[0m
+[0mGET /api/v1/leads?page=1&limit=6&assignedUserId=4&sortBy=created_at&sortOrder=desc [36m304[0m 17.927 ms - -[0m
+2:11:41 pm [tsx] change in ./src\modules\dashboard\dashboard.controller.ts Restarting...
+cDatabase connection established
+Server listening on port 3000 [development]
+[0mGET /api/v1/auth/me [32m200[0m 141.564 ms - 954[0m
+[0mGET /api/v1/auth/me [36m304[0m 32.405 ms - -[0m
+[0mGET /api/v1/followups/today [36m304[0m 77.284 ms - -[0m
+[0mGET /api/v1/followups/overdue [36m304[0m 85.305 ms - -[0m
+[0mGET /api/v1/leads?page=1&limit=100&sortBy=created_at&sortOrder=desc [36m304[0m 223.793 ms - -[0m
+[0mGET /api/v1/leads/form-options [36m304[0m 141.451 ms - -[0m
+[0mGET /api/v1/leads?page=1&limit=8&status=ASSIGNED&sortBy=updated_at&sortOrder=desc [36m304[0m 206.724 ms - -[0m
+[0mGET /api/v1/leads?page=1&limit=10&sortBy=created_at&sortOrder=desc [36m304[0m 185.763 ms - -[0m
+[0mGET /api/v1/auth/me [36m304[0m 168.097 ms - -[0m
+[0mGET /api/v1/auth/me [36m304[0m 310.098 ms - -[0m
+[0mGET /api/v1/leads/form-options [36m304[0m 384.729 ms - -[0m
+[0mGET /api/v1/followups/overdue [36m304[0m 298.638 ms - -[0m
+[0mGET /api/v1/followups/today [36m304[0m 183.131 ms - -[0m
+[0mGET /api/v1/leads?page=1&limit=8&status=ASSIGNED&sortBy=updated_at&sortOrder=desc [36m304[0m 264.240 ms - -[0m
+[0mGET /api/v1/leads?page=1&limit=10&sortBy=created_at&sortOrder=desc [36m304[0m 201.115 ms - -[0m
+[0mGET /api/v1/leads?page=1&limit=100&sortBy=created_at&sortOrder=desc [36m304[0m 191.100 ms - -[0m
+2026-09-02 14:16:15 [[32minfo[39m]: User logged out
+[0mPOST /api/v1/auth/logout [32m200[0m 28.208 ms - 46[0m
+2026-09-02 14:16:22 [[32minfo[39m]: User logged in successfully
+[0mPOST /api/v1/auth/login [32m200[0m 723.458 ms - -[0m
+[0mGET /api/v1/visits?page=1&limit=8&fromDate=2026-09-02&sortBy=visit_date&sortOrder=asc [36m304[0m 67.911 ms - -[0m
+[0mGET /api/v1/bookings?page=1&limit=8&sortBy=created_at&sortOrder=desc [36m304[0m 89.507 ms - -[0m
+[0mGET /api/v1/payments?page=1&limit=8&status=PAID&sortBy=payment_date&sortOrder=desc [36m304[0m 89.339 ms - -[0m
+[0mGET /api/v1/reports/dashboard?period=daily&fromDate=2026-09-02&toDate=2026-09-02&page=1&limit=5 [36m304[0m 146.724 ms - -[0m
+[0mGET /api/v1/reports/dashboard?period=monthly&fromDate=2026-08-31&toDate=2026-09-02&page=1&limit=5 [36m304[0m 64.949 ms - -[0m
+[0mGET /api/v1/users?page=1&limit=8&sortBy=created_at&sortOrder=desc [32m200[0m 175.455 ms - -[0m
+[0mGET /api/v1/payments/collection-summary [36m304[0m 17.518 ms - -[0m
+[0mGET /api/v1/reports/employees?period=daily&fromDate=2026-09-02&toDate=2026-09-02&page=1&limit=10 [32m200[0m 82.821 ms - 954[0m
+[0mGET /api/v1/projects/inventory/dashboard [36m304[0m 19.407 ms - -[0m
+[0mGET /api/v1/calls/summary?fromDate=2026-09-02&toDate=2026-09-02 [36m304[0m 103.951 ms - -[0m
+[0mGET /api/v1/dashboard/recent-activities?limit=30 [32m200[0m 27.219 ms - -[0m
+[0mGET /api/v1/leads?page=1&limit=8&sortBy=created_at&sortOrder=desc [36m304[0m 34.578 ms - -[0m
+[0mGET /api/v1/leads?page=1&limit=100&sortBy=updated_at&sortOrder=desc [36m304[0m 19.034 ms - -[0m
+[0mGET /api/v1/reports/payments?period=daily&fromDate=2026-09-02&toDate=2026-09-02&page=1&limit=5 [36m304[0m 105.212 ms - -[0m
+[0mGET /api/v1/visits?page=1&limit=8&fromDate=2026-09-02&toDate=2026-09-02&sortBy=visit_date&sortOrder=asc [36m304[0m 21.796 ms - -[0m
+[0mGET /api/v1/bookings?page=1&limit=5&status=PENDING_APPROVAL&sortBy=booking_date&sortOrder=desc [36m304[0m 22.681 ms - -[0m
+[0mGET /api/v1/payments?page=1&limit=8&status=PENDING&sortBy=due_date&sortOrder=asc [36m304[0m 10.213 ms - -[0m
+[0mGET /api/v1/bookings?page=1&limit=8&fromDate=2026-09-02&toDate=2026-09-02&sortBy=booking_date&sortOrder=desc [36m304[0m 15.902 ms - -[0m
+[0mGET /api/v1/calls/summary [36m304[0m 27.533 ms - -[0m

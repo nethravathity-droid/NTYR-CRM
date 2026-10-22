@@ -110,4 +110,11 @@ export const leadsService = {
 
     return response.data.data;
   },
+
+  async getImportTemplate(): Promise<Blob> {
+    const response = await apiClient.get("/leads/import/template", {
+      responseType: "blob",
+    });
+    return response.data as Blob;
+  },
 };

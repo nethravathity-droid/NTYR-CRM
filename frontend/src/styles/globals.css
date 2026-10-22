@@ -105,13 +105,16 @@
   }
 
   html,
-  body,
-  #root {
+  body {
     @apply h-full;
   }
 
+  #root {
+    @apply min-h-full;
+  }
+
   body {
-    @apply overflow-hidden bg-background text-foreground antialiased;
+    @apply overflow-x-hidden overflow-y-auto bg-background text-foreground antialiased;
   }
 }
 

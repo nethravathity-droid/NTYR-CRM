@@ -66,12 +66,17 @@ const TENANT_ROLES: RoleDefinition[] = [
       "payments.view",
       "payments.create",
       "payments.update",
+      "invoices.view",
+      "invoices.create",
       "reports.view",
       "reports.export",
       "calls.view",
       "calls.create",
       "calls.update",
       "calls.delete",
+      "growth.view",
+      "growth.create",
+      "growth.update",
     ],
   },
   {
@@ -107,6 +112,8 @@ const TENANT_ROLES: RoleDefinition[] = [
       "bookings.update",
       "payments.view",
       "payments.create",
+      "invoices.view",
+      "invoices.create",
     ],
   },
 ];
@@ -146,7 +153,8 @@ async function ensureRolePermissions(
   for (const code of permissionCodes) {
     const permissionId = permissionMap.get(code);
     if (!permissionId) {
-      throw new AppError(500, `Permission "${code}" is not configured on the platform.`);
+      console.warn(`[seed] Skipping missing permission: ${code}`);
+      continue;
     }
 
     const exists = await trx("role_permissions")

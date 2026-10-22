@@ -4,6 +4,7 @@ import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 
 export default defineConfig({
+  base: "/",
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
@@ -13,5 +14,15 @@ export default defineConfig({
   server: {
     port: 5173,
     host: true,
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: undefined,
+      },
+    },
+  },
+  preview: {
+    port: 5173,
   },
 });

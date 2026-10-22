@@ -40,6 +40,7 @@ export function getCommandItemsForRole(roleCode: RoleCode): CommandItem[] {
         { id: "visits", label: "Visits", group: "Sales", href: paths.visits.list, permission: "visits.view", keywords: "site visit schedule appointment" },
         { id: "bookings", label: "Bookings", group: "Sales", href: paths.bookings.list, permission: "bookings.view", keywords: "deals reservations sales orders" },
         { id: "payments", label: "Payments", group: "Finance", href: paths.payments.dashboard, permission: "payments.view", keywords: "collections receipts finance dues" },
+        { id: "invoices", label: "Invoices", group: "Finance", href: paths.invoices.list, permission: "invoices.view", keywords: "billing invoices bills generate" },
         { id: "employees", label: "Employees", group: "People", href: paths.employees.list, permission: "users.view", keywords: "staff team users hr" },
         { id: "reports", label: "Reports", group: "Analytics", href: paths.reports.dashboard, permission: "reports.view", keywords: "analytics performance insights" },
         { id: "assign-lead", label: "Assign Lead", group: "Quick Actions", href: paths.leads.assign, permission: "leads.update", keywords: "transfer allocate lead owner" },
@@ -56,6 +57,7 @@ export function getCommandItemsForRole(roleCode: RoleCode): CommandItem[] {
         { id: "reports", label: "Team Reports", group: "Analytics", href: paths.reports.employees, permission: "reports.view", keywords: "performance team analytics" },
         { id: "bookings", label: "Bookings", group: "Sales", href: paths.bookings.list, permission: "bookings.view", keywords: "deals reservations sales" },
         { id: "payments", label: "Collections", group: "Finance", href: paths.payments.dashboard, permission: "payments.view", keywords: "payments receipts dues" },
+        { id: "invoices", label: "Invoices", group: "Finance", href: paths.invoices.list, permission: "invoices.view", keywords: "billing invoices bills generate" },
       );
       break;
     case "TELECALLER":
@@ -73,6 +75,7 @@ export function getCommandItemsForRole(roleCode: RoleCode): CommandItem[] {
         { id: "schedule-visit", label: "Schedule Visit", group: "Quick Actions", href: paths.visits.create, permission: "visits.create", keywords: "book visit site" },
         { id: "bookings", label: "Bookings", group: "Sales", href: paths.bookings.list, permission: "bookings.view", keywords: "deals reservations" },
         { id: "payments", label: "Collections", group: "Finance", href: paths.payments.list, permission: "payments.view", keywords: "payments receipts collect" },
+        { id: "invoices", label: "Invoices", group: "Finance", href: paths.invoices.list, permission: "invoices.view", keywords: "billing invoices bills generate" },
         { id: "leads", label: "Leads", group: "CRM", href: paths.leads.list, permission: "leads.view", keywords: "customers prospects pipeline" },
       );
       break;

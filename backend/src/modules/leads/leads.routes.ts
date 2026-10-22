@@ -80,6 +80,12 @@ const handleImportUpload = (
   });
 };
 
+router.get(
+  "/import/template",
+  authorize("leads.view"),
+  leadsController.getImportTemplate,
+);
+
 router.post(
   "/import",
   authorize("leads.create"),

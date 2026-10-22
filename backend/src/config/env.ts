@@ -31,6 +31,12 @@ const envSchema = z
       .int()
       .positive()
       .default(30),
+    SMS_PROVIDER: z.enum(["none", "msg91", "twilio"]).default("none"),
+    MSG91_AUTH_KEY: z.string().optional(),
+    MSG91_SENDER_ID: z.string().optional(),
+    TWILIO_ACCOUNT_SID: z.string().optional(),
+    TWILIO_AUTH_TOKEN: z.string().optional(),
+    TWILIO_FROM_NUMBER: z.string().optional(),
   })
   .superRefine((data, ctx) => {
     if (data.DB_USER.toLowerCase() === "postgre") {

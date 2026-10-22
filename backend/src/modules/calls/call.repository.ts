@@ -80,6 +80,7 @@ export class CallsRepository {
 
     if (query.fromDate) base.where("c.call_date", ">=", query.fromDate);
     if (query.toDate) base.where("c.call_date", "<=", query.toDate);
+    if (query.assignedUserId) base.where("c.assigned_user_id", query.assignedUserId);
 
     const summary = await base.clone().select(
       this.db.raw("COUNT(*) as total"),

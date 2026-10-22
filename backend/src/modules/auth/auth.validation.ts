@@ -137,10 +137,7 @@ export const registerSchema = z.object({
       .min(3, "Username must be at least 3 characters")
       .max(50)
       .regex(/^[a-zA-Z0-9._-]+$/, "Invalid username format"),
-    password: z
-      .string()
-      .min(8, "Password must be at least 8 characters")
-      .max(128),
+    password: passwordSchema,
     employeeCode: z
       .string()
       .trim()

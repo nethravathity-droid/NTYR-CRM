@@ -15,6 +15,8 @@ import supportRoutes from "../modules/support/support.routes.js";
 import whatsappRoutes from "../modules/whatsapp/whatsapp.routes.js";
 import aiRoutes from "../modules/ai/ai.routes.js";
 import attendanceRoutes from "../modules/attendance/attendance.routes.js";
+import invoicesRoutes from "../modules/invoices/invoice.routes.js";
+import growthRoutes from "../modules/growth/growth.routes.js";
 
 const router = Router();
 
@@ -35,6 +37,8 @@ router.use("/support", supportRoutes);
 router.use("/whatsapp", whatsappRoutes);
 router.use("/ai", aiRoutes);
 router.use("/attendance", attendanceRoutes);
+router.use("/invoices", invoicesRoutes);
+router.use("/growth", growthRoutes);
 
 router.get("/health", (_req, res) => {
   res.status(200).json({

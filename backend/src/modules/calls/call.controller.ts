@@ -38,7 +38,8 @@ export class CallsController {
 
   summary = asyncHandler(async (req: Request, res: Response): Promise<void> => {
     const { query } = (req as GetCallSummaryRequest).validated;
-    const summary = await this.callsService.getDashboardSummary(req.user!.companyId, query);
+    const scopedQuery = withAssignedUserScope(req.user!.roleCode, req.user!.id, query);
+    const summary = await this.callsService.getDashboardSummary(req.user!.companyId, scopedQuery);
 
     res.status(200).json({
       success: true,

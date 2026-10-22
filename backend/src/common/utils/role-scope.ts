@@ -14,3 +14,14 @@ export function withAssignedUserScope<T extends { assignedUserId?: number }>(
   }
   return query;
 }
+
+export function withSalesExecutiveBookingScope<T extends { salesExecutiveUserId?: number }>(
+  roleCode: string,
+  userId: number,
+  query: T,
+): T {
+  if (roleCode === "SALES_EXECUTIVE" && !query.salesExecutiveUserId) {
+    return { ...query, salesExecutiveUserId: userId };
+  }
+  return query;
+}

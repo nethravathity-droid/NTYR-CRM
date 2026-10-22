@@ -45,6 +45,9 @@ import { PaymentEditPage } from "@/features/payments/pages/PaymentEditPage";
 import { PaymentReceiptPage } from "@/features/payments/pages/PaymentReceiptPage";
 import { PaymentSchedulePage } from "@/features/payments/pages/PaymentSchedulePage";
 import { PaymentsListPage } from "@/features/payments/pages/PaymentsListPage";
+import { InvoiceCreatePage } from "@/features/invoices/pages/InvoiceCreatePage";
+import { InvoiceDetailsPage } from "@/features/invoices/pages/InvoiceDetailsPage";
+import { InvoicesListPage } from "@/features/invoices/pages/InvoicesListPage";
 import { BookingReportPage } from "@/features/reports/pages/BookingReportPage";
 import { EmployeeReportPage } from "@/features/reports/pages/EmployeeReportPage";
 import { FollowupReportPage } from "@/features/reports/pages/FollowupReportPage";
@@ -76,6 +79,8 @@ import { SuperAdminRoute } from "@/routes/SuperAdminRoute";
 import { SuperAdminBroadcastPage } from "@/features/dashboards/pages/SuperAdminBroadcastPage";
 import { WhatsAppInboxPage } from "@/features/whatsapp/pages/WhatsAppInboxPage";
 import { WhatsAppSettingsPage } from "@/features/whatsapp/pages/WhatsAppSettingsPage";
+import { GrowthHubPage } from "@/features/growth/pages/GrowthHubPage";
+import { GrowthSectionPage } from "@/features/growth/pages/GrowthSectionPage";
 
 export type WorkspaceRouteOptions = {
   dashboardElement?: ReactElement;
@@ -88,8 +93,10 @@ export type WorkspaceRouteOptions = {
   includeVisits?: boolean;
   includeBookings?: boolean;
   includePayments?: boolean;
+  includeInvoices?: boolean;
   includeCalls?: boolean;
   includeReports?: boolean;
+  includeGrowth?: boolean;
 };
 
 function withPermission(permission: string, element: ReactElement) {
@@ -116,8 +123,10 @@ export function createWorkspaceRoutes(options: WorkspaceRouteOptions = {}): Rout
     includeVisits = true,
     includeBookings = true,
     includePayments = true,
+    includeInvoices = true,
     includeCalls = true,
     includeReports = false,
+    includeGrowth = true,
   } = options;
 
   const routes: RouteObject[] = [
@@ -226,6 +235,14 @@ export function createWorkspaceRoutes(options: WorkspaceRouteOptions = {}): Rout
     );
   }
 
+  if (includeInvoices) {
+    routes.push(
+      { path: "invoices", element: withPermission("invoices.view", <InvoicesListPage />) },
+      { path: "invoices/new", element: withPermission("invoices.create", <InvoiceCreatePage />) },
+      { path: "invoices/:uuid", element: withPermission("invoices.view", <InvoiceDetailsPage />) },
+    );
+  }
+
   if (includeCalls) {
     routes.push(
       { path: "calls", element: withPermission("calls.view", <CallsDashboardPage />) },
@@ -233,6 +250,13 @@ export function createWorkspaceRoutes(options: WorkspaceRouteOptions = {}): Rout
       { path: "calls/new", element: withPermission("calls.create", <CallCreatePage />) },
       { path: "calls/:uuid/edit", element: withPermission("calls.update", <CallEditPage />) },
       { path: "calls/:uuid", element: withPermission("calls.view", <CallDetailsPage />) },
+    );
+  }
+
+  if (includeGrowth) {
+    routes.push(
+      { path: "growth", element: withPermission("growth.view", <GrowthHubPage />) },
+      { path: "growth/:section", element: withPermission("growth.view", <GrowthSectionPage />) },
     );
   }
 
@@ -261,6 +285,7 @@ export const superAdminWorkspaceRoutes = createWorkspaceRoutes({
   includeBookings: false,
   includePayments: false,
   includeCalls: false,
+  includeGrowth: false,
 });
 
 superAdminWorkspaceRoutes.push(

@@ -71,7 +71,7 @@ export class SupportController {
     const { body } = (req as BroadcastRequest).validated;
     const count = await this.supportService.broadcastMessage(body.body, {
       id: req.user!.id,
-    });
+    }, body.statuses);
 
     res.status(200).json({
       success: true,

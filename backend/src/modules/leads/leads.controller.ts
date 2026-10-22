@@ -231,4 +231,13 @@ export class LeadsController {
       });
     },
   );
+
+  getImportTemplate = asyncHandler(async (_req: Request, res: Response): Promise<void> => {
+    const file = await this.leadsService.getImportTemplate();
+
+    res.setHeader("Content-Type", file.contentType);
+    res.setHeader("Content-Disposition", 'attachment; filename="lead-import-template.xlsx"');
+    res.status(200).send(file.body);
+  });
 }
+

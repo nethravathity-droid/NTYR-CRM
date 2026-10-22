@@ -1,4 +1,5 @@
 import { Navigate, Outlet, useLocation } from "react-router-dom";
+import { paths } from "@/routes/paths";
 import { env } from "@/config/env";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { Loading } from "@/components/shared/Loading";
@@ -9,6 +10,7 @@ export function AuthLayout() {
   const location = useLocation();
   const fromPath =
     (location.state as { from?: { pathname?: string } } | null)?.from?.pathname;
+  const isRegister = location.pathname === paths.register;
 
   if (isInitializing) {
     return <Loading fullScreen label="Checking session..." />;
@@ -38,7 +40,7 @@ export function AuthLayout() {
             Manage leads, customers, sales, conversations, tasks and automation from one intelligent workspace.
           </p>
         </div>
-        <div className="w-full max-w-md">
+        <div className={isRegister ? "w-full max-w-xl" : "w-full max-w-md"}>
           <Outlet />
         </div>
       </div>

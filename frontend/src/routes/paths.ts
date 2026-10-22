@@ -152,6 +152,16 @@ export const paths = {
     edit: (uuid: string) => rolePath(`/payments/${uuid}/edit`),
     receipt: (uuid: string) => rolePath(`/payments/${uuid}/receipt`),
   },
+  invoices: {
+    get list() {
+      return rolePath("/invoices");
+    },
+    get create() {
+      return rolePath("/invoices/new");
+    },
+    details: (uuid: string) => rolePath(`/invoices/${uuid}`),
+    edit: (uuid: string) => rolePath(`/invoices/${uuid}/edit`),
+  },
   calls: {
     get dashboard() {
       return rolePath("/calls");
@@ -165,6 +175,13 @@ export const paths = {
     details: (uuid: string) => rolePath(`/calls/${uuid}`),
     edit: (uuid: string) => rolePath(`/calls/${uuid}/edit`),
   },
+  growth: {
+    get hub() {
+      return rolePath("/growth");
+    },
+    section: (section: string) => rolePath(`/growth/${section}`),
+  },
+  capture: (formUuid: string) => `/capture/${formUuid}`,
   reports: {
     get dashboard() {
       return rolePath("/reports");

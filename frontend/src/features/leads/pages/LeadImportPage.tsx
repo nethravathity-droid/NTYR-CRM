@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/card";
 import { CompanyPageHeader } from "@/features/companies/components/CompanyPageHeader";
 import { useImportLeads } from "@/features/leads/hooks/useLeads";
+import { leadsService } from "@/features/leads/services/leads.service";
 import type { ImportLeadsResult } from "@/features/leads/types/lead.types";
 import { getApiErrorMessage } from "@/lib/api/client";
 import { paths } from "@/routes/paths";
@@ -21,6 +22,7 @@ export function LeadImportPage() {
   const [skipDuplicates, setSkipDuplicates] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<ImportLeadsResult | null>(null);
+  const [isDownloadingTemplate, setIsDownloadingTemplate] = useState(false);
 
   const handleImport = async () => {
     if (!file) {
@@ -42,6 +44,24 @@ export function LeadImportPage() {
     }
   };
 
+  const handleDownloadTemplate = async () => {
+    setIsDownloadingTemplate(true);
+    setError(null);
+    try {
+      const blob = await leadsService.getImportTemplate();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "lead-import-template.xlsx";
+      link.click();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      setError(getApiErrorMessage(err));
+    } finally {
+      setIsDownloadingTemplate(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <Button variant="outline" size="sm" asChild>
@@ -57,6 +77,25 @@ export function LeadImportPage() {
         title="Import Leads"
         description="Upload CSV or Excel files to bulk create leads with duplicate detection."
       />
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Download Template</CardTitle>
+          <CardDescription>
+            Use this Excel template to ensure your data is formatted correctly.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Button
+            variant="outline"
+            onClick={handleDownloadTemplate}
+            disabled={isDownloadingTemplate}
+          >
+            <FileSpreadsheet className="mr-2 h-4 w-4" />
+            {isDownloadingTemplate ? "Preparing..." : "Download Excel Template"}
+          </Button>
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>

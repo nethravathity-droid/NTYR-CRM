@@ -11,7 +11,7 @@ Last Updated: July 2026
 1. Project Vision
 Vision
 
-To build a modern cloud-based Real Estate CRM SaaS platform that enables real estate companies to efficiently manage their complete sales lifecycle—from lead generation to booking, payment tracking, customer relationship management, employee performance, and business analytics.
+To build a modern cloud-based NTYR CRM SaaS platform that enables real estate companies to efficiently manage their complete sales lifecycle—from lead generation to booking, payment tracking, customer relationship management, employee performance, and business analytics.
 
 The system must be scalable, secure, mobile-friendly, and capable of serving multiple companies from a single platform.
 

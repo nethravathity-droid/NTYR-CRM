@@ -8,7 +8,11 @@ import {
   type ReactNode,
 } from "react";
 import { authService } from "@/features/auth/services/auth.service";
-import type { CurrentUser, LoginPayload } from "@/features/auth/types/auth.types";
+import type {
+  CurrentUser,
+  LoginPayload,
+  LoginResponse,
+} from "@/features/auth/types/auth.types";
 import { setActiveRoleCode } from "@/lib/rbac/roles";
 import { tokenStorage } from "@/lib/storage/token.storage";
 import { getApiErrorMessage } from "@/lib/api/client";
@@ -19,6 +23,9 @@ interface AuthContextValue {
   isLoading: boolean;
   isInitializing: boolean;
   login: (payload: LoginPayload) => Promise<void>;
+  registerWorkspace: (
+    payload: Parameters<typeof authService.register>[0],
+  ) => Promise<LoginResponse>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
 }
@@ -60,23 +67,41 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     void initialize();
   }, [refreshUser]);
 
+  const establishSession = useCallback((result: LoginResponse) => {
+    tokenStorage.setTokens(result.tokens.accessToken, result.tokens.refreshToken);
+    setUser(result.user);
+    setActiveRoleCode(result.user.role.code);
+  }, []);
+
   const login = useCallback(async (payload: LoginPayload) => {
     setIsLoading(true);
 
     try {
       const result = await authService.login(payload);
-      tokenStorage.setTokens(
-        result.tokens.accessToken,
-        result.tokens.refreshToken,
-      );
-      setUser(result.user);
-      setActiveRoleCode(result.user.role.code);
+      establishSession(result);
     } catch (error) {
       throw new Error(getApiErrorMessage(error));
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [establishSession]);
+
+  const registerWorkspace = useCallback(
+    async (payload: Parameters<typeof authService.register>[0]) => {
+      setIsLoading(true);
+
+      try {
+        const result = await authService.register(payload);
+        establishSession(result);
+        return result;
+      } catch (error) {
+        throw new Error(getApiErrorMessage(error));
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [establishSession],
+  );
 
   const logout = useCallback(async () => {
     setIsLoading(true);
@@ -104,10 +129,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       isLoading,
       isInitializing,
       login,
+      registerWorkspace,
       logout,
       refreshUser,
     }),
-    [user, isLoading, isInitializing, login, logout, refreshUser],
+    [user, isLoading, isInitializing, login, registerWorkspace, logout, refreshUser],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

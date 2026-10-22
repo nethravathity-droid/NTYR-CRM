@@ -1,5 +1,5 @@
 import type { Logger } from "winston";
-import { read, utils } from "xlsx";
+import * as XLSX from "xlsx";
 import { db } from "../../database/knex.js";
 import { logger } from "../../config/logger.js";
 import { AppError } from "../../common/errors/AppError.js";
@@ -22,6 +22,7 @@ import type {
   ListLeadsQuery,
   UpdateLeadInput,
 } from "./leads.validation.js";
+import { dispatchAutomationEvent } from "../growth/automation.engine.js";
 
 const IMPORT_COLUMN_MAP: Record<string, keyof ImportLeadRow> = {
   customername: "customerName",
@@ -92,7 +93,7 @@ export class LeadsService {
     companyId: number,
     input: CreateLeadInput,
     createdBy: number,
-    options: { allowDuplicate?: boolean } = {},
+    options: { allowDuplicate?: boolean; skipAutomation?: boolean } = {},
   ): Promise<LeadDetail> {
     await this.validateAssignee(companyId, input.assignedUserId);
 
@@ -129,6 +130,30 @@ export class LeadsService {
       leadUuid: lead.uuid,
       leadNumber: lead.leadNumber,
     });
+
+    if (!options.skipAutomation) {
+      void dispatchAutomationEvent(
+        companyId,
+        "LEAD_CREATED",
+        {
+          leadId: lead.id,
+          leadUuid: lead.uuid,
+          customerName: lead.customerName,
+          mobile: lead.mobile,
+          email: lead.email,
+          leadNumber: lead.leadNumber,
+          leadSource: lead.leadSource,
+          status: lead.status,
+        },
+        createdBy,
+      ).catch((error) => {
+        this.logger.error("Lead automation dispatch failed", {
+          companyId,
+          leadUuid: lead.uuid,
+          error: error instanceof Error ? error.message : error,
+        });
+      });
+    }
 
     return lead;
   }
@@ -185,6 +210,34 @@ export class LeadsService {
 
     if (!lead) {
       throw new AppError(404, "Lead not found");
+    }
+
+    const statusChanged =
+      input.status !== undefined && input.status !== existing.status;
+
+    if (statusChanged) {
+      void dispatchAutomationEvent(
+        companyId,
+        "LEAD_STATUS_CHANGED",
+        {
+          leadId: lead.id,
+          leadUuid: lead.uuid,
+          customerName: lead.customerName,
+          mobile: lead.mobile,
+          email: lead.email,
+          leadNumber: lead.leadNumber,
+          leadSource: lead.leadSource,
+          status: lead.status,
+          previousStatus: existing.status,
+        },
+        updatedBy,
+      ).catch((error) => {
+        this.logger.error("Lead status automation failed", {
+          companyId,
+          leadUuid: lead.uuid,
+          error: error instanceof Error ? error.message : error,
+        });
+      });
     }
 
     return lead;
@@ -310,6 +363,88 @@ export class LeadsService {
     return { mobileDuplicate, emailDuplicate };
   }
 
+  async getImportTemplate(): Promise<{ contentType: string; filename: string; body: Buffer }> {
+    const headers = [
+      "Customer Name",
+      "Mobile",
+      "Alternate Mobile",
+      "Email",
+      "Project Interested",
+      "Budget",
+      "Property Type",
+      "Lead Source",
+      "Campaign",
+      "City",
+      "Priority",
+      "Status",
+      "Notes",
+      "Assigned User ID",
+    ];
+
+    const exampleRow = headers.reduce<Record<string, unknown>>((acc, header) => {
+      switch (header) {
+        case "Customer Name":
+          acc[header] = "John Doe";
+          break;
+        case "Mobile":
+          acc[header] = "9876543210";
+          break;
+        case "Alternate Mobile":
+          acc[header] = "9876543211";
+          break;
+        case "Email":
+          acc[header] = "john@example.com";
+          break;
+        case "Project Interested":
+          acc[header] = "Prestige Ozone";
+          break;
+        case "Budget":
+          acc[header] = 5000000;
+          break;
+        case "Property Type":
+          acc[header] = "Apartment";
+          break;
+        case "Lead Source":
+          acc[header] = "Website";
+          break;
+        case "Campaign":
+          acc[header] = "Spring Launch";
+          break;
+        case "City":
+          acc[header] = "Bangalore";
+          break;
+        case "Priority":
+          acc[header] = "HOT";
+          break;
+        case "Status":
+          acc[header] = "NEW";
+          break;
+        case "Notes":
+          acc[header] = "Interested in 3 BHK";
+          break;
+        case "Assigned User ID":
+          acc[header] = "";
+          break;
+        default:
+          acc[header] = "";
+      }
+      return acc;
+    }, {});
+
+    const worksheet = XLSX.utils.json_to_sheet([exampleRow], { header: headers });
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Leads");
+    const buffer = XLSX.write(workbook, { type: "buffer", bookType: "xlsx" }) as Buffer;
+
+    this.logger.info("Lead import template generated", { headers });
+
+    return {
+      contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      filename: "lead-import-template.xlsx",
+      body: buffer,
+    };
+  }
+
   async getFormOptions(companyId: number): Promise<LeadFormOptions> {
     const options = await this.leadsRepository.getFormOptions(companyId);
 
@@ -385,8 +520,8 @@ export class LeadsService {
 
           if (skipDuplicates) {
             result.skipped += 1;
-            continue;
           }
+          continue;
         }
 
         if (row.email) {
@@ -404,8 +539,8 @@ export class LeadsService {
 
             if (skipDuplicates) {
               result.skipped += 1;
-              continue;
             }
+            continue;
           }
         }
 
@@ -416,11 +551,7 @@ export class LeadsService {
           );
 
           if (!assigneeExists) {
-            result.errors.push({
-              row: rowNumber,
-              message: "Invalid assigned employee ID",
-            });
-            continue;
+            row.assignedUserId = null;
           }
         }
 
@@ -526,7 +657,16 @@ export class LeadsService {
   }
 
   private parseExcel(buffer: Buffer): ImportLeadRow[] {
-    const workbook = read(buffer, { type: "buffer" });
+    let workbook;
+    try {
+      workbook = XLSX.read(buffer, { type: "buffer" });
+    } catch (error) {
+      throw new AppError(
+        400,
+        "Unable to read Excel file. Ensure it is a valid .xlsx or .xls file and not password protected.",
+      );
+    }
+
     const sheetName = workbook.SheetNames[0];
 
     if (!sheetName) {
@@ -537,18 +677,43 @@ export class LeadsService {
     if (!sheet) {
       throw new AppError(400, "Excel file does not contain a valid sheet");
     }
-    const rawRows = utils.sheet_to_json<Record<string, unknown>>(sheet, {
+
+    const rawRows = XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet, {
       defval: "",
     });
 
-    return rawRows.map((row) => {
+    if (!rawRows.length) {
+      throw new AppError(
+        400,
+        "Excel file appears empty. Ensure the first row contains headers like Customer Name, Mobile, Email and data rows follow below.",
+      );
+    }
+
+    this.logger.info("Excel import parsed", {
+      sheetName,
+      rowCount: rawRows.length,
+      headers: Object.keys(rawRows[0] ?? {}),
+    });
+
+    return rawRows.map((row, index) => {
       const headers = Object.keys(row);
       const values = headers.map((header) => String(row[header] ?? ""));
       const normalizedHeaders = headers.map((header) =>
         this.normalizeHeader(header),
       );
 
-      return this.mapImportRow(normalizedHeaders, values);
+      const mapped = this.mapImportRow(normalizedHeaders, values);
+
+      if (index === 0) {
+        this.logger.info("Excel import first row mapped", {
+          headers,
+          normalizedHeaders,
+          sampleValues: values.slice(0, 5),
+          mapped,
+        });
+      }
+
+      return mapped;
     });
   }
 

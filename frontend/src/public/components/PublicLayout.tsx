@@ -1,7 +1,7 @@
 import { Outlet } from "react-router-dom";
 import { Link, useLocation } from "react-router-dom";
 import { useState } from "react";
-import { Menu, X } from "lucide-react";
+import { Layers3, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { APP_NAME } from "@/config/branding";
 
@@ -17,18 +17,14 @@ export function PublicLayout() {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="sticky top-0 z-50 border-b bg-background/80 backdrop-blur-xl">
+      <header className="sticky top-0 z-50 border-b border-border/60 bg-background/75 backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-3">
-            <Link to="/" className="flex items-center gap-2">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-primary-foreground">
-                <span className="text-sm font-bold">
-                  {APP_NAME.split(" ").map((w) => w[0]).slice(0, 2).join("")}
-                </span>
+            <Link to="/" className="group flex items-center gap-2.5">
+              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-violet-600 text-primary-foreground shadow-md shadow-primary/25 ring-1 ring-primary/20 transition group-hover:shadow-lg group-hover:shadow-primary/30">
+                <Layers3 className="h-5 w-5" />
               </div>
-              <span className="text-lg font-semibold tracking-tight">
-                {APP_NAME}
-              </span>
+              <span className="text-lg font-semibold tracking-tight">{APP_NAME}</span>
             </Link>
           </div>
 
@@ -52,7 +48,7 @@ export function PublicLayout() {
             <Button variant="ghost" asChild>
               <Link to="/login">Log in</Link>
             </Button>
-            <Button asChild>
+            <Button className="rounded-full shadow-md shadow-primary/15" asChild>
               <Link to="/register">Start Free Trial</Link>
             </Button>
           </div>

@@ -29,6 +29,7 @@ import { ContactPage } from "@/public/pages/ContactPage";
 import { TermsPage } from "@/public/pages/TermsPage";
 import { PrivacyPage } from "@/public/pages/PrivacyPage";
 import { RegisterPage } from "@/public/pages/RegisterPage";
+import { LeadCaptureFormPage } from "@/public/pages/LeadCaptureFormPage";
 import { ForgotPasswordPage } from "@/public/pages/ForgotPasswordPage";
 import { ResetPasswordPage } from "@/public/pages/ResetPasswordPage";
 import {
@@ -73,6 +74,7 @@ export const router = createBrowserRouter([
       { path: "contact", element: <ContactPage /> },
       { path: "terms", element: <TermsPage /> },
       { path: "privacy", element: <PrivacyPage /> },
+      { path: "capture/:formUuid", element: <LeadCaptureFormPage /> },
     ],
   },
   {

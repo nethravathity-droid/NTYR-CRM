@@ -2,6 +2,7 @@ import type { Request, Response } from "express";
 import type { z } from "zod";
 import { AppError } from "../../common/errors/AppError.js";
 import { asyncHandler } from "../../common/utils/asyncHandler.js";
+import { withSalesExecutiveBookingScope } from "../../common/utils/role-scope.js";
 import type { BookingsService } from "./booking.service.js";
 import type {
   approveBookingSchema,
@@ -32,7 +33,12 @@ export class BookingsController {
 
   list = asyncHandler(async (req: Request, res: Response): Promise<void> => {
     const { query } = (req as ListBookingsRequest).validated;
-    const result = await this.bookingsService.listBookings(req.user!.companyId, query);
+    const scopedQuery = withSalesExecutiveBookingScope(
+      req.user!.roleCode,
+      req.user!.id,
+      query,
+    );
+    const result = await this.bookingsService.listBookings(req.user!.companyId, scopedQuery);
 
     res.status(200).json({
       success: true,

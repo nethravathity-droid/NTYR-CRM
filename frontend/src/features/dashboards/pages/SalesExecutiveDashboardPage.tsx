@@ -39,6 +39,7 @@ export function SalesExecutiveDashboardPage() {
   const { data: bookings, isLoading: bookingsLoading } = useBookings({
     page: 1,
     limit: 5,
+    salesExecutiveUserId: assignedUserId,
     sortBy: "booking_date",
     sortOrder: "desc",
   });

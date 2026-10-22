@@ -18,6 +18,7 @@ function companyWorkspaceItems(hasPermission: PermissionChecker): QuickAddItem[]
     hasPermission("visits.create") ? { label: "Schedule Visit", href: paths.visits.create } : null,
     hasPermission("bookings.create") ? { label: "Create Booking", href: paths.bookings.create } : null,
     hasPermission("payments.create") ? { label: "Receive Payment", href: paths.payments.create } : null,
+    hasPermission("invoices.create") ? { label: "Create Invoice", href: paths.invoices.create } : null,
     hasPermission("users.create") ? { label: "Add Employee", href: paths.employees.create } : null,
     hasPermission("projects.create") ? { label: "Add Property", href: paths.projects.create } : null,
   ].filter(Boolean) as QuickAddItem[];

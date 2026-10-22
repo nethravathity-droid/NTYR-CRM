@@ -1,6 +1,14 @@
 import { z } from "zod";
+import { COUNTRIES } from "@/features/companies/constants/countries";
 
 const optionalString = z.string().trim().optional().or(z.literal(""));
+
+const countrySchema = z.string().trim().refine(
+  (value) => COUNTRIES.some((country) => country.value === value),
+  "Select a valid country",
+);
+
+const stateSchema = z.string().trim().min(2, "State is required").max(100);
 
 export const companyFormSchema = z.object({
   companyCode: z
@@ -41,8 +49,8 @@ export const companyFormSchema = z.object({
   addressLine1: z.string().trim().min(3, "Address is required").max(255),
   addressLine2: optionalString,
   city: z.string().trim().min(2, "City is required").max(100),
-  state: z.string().trim().min(2, "State is required").max(100),
-  country: z.string().trim().min(2).max(100),
+  state: stateSchema,
+  country: countrySchema,
   postalCode: z.string().trim().min(3, "Postal code is required").max(20),
   logoUrl: optionalString,
   faviconUrl: optionalString,
@@ -182,7 +190,7 @@ export function normalizeCompanyPayload(values: CompanyFormSchema) {
     addressLine2: emptyToNull(values.addressLine2),
     city: values.city.trim(),
     state: values.state.trim(),
-    country: values.country.trim(),
+    country: values.country,
     postalCode: values.postalCode.trim(),
     logoUrl: emptyToNull(values.logoUrl),
     faviconUrl: emptyToNull(values.faviconUrl),

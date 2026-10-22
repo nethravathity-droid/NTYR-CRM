@@ -65,6 +65,7 @@ export const getCallSummarySchema = z.object({
   query: z.object({
     fromDate: z.string().optional(),
     toDate: z.string().optional(),
+    assignedUserId: z.coerce.number().int().positive().optional(),
   }),
 });
 

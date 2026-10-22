@@ -5,6 +5,7 @@ import {
   Banknote,
   CalendarClock,
   CreditCard,
+  FileText,
   LayoutDashboard,
   MapPinned,
   Users,
@@ -86,6 +87,13 @@ const navigation: NavItem[] = [
     href: paths.payments.dashboard,
     icon: Banknote,
     permission: "payments.view",
+    disabled: false,
+  },
+  {
+    label: "Invoices",
+    href: paths.invoices.list,
+    icon: FileText,
+    permission: "invoices.view",
     disabled: false,
   },
   {

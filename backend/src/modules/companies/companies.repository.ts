@@ -218,15 +218,22 @@ export class CompaniesRepository {
     status: CompanyStatus,
     updatedBy: number,
   ): Promise<CompanyDetail | null> {
+    const updatePayload: Record<string, unknown> = {
+      status,
+      is_active: this.resolveIsActive(status),
+      updated_by: updatedBy,
+      updated_at: this.db.fn.now(),
+    };
+
+    if (status === "ACTIVE") {
+      updatePayload.trial_start_date = null;
+      updatePayload.trial_end_date = null;
+    }
+
     const updated = await this.db("companies")
       .where({ id: companyId })
       .whereNull("deleted_at")
-      .update({
-        status,
-        is_active: this.resolveIsActive(status),
-        updated_by: updatedBy,
-        updated_at: this.db.fn.now(),
-      })
+      .update(updatePayload)
       .returning("uuid");
 
     if (!updated.length) {
@@ -241,15 +248,22 @@ export class CompaniesRepository {
     isActive: boolean,
     updatedBy: number,
   ): Promise<CompanyDetail | null> {
+    const updatePayload: Record<string, unknown> = {
+      is_active: isActive,
+      status: isActive ? "ACTIVE" : "SUSPENDED",
+      updated_by: updatedBy,
+      updated_at: this.db.fn.now(),
+    };
+
+    if (isActive) {
+      updatePayload.trial_start_date = null;
+      updatePayload.trial_end_date = null;
+    }
+
     const updated = await this.db("companies")
       .where({ id: companyId })
       .whereNull("deleted_at")
-      .update({
-        is_active: isActive,
-        status: isActive ? "ACTIVE" : "SUSPENDED",
-        updated_by: updatedBy,
-        updated_at: this.db.fn.now(),
-      })
+      .update(updatePayload)
       .returning("uuid");
 
     if (!updated.length) {
@@ -278,9 +292,9 @@ export class CompaniesRepository {
     companyCode: string,
     excludeCompanyId?: number,
   ): Promise<boolean> {
-    const query = this.db("companies").whereRaw("LOWER(company_code) = LOWER(?)", [
-      companyCode,
-    ]);
+    const query = this.db("companies")
+      .whereNull("deleted_at")
+      .whereRaw("LOWER(company_code) = LOWER(?)", [companyCode]);
 
     if (excludeCompanyId) {
       query.whereNot("id", excludeCompanyId);
@@ -290,7 +304,21 @@ export class CompaniesRepository {
   }
 
   async isEmailTaken(email: string, excludeCompanyId?: number): Promise<boolean> {
-    const query = this.db("companies").whereRaw("LOWER(email) = LOWER(?)", [email]);
+    const query = this.db("companies")
+      .whereNull("deleted_at")
+      .whereRaw("LOWER(email) = LOWER(?)", [email]);
+
+    if (excludeCompanyId) {
+      query.whereNot("id", excludeCompanyId);
+    }
+
+    return Boolean(await query.first());
+  }
+
+  async isPhoneTaken(phone: string, excludeCompanyId?: number): Promise<boolean> {
+    const query = this.db("companies")
+      .whereNull("deleted_at")
+      .where("phone", phone);
 
     if (excludeCompanyId) {
       query.whereNot("id", excludeCompanyId);

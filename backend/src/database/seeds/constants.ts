@@ -232,6 +232,26 @@ export const PERMISSIONS = [
     module: "payments",
   },
   {
+    code: "invoices.view",
+    name: "View Invoices",
+    module: "invoices",
+  },
+  {
+    code: "invoices.create",
+    name: "Create Invoices",
+    module: "invoices",
+  },
+  {
+    code: "invoices.update",
+    name: "Update Invoices",
+    module: "invoices",
+  },
+  {
+    code: "invoices.delete",
+    name: "Delete Invoices",
+    module: "invoices",
+  },
+  {
     code: "reports.view",
     name: "View Reports",
     module: "reports",
@@ -260,6 +280,26 @@ export const PERMISSIONS = [
     code: "calls.delete",
     name: "Delete Calls",
     module: "calls",
+  },
+  {
+    code: "growth.view",
+    name: "View Growth & Marketing",
+    module: "growth",
+  },
+  {
+    code: "growth.create",
+    name: "Create Growth & Marketing",
+    module: "growth",
+  },
+  {
+    code: "growth.update",
+    name: "Update Growth & Marketing",
+    module: "growth",
+  },
+  {
+    code: "growth.delete",
+    name: "Delete Growth & Marketing",
+    module: "growth",
   },
 ] as const;
 
