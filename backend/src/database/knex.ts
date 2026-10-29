@@ -13,9 +13,14 @@ const connection: string | Knex.PgConnectionConfig = env.DATABASE_URL
 
 const config: Knex.Config = {
   client: "pg",
-  connection,
+  connection: {
+    ...(typeof connection === "string"
+      ? { connectionString: connection }
+      : connection),
+    ssl: { rejectUnauthorized: false },
+  },
   pool: {
-    min: 2,
+    min: 0,
     max: 10,
     acquireTimeoutMillis: 30_000,
     idleTimeoutMillis: 30_000,

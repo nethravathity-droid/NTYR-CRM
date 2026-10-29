@@ -1,47 +1,50 @@
+
 import "dotenv/config";
 import knex from "knex";
 
 const connection = process.env.DATABASE_URL
-  ? process.env.DATABASE_URL
+  ? {
+      connectionString: process.env.DATABASE_URL,
+      ssl: { rejectUnauthorized: false },
+    }
   : {
       host: process.env.DB_HOST ?? "localhost",
       port: Number(process.env.DB_PORT ?? 5432),
       database: process.env.DB_NAME ?? "postgres",
       user: process.env.DB_USER ?? "postgres",
       password: process.env.DB_PASSWORD,
+      ssl: { rejectUnauthorized: false },
     };
 
-const db = knex({ client: "pg", connection });
-
-const messages: Record<string, string> = {
-  "28P01":
-    "Password rejected by PostgreSQL. The DB_PASSWORD in backend/.env does not match the postgres user password.",
-  "3D000":
-    `Database "${process.env.DB_NAME}" does not exist. Create it in pgAdmin or run: CREATE DATABASE ${process.env.DB_NAME};`,
-  ECONNREFUSED:
-    "PostgreSQL is not running. Start the PostgreSQL service in Windows Services.",
-};
+const db = knex({
+  client: "pg",
+  connection,
+  pool: { min: 0, max: 1 },
+});
 
 async function testConnection(): Promise<void> {
   console.log("Testing database connection...");
-  console.log(`  Host: ${process.env.DB_HOST ?? "localhost"}`);
+  console.log(`  Host: ${process.env.DB_HOST ?? "(from DATABASE_URL)"}`);
   console.log(`  Port: ${process.env.DB_PORT ?? 5432}`);
   console.log(`  Database: ${process.env.DB_NAME}`);
-  console.log(`  User: ${process.env.DB_USER ?? "postgres"}`);
+  console.log(`  User: ${process.env.DB_USER ?? "(from DATABASE_URL)"}`);
   console.log("");
 
   try {
-    await db.raw("SELECT 1");
+    const result = await db.raw(
+      "SELECT current_database() AS database, current_user AS username",
+    );
     console.log("Connection successful.");
+    console.log("Connected database:", result.rows[0].database);
+    console.log("Connected user:", result.rows[0].username);
   } catch (error) {
-    const code = (error as { code?: string }).code ?? "UNKNOWN";
+    const err = error as {
+      code?: string;
+      message?: string;
+    };
     console.error("Connection failed.");
-    console.error(`  Code: ${code}`);
-    console.error(`  ${messages[code] ?? (error as Error).message}`);
-    console.error("");
-    console.error("Fix in pgAdmin (Query Tool on postgres database):");
-    console.error("  ALTER USER postgres WITH PASSWORD 'your-chosen-password';");
-    console.error("Then set the same value in backend/.env as DB_PASSWORD.");
+    console.error("Code:", err.code ?? "UNKNOWN");
+    console.error("Error:", err.message ?? "Unknown error");
     process.exitCode = 1;
   } finally {
     await db.destroy();
